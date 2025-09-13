@@ -1,0 +1,314 @@
+---
+title: "Get State Details"
+api: "GET https://api.countrystatecity.in/v1/countries/{country_iso2}/states/{state_iso2}"
+description: "Retrieve detailed information for a specific state using country and state ISO2 codes"
+---
+
+Retrieve detailed information for a specific state or province using the country's ISO2 code and the state's ISO2 code.
+
+## Path Parameters
+
+<ParamField path="country_iso2" type="string" required>
+  ISO2 code of the country (e.g., "IN", "US")
+</ParamField>
+
+<ParamField path="state_iso2" type="string" required>
+  ISO2 code of the state/province (e.g., "MH" for Maharashtra, "CA" for California)
+</ParamField>
+
+## Authentication
+
+<ParamField header="X-CSCAPI-KEY" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="integer">
+  Unique identifier for the state/province
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Official name of the state/province
+</ResponseField>
+
+<ResponseField name="country_id" type="integer">
+  Unique identifier of the parent country
+</ResponseField>
+
+<ResponseField name="country_code" type="string">
+  ISO2 code of the parent country
+</ResponseField>
+
+<ResponseField name="iso2" type="string">
+  ISO2 code for the state/province
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  Administrative division type (e.g., "state", "province", "region")
+</ResponseField>
+
+<ResponseField name="latitude" type="string">
+  Approximate latitude coordinate of the state/province center
+</ResponseField>
+
+<ResponseField name="longitude" type="string">
+  Approximate longitude coordinate of the state/province center
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X GET 'https://api.countrystatecity.in/v1/countries/IN/states/MH' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```python Python
+import requests
+
+def get_state_details(country_code, state_code):
+    response = requests.get(
+      f'https://api.countrystatecity.in/v1/countries/{country_code}/states/{state_code}',
+      headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+    )
+    
+    if response.ok:
+        state = response.json()
+        print(f"{state['name']} is located at {state['latitude']}, {state['longitude']}")
+        return state
+    else:
+        print('State not found')
+        return None
+
+state = get_state_details('IN', 'MH')
+```
+
+```javascript JavaScript
+const getStateDetails = async (countryCode, stateCode) => {
+  const response = await fetch(
+    `https://api.countrystatecity.in/v1/countries/${countryCode}/states/${stateCode}`, 
+    {
+      headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' }
+    }
+  );
+
+  if (response.ok) {
+    const state = await response.json();
+    console.log(`${state.name} is located at ${state.latitude}, ${state.longitude}`);
+    return state;
+  } else {
+    console.error('State not found');
+  }
+};
+
+getStateDetails('IN', 'MH');
+```
+
+```php PHP
+<?php
+function getStateDetails($countryCode, $stateCode) {
+    $curl = curl_init();
+    
+    curl_setopt_array($curl, array(
+      CURLOPT_URL => "https://api.countrystatecity.in/v1/countries/{$countryCode}/states/{$stateCode}",
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_HTTPHEADER => array(
+        'X-CSCAPI-KEY: YOUR_API_KEY'
+      ),
+    ));
+    
+    $response = curl_exec($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+    
+    if ($httpCode == 200) {
+        $state = json_decode($response, true);
+        echo $state['name'] . " is located at " . $state['latitude'] . ", " . $state['longitude'] . "\n";
+        return $state;
+    } else {
+        echo "State not found\n";
+        return null;
+    }
+}
+
+$state = getStateDetails('IN', 'MH');
+?>
+```
+
+```go Go
+package main
+
+import (
+    "encoding/json"
+    "fmt"
+    "io/ioutil"
+    "net/http"
+)
+
+func getStateDetails(countryCode, stateCode string) {
+    url := fmt.Sprintf("https://api.countrystatecity.in/v1/countries/%s/states/%s", countryCode, stateCode)
+    
+    client := &http.Client{}
+    req, _ := http.NewRequest("GET", url, nil)
+    req.Header.Add("X-CSCAPI-KEY", "YOUR_API_KEY")
+    
+    res, _ := client.Do(req)
+    defer res.Body.Close()
+    
+    if res.StatusCode == 200 {
+        body, _ := ioutil.ReadAll(res.Body)
+        
+        var state map[string]interface{}
+        json.Unmarshal(body, &state)
+        
+        fmt.Printf("%s is located at %s, %s\n", 
+            state["name"], state["latitude"], state["longitude"])
+    } else {
+        fmt.Println("State not found")
+    }
+}
+
+func main() {
+    getStateDetails("IN", "MH")
+}
+```
+
+```java Java
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
+import java.util.Map;
+
+public class StateDetails {
+    public static void main(String[] args) throws Exception {
+        String countryCode = "IN";
+        String stateCode = "MH";
+        
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("https://api.countrystatecity.in/v1/countries/" + countryCode + 
+                           "/states/" + stateCode))
+            .header("X-CSCAPI-KEY", "YOUR_API_KEY")
+            .build();
+
+        HttpResponse<String> response = client.send(request,
+            HttpResponse.BodyHandlers.ofString());
+            
+        if (response.statusCode() == 200) {
+            Gson gson = new Gson();
+            Type mapType = new TypeToken<Map<String, Object>>(){}.getType();
+            Map<String, Object> state = gson.fromJson(response.body(), mapType);
+            
+            System.out.println(state.get("name") + " is located at " + 
+                             state.get("latitude") + ", " + state.get("longitude"));
+        } else {
+            System.out.println("State not found");
+        }
+    }
+}
+```
+
+```ruby Ruby
+require 'net/http'
+require 'json'
+
+def get_state_details(country_code, state_code)
+  uri = URI("https://api.countrystatecity.in/v1/countries/#{country_code}/states/#{state_code}")
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = true
+
+  request = Net::HTTP::Get.new(uri)
+  request['X-CSCAPI-KEY'] = 'YOUR_API_KEY'
+
+  response = http.request(request)
+  
+  if response.code == '200'
+    state = JSON.parse(response.body)
+    puts "#{state['name']} is located at #{state['latitude']}, #{state['longitude']}"
+    state
+  else
+    puts 'State not found'
+    nil
+  end
+end
+
+state = get_state_details('IN', 'MH')
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 - Success
+{
+  "id": 4008,
+  "name": "Maharashtra",
+  "country_id": 101,
+  "country_code": "IN",
+  "iso2": "MH",
+  "type": "state",
+  "latitude": "19.75147980",
+  "longitude": "75.71388840"
+}
+```
+
+```json 404 - Not Found
+{
+  "error": "No State/Region found."
+}
+```
+
+```json 401 - Unauthorized
+{
+  "error": "Unauthorized. You shouldn't be here."
+}
+```
+</ResponseExample>
+
+## Common Use Cases
+
+<AccordionGroup>
+<Accordion title="Location-Based Services">
+  Use coordinates for distance calculations and mapping.
+  
+  ```javascript
+  const calculateDistance = (lat1, lng1, lat2, lng2) => {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng/2) * Math.sin(dLng/2);
+    
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  };
+  
+  const getDistanceFromState = async (countryCode, stateCode, targetLat, targetLng) => {
+    const state = await getStateDetails(countryCode, stateCode);
+    return calculateDistance(
+      parseFloat(state.latitude), 
+      parseFloat(state.longitude),
+      targetLat, 
+      targetLng
+    );
+  };
+  ```
+</Accordion>
+
+<Accordion title="Administrative Type Validation">
+  Validate administrative division types for data processing.
+  
+  ```javascript
+  const isStateType = async (countryCode, stateCode, expectedType) => {
+    const state = await getStateDetails(countryCode, stateCode);
+    return state && state.type === expectedType;
+  };
+  ```
+</Accordion>
+</AccordionGroup>
+
+<Tip>
+Use this endpoint when you need precise geographical coordinates or want to validate specific state/country combinations.
+</Tip>

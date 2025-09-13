@@ -1,93 +1,142 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Country State City Documentation",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#2563EB",
+    "light": "#3B82F6",
+    "dark": "#1E40AF"
   },
   "favicon": "/favicon.svg",
   "navigation": {
+    "groups": [
+      {
+        "group": "Getting Started",
+        "pages": [
+          "introduction",
+          "quickstart"
+        ]
+      }
+    ],
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "API",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "API Documentation",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              "api/introduction",
+              "api/authentication",
+              "api/rate-limits"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Countries Endpoints",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
+              "api/endpoints/get-all-countries",
+              "api/endpoints/get-country-details"
             ]
           },
           {
-            "group": "Writing content",
+            "group": "States Endpoints", 
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
+              "api/endpoints/get-all-states",
+              "api/endpoints/get-states-by-country",
+              "api/endpoints/get-state-details"
             ]
           },
           {
-            "group": "AI tools",
+            "group": "Cities Endpoints",
             "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "api/endpoints/get-cities-by-country", 
+              "api/endpoints/get-cities-by-state"
+            ]
+          },
+          {
+            "group": "SDKs & Examples",
+            "pages": [
+              "api/sdks",
+              "api/examples"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "Tools",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Tools Overview",
             "pages": [
-              "api-reference/introduction"
+              "tools/overview"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Update Tool",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "tools/update-tool/introduction",
+              "tools/update-tool/installation",
+              "tools/update-tool/configuration",
+              "tools/update-tool/monitoring"
+            ]
+          },
+          {
+            "group": "Export Tool",
+            "pages": [
+              "tools/export-tool/introduction",
+              "tools/export-tool/formats",
+              "tools/export-tool/usage"
+            ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              "tools/integrations"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Database",
+        "groups": [
+          {
+            "group": "Database Documentation",
+            "pages": [
+              "database/overview",
+              "database/schema",
+              "database/installation"
+            ]
+          },
+          {
+            "group": "Data Management",
+            "pages": [
+              "database/data-sources",
+              "database/updates",
+              "database/contributing"
             ]
           }
         ]
       }
-    ],
-    "global": {
+    ]
+  },
+  "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "anchor": "API Portal",
+          "href": "https://countrystatecity.in",
+          "icon": "globe"
         },
         {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
+          "anchor": "GitHub",
+          "href": "https://github.com/dr5hn/countries-states-cities-database",
+          "icon": "github"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Support",
+          "href": "mailto:api@countrystatecity.in",
+          "icon": "envelope"
         }
       ]
-    }
-  },
+    },
   "logo": {
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg"
@@ -95,14 +144,14 @@
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "API Portal",
+        "href": "https://countrystatecity.in"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Get API Key",
+      "href": "https://countrystatecity.in"
     }
   },
   "contextual": {
@@ -119,9 +168,18 @@
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "github": "https://github.com/dr5hn/countries-states-cities-database"
     }
+  },
+  "seo": {
+    "indexHiddenPages": true
+  },
+  "analytics": {
+    "gtag": {
+      "measurementId": "G-XXXXXXXXXX"
+    }
+  },
+  "search": {
+    "prompt": "Search the Country State City ecosystem documentation..."
   }
 }

@@ -1,0 +1,253 @@
+---
+title: "Authentication"
+description: "Learn how to authenticate your requests to the Country State City API using API keys"
+icon: "key"
+---
+
+## API Key Authentication
+
+The Country State City API uses API key authentication for all endpoints. Your API key must be included in every request using the `X-CSCAPI-KEY` header.
+
+<Steps>
+<Step title="Get Your API Key">
+  Register at [our portal](https://countrystatecity.in) to obtain your API key.
+  
+  <Info>
+  API keys are generated instantly and are ready to use immediately.
+  </Info>
+</Step>
+
+<Step title="Add to Request Headers">
+  Include your API key in the `X-CSCAPI-KEY` header for every request:
+  
+  <CodeGroup>
+  ```bash cURL
+  curl -X GET 'https://api.countrystatecity.in/v1/countries' \
+    -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+  ```
+  
+  ```javascript JavaScript
+  const response = await fetch('https://api.countrystatecity.in/v1/countries', {
+    headers: {
+      'X-CSCAPI-KEY': 'YOUR_API_KEY'
+    }
+  });
+  ```
+  
+  ```python Python
+  import requests
+  
+  headers = {
+    'X-CSCAPI-KEY': 'YOUR_API_KEY'
+  }
+  
+  response = requests.get(
+    'https://api.countrystatecity.in/v1/countries',
+    headers=headers
+  )
+  ```
+  </CodeGroup>
+</Step>
+
+<Step title="Handle Responses">
+  Check for authentication errors and implement proper error handling:
+  
+  ```javascript
+  if (response.status === 401) {
+    console.error('Invalid API key');
+  } else if (response.ok) {
+    const data = await response.json();
+    console.log('Success:', data);
+  }
+  ```
+</Step>
+</Steps>
+
+## Security Best Practices
+
+<Warning>
+**Keep your API key secure!** Never expose it in client-side code, public repositories, or logs.
+</Warning>
+
+### ✅ Do This
+- Store API keys in environment variables
+- Use server-side configurations
+- Rotate keys regularly
+- Monitor API key usage
+- Implement proper error handling
+
+### ❌ Don't Do This
+- Hard-code API keys in source code
+- Commit API keys to version control
+- Share API keys in plain text
+- Use the same key across all environments
+- Ignore authentication errors
+
+## Environment Variables
+
+Store your API key securely using environment variables:
+
+<Tabs>
+<Tab title="Node.js">
+```javascript .env
+CSC_API_KEY=your_api_key_here
+```
+
+```javascript app.js
+const apiKey = process.env.CSC_API_KEY;
+
+const response = await fetch('https://api.countrystatecity.in/v1/countries', {
+  headers: { 'X-CSCAPI-KEY': apiKey }
+});
+```
+</Tab>
+
+<Tab title="Python">
+```bash .env
+CSC_API_KEY=your_api_key_here
+```
+
+```python app.py
+import os
+import requests
+
+api_key = os.getenv('CSC_API_KEY')
+
+response = requests.get(
+  'https://api.countrystatecity.in/v1/countries',
+  headers={'X-CSCAPI-KEY': api_key}
+)
+```
+</Tab>
+
+<Tab title="PHP">
+```php .env
+CSC_API_KEY=your_api_key_here
+```
+
+```php app.php
+<?php
+$apiKey = $_ENV['CSC_API_KEY'];
+
+$headers = [
+  'X-CSCAPI-KEY: ' . $apiKey
+];
+
+$response = curl_exec($curl);
+?>
+```
+</Tab>
+</Tabs>
+
+## Authentication Errors
+
+When authentication fails, the API returns a `401 Unauthorized` status with an error message:
+
+<RequestExample>
+```bash Invalid API Key
+curl -X GET 'https://api.countrystatecity.in/v1/countries' \
+  -H 'X-CSCAPI-KEY: invalid_key'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Error Response
+{
+  "error": "Unauthorized. You shouldn't be here."
+}
+```
+</ResponseExample>
+
+## Common Authentication Issues
+
+<AccordionGroup>
+<Accordion title="401 Unauthorized Error">
+  **Cause**: Invalid, missing, or expired API key
+  
+  **Solution**: 
+  - Verify your API key is correct
+  - Check the header name is exactly `X-CSCAPI-KEY`
+  - Ensure the key hasn't been revoked
+  - Register for a new key if needed
+</Accordion>
+
+<Accordion title="Headers Not Being Sent">
+  **Cause**: HTTP client configuration issues
+  
+  **Solution**:
+  - Verify headers are properly set
+  - Check for typos in header name
+  - Ensure headers aren't being stripped by proxies
+  - Test with a simple cURL command first
+</Accordion>
+
+<Accordion title="CORS Issues in Browser">
+  **Cause**: Browser blocking cross-origin requests
+  
+  **Solution**:
+  - Make API calls from your server instead
+  - Use a proxy server for development
+  - Never use API keys in browser applications
+</Accordion>
+</AccordionGroup>
+
+## Testing Your Authentication
+
+Use this simple test to verify your API key is working:
+
+<CodeGroup>
+```bash cURL Test
+curl -X GET 'https://api.countrystatecity.in/v1/countries' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY' \
+  -w "HTTP Status: %{http_code}\n"
+```
+
+```javascript JavaScript Test
+const testAuth = async () => {
+  try {
+    const response = await fetch('https://api.countrystatecity.in/v1/countries', {
+      headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' }
+    });
+    
+    if (response.ok) {
+      console.log('✅ Authentication successful');
+      const data = await response.json();
+      console.log(`Found ${data.length} countries`);
+    } else {
+      console.log('❌ Authentication failed:', response.status);
+    }
+  } catch (error) {
+    console.error('Request failed:', error);
+  }
+};
+
+testAuth();
+```
+
+```python Python Test
+import requests
+
+def test_auth():
+    try:
+        response = requests.get(
+            'https://api.countrystatecity.in/v1/countries',
+            headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+        )
+        
+        if response.ok:
+            print('✅ Authentication successful')
+            data = response.json()
+            print(f'Found {len(data)} countries')
+        else:
+            print(f'❌ Authentication failed: {response.status_code}')
+            print(response.json())
+    except Exception as error:
+        print(f'Request failed: {error}')
+
+test_auth()
+```
+</CodeGroup>
+
+<Tip>
+A successful authentication test should return HTTP 200 with a list of countries. If you get different results, check your API key and request format.
+</Tip>

@@ -1,0 +1,317 @@
+---
+title: "Rate Limits"
+description: "Understand API rate limits, monitoring, and best practices for optimal performance"
+icon: "gauge"
+---
+
+## Rate Limit Overview
+
+The Country State City API implements rate limiting to ensure fair usage and optimal performance for all users. Rate limits are enforced per API key and reset hourly.
+
+## Current Rate Limits
+
+| Plan | Monthly Requests | Daily Requests | Rate Limit |
+|:-----|:-----------------|:---------------|:-----------|
+| **Community (Free)** | 3,000 | 100 | 2 req/second |
+| **Supporter** | 30,000 | 1,000 | 10 req/second |
+| **Professional** | 150,000 | 5,000 | 25 req/second |
+
+<Card 
+  title="View Full Pricing Details" 
+  icon="credit-card" 
+  href="https://countrystatecity.in/pricing"
+>
+  Compare plans, features, and pricing options
+</Card>
+
+## Rate Limit Headers
+
+Every API response includes rate limit information in the headers:
+
+```
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 999
+X-RateLimit-Reset: 1640995200
+X-RateLimit-Window: 3600
+```
+
+| Header | Description |
+|--------|-------------|
+| `X-RateLimit-Limit` | Total requests allowed in current window |
+| `X-RateLimit-Remaining` | Requests remaining in current window |
+| `X-RateLimit-Reset` | Unix timestamp when the limit resets |
+| `X-RateLimit-Window` | Rate limit window in seconds (3600 = 1 hour) |
+
+## Monitoring Your Usage
+
+<Tabs>
+<Tab title="JavaScript">
+```javascript
+const checkRateLimit = async () => {
+  const response = await fetch('https://api.countrystatecity.in/v1/countries', {
+    headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' }
+  });
+  
+  const remaining = response.headers.get('X-RateLimit-Remaining');
+  const limit = response.headers.get('X-RateLimit-Limit');
+  const reset = response.headers.get('X-RateLimit-Reset');
+  
+  console.log(`Rate Limit: ${remaining}/${limit}`);
+  console.log(`Resets at: ${new Date(reset * 1000)}`);
+  
+  // Warn when approaching limit
+  if (remaining < limit * 0.1) {
+    console.warn('⚠️ Approaching rate limit!');
+  }
+};
+```
+</Tab>
+
+<Tab title="Python">
+```python
+import requests
+from datetime import datetime
+
+def check_rate_limit():
+    response = requests.get(
+        'https://api.countrystatecity.in/v1/countries',
+        headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+    )
+    
+    remaining = int(response.headers.get('X-RateLimit-Remaining', 0))
+    limit = int(response.headers.get('X-RateLimit-Limit', 0))
+    reset = int(response.headers.get('X-RateLimit-Reset', 0))
+    
+    print(f'Rate Limit: {remaining}/{limit}')
+    print(f'Resets at: {datetime.fromtimestamp(reset)}')
+    
+    # Warn when approaching limit
+    if remaining < limit * 0.1:
+        print('⚠️ Approaching rate limit!')
+        
+    return remaining, limit, reset
+```
+</Tab>
+
+<Tab title="PHP">
+```php
+<?php
+function checkRateLimit($apiKey) {
+    $curl = curl_init();
+    
+    curl_setopt_array($curl, [
+        CURLOPT_URL => 'https://api.countrystatecity.in/v1/countries',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HEADER => true,
+        CURLOPT_HTTPHEADER => [
+            'X-CSCAPI-KEY: ' . $apiKey
+        ],
+    ]);
+    
+    $response = curl_exec($curl);
+    $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+    $headers = substr($response, 0, $headerSize);
+    
+    preg_match('/X-RateLimit-Remaining: (\d+)/', $headers, $remaining);
+    preg_match('/X-RateLimit-Limit: (\d+)/', $headers, $limit);
+    
+    $remainingCount = $remaining[1] ?? 0;
+    $limitCount = $limit[1] ?? 0;
+    
+    echo "Rate Limit: {$remainingCount}/{$limitCount}\n";
+    
+    if ($remainingCount < $limitCount * 0.1) {
+        echo "⚠️ Approaching rate limit!\n";
+    }
+    
+    curl_close($curl);
+}
+?>
+```
+</Tab>
+</Tabs>
+
+## Rate Limit Exceeded (HTTP 429)
+
+When you exceed your rate limit, the API returns a `429 Too Many Requests` status:
+
+<RequestExample>
+```bash Rate Limit Exceeded
+curl -X GET 'https://api.countrystatecity.in/v1/countries' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY' \
+  -w "HTTP Status: %{http_code}\n"
+```
+</RequestExample>
+
+<ResponseExample>
+```json 429 Response
+{
+  "error": "Rate limit exceeded",
+  "message": "Too many requests. Please try again later.",
+  "retry_after": 3600
+}
+```
+</ResponseExample>
+
+## Best Practices
+
+### Implement Exponential Backoff
+
+<CodeGroup>
+```javascript JavaScript
+const makeRequestWithBackoff = async (url, options, maxRetries = 3) => {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, options);
+      
+      if (response.status === 429) {
+        const retryAfter = response.headers.get('Retry-After') || Math.pow(2, attempt);
+        console.log(`Rate limited. Waiting ${retryAfter}s before retry...`);
+        await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+        continue;
+      }
+      
+      return response;
+    } catch (error) {
+      if (attempt === maxRetries - 1) throw error;
+      
+      const delay = Math.pow(2, attempt) * 1000;
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+};
+```
+
+```python Python
+import time
+import requests
+from functools import wraps
+
+def with_backoff(max_retries=3):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for attempt in range(max_retries):
+                try:
+                    response = func(*args, **kwargs)
+                    
+                    if response.status_code == 429:
+                        retry_after = int(response.headers.get('Retry-After', 2 ** attempt))
+                        print(f'Rate limited. Waiting {retry_after}s...')
+                        time.sleep(retry_after)
+                        continue
+                        
+                    return response
+                except Exception as e:
+                    if attempt == max_retries - 1:
+                        raise e
+                    time.sleep(2 ** attempt)
+            
+        return wrapper
+    return decorator
+
+@with_backoff()
+def make_request(url, headers):
+    return requests.get(url, headers=headers)
+```
+</CodeGroup>
+
+### Cache Responses Effectively
+
+<Tip>
+Implement intelligent caching to reduce API calls:
+- Cache country/state data for 24+ hours (rarely changes)
+- Cache city data for 12+ hours  
+- Use ETags and conditional requests when available
+- Implement local fallbacks for critical data
+</Tip>
+
+```javascript
+class CSCCache {
+  constructor(ttl = 24 * 60 * 60 * 1000) { // 24 hours
+    this.cache = new Map();
+    this.ttl = ttl;
+  }
+  
+  set(key, data) {
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now()
+    });
+  }
+  
+  get(key) {
+    const item = this.cache.get(key);
+    if (!item) return null;
+    
+    if (Date.now() - item.timestamp > this.ttl) {
+      this.cache.delete(key);
+      return null;
+    }
+    
+    return item.data;
+  }
+  
+  async fetchCountries(apiKey) {
+    const cached = this.get('countries');
+    if (cached) return cached;
+    
+    const response = await fetch('https://api.countrystatecity.in/v1/countries', {
+      headers: { 'X-CSCAPI-KEY': apiKey }
+    });
+    
+    const countries = await response.json();
+    this.set('countries', countries);
+    return countries;
+  }
+}
+```
+
+### Batch Requests Efficiently
+
+<Warning>
+Plan your requests to maximize efficiency:
+- Fetch broader datasets when possible (all countries vs individual requests)
+- Use hierarchical endpoints strategically
+- Implement request queuing for high-volume applications
+</Warning>
+
+### Monitor and Alert
+
+Set up monitoring to track your API usage:
+
+```javascript
+const usage = {
+  daily: 0,
+  hourly: 0,
+  
+  track(response) {
+    this.daily++;
+    this.hourly++;
+    
+    const remaining = response.headers.get('X-RateLimit-Remaining');
+    
+    if (remaining < 100) {
+      console.warn(`Low rate limit: ${remaining} requests remaining`);
+      // Send alert to monitoring system
+    }
+  },
+  
+  reset() {
+    this.hourly = 0;
+  }
+};
+```
+
+## Upgrading Your Plan
+
+Need higher rate limits? Contact Us:
+
+<Card
+  title="Contact Sales"
+  icon="phone"
+  href="mailto:contact@countrystatecity.in"
+  horizontal
+>
+  Discuss custom rate limits and enterprise features for your specific needs.
+</Card>

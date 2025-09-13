@@ -1,0 +1,305 @@
+---
+title: "Get Cities by Country"
+api: "GET https://api.countrystatecity.in/v1/countries/{iso2}/cities"
+description: "Retrieve all cities within a specific country"
+---
+
+Retrieve all cities within a specific country using the country's ISO2 code. This endpoint is useful for building location selectors and geographical applications.
+
+## Path Parameters
+
+<ParamField path="iso2" type="string" required>
+  ISO2 code of the country (e.g., "IN" for India, "US" for United States)
+</ParamField>
+
+## Authentication
+
+<ParamField header="X-CSCAPI-KEY" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="integer">
+  Unique identifier for the city
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Official name of the city
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X GET 'https://api.countrystatecity.in/v1/countries/IN/cities' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```python Python
+import requests
+
+def get_cities_by_country(country_code):
+    response = requests.get(
+      f'https://api.countrystatecity.in/v1/countries/{country_code}/cities',
+      headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+    )
+    
+    if response.ok:
+        cities = response.json()
+        print(f'Found {len(cities)} cities in {country_code}')
+        return cities
+    else:
+        print('Country not found or no cities available')
+        return []
+
+cities = get_cities_by_country('IN')
+```
+
+```javascript JavaScript
+const getCitiesByCountry = async (countryCode) => {
+  const response = await fetch(`https://api.countrystatecity.in/v1/countries/${countryCode}/cities`, {
+    headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' }
+  });
+
+  if (response.ok) {
+    const cities = await response.json();
+    console.log(`Found ${cities.length} cities in ${countryCode}`);
+    return cities;
+  } else {
+    console.error('Country not found or no cities available');
+    return [];
+  }
+};
+
+getCitiesByCountry('IN');
+```
+
+```php PHP
+<?php
+function getCitiesByCountry($countryCode) {
+    $curl = curl_init();
+    
+    curl_setopt_array($curl, array(
+      CURLOPT_URL => "https://api.countrystatecity.in/v1/countries/{$countryCode}/cities",
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_HTTPHEADER => array(
+        'X-CSCAPI-KEY: YOUR_API_KEY'
+      ),
+    ));
+    
+    $response = curl_exec($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+    
+    if ($httpCode == 200) {
+        $cities = json_decode($response, true);
+        echo "Found " . count($cities) . " cities in {$countryCode}\n";
+        return $cities;
+    } else {
+        echo "Country not found or no cities available\n";
+        return [];
+    }
+}
+
+$cities = getCitiesByCountry('IN');
+?>
+```
+
+```go Go
+package main
+
+import (
+    "encoding/json"
+    "fmt"
+    "io/ioutil"
+    "net/http"
+)
+
+func getCitiesByCountry(countryCode string) []map[string]interface{} {
+    url := fmt.Sprintf("https://api.countrystatecity.in/v1/countries/%s/cities", countryCode)
+    
+    client := &http.Client{}
+    req, _ := http.NewRequest("GET", url, nil)
+    req.Header.Add("X-CSCAPI-KEY", "YOUR_API_KEY")
+    
+    res, _ := client.Do(req)
+    defer res.Body.Close()
+    
+    if res.StatusCode == 200 {
+        body, _ := ioutil.ReadAll(res.Body)
+        var cities []map[string]interface{}
+        json.Unmarshal(body, &cities)
+        
+        fmt.Printf("Found %d cities in %s\n", len(cities), countryCode)
+        return cities
+    } else {
+        fmt.Printf("Country not found or no cities available\n")
+        return nil
+    }
+}
+
+func main() {
+    cities := getCitiesByCountry("IN")
+    fmt.Println(cities)
+}
+```
+
+```java Java
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Map;
+
+public class CitiesByCountry {
+    public static void main(String[] args) throws Exception {
+        String countryCode = "IN";
+        
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("https://api.countrystatecity.in/v1/countries/" + countryCode + "/cities"))
+            .header("X-CSCAPI-KEY", "YOUR_API_KEY")
+            .build();
+
+        HttpResponse<String> response = client.send(request,
+            HttpResponse.BodyHandlers.ofString());
+            
+        if (response.statusCode() == 200) {
+            Gson gson = new Gson();
+            Type listType = new TypeToken<List<Map<String, Object>>>(){}.getType();
+            List<Map<String, Object>> cities = gson.fromJson(response.body(), listType);
+            
+            System.out.println("Found " + cities.size() + " cities in " + countryCode);
+        } else {
+            System.out.println("Country not found or no cities available");
+        }
+    }
+}
+```
+
+```ruby Ruby
+require 'net/http'
+require 'json'
+
+def get_cities_by_country(country_code)
+  uri = URI("https://api.countrystatecity.in/v1/countries/#{country_code}/cities")
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = true
+
+  request = Net::HTTP::Get.new(uri)
+  request['X-CSCAPI-KEY'] = 'YOUR_API_KEY'
+
+  response = http.request(request)
+  
+  if response.code == '200'
+    cities = JSON.parse(response.body)
+    puts "Found #{cities.length} cities in #{country_code}"
+    cities
+  else
+    puts 'Country not found or no cities available'
+    []
+  end
+end
+
+cities = get_cities_by_country('IN')
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 - Success
+[
+  {
+    "id": 133024,
+    "name": "Mumbai"
+  },
+  {
+    "id": 131718,
+    "name": "Delhi"
+  },
+  {
+    "id": 131645,
+    "name": "Bangalore"
+  }
+]
+```
+
+```json 404 - Not Found
+{
+  "error": "No Cities found."
+}
+```
+
+```json 401 - Unauthorized
+{
+  "error": "Unauthorized. You shouldn't be here."
+}
+```
+</ResponseExample>
+
+## Common Use Cases
+
+<AccordionGroup>
+<Accordion title="City Autocomplete">
+  Implement type-ahead city search for a specific country.
+  
+  ```javascript
+  class CountryCityAutocomplete {
+    constructor(countryCode) {
+      this.countryCode = countryCode;
+      this.cities = [];
+      this.loadCities();
+    }
+    
+    async loadCities() {
+      this.cities = await getCitiesByCountry(this.countryCode);
+    }
+    
+    search(query) {
+      const lowerQuery = query.toLowerCase();
+      return this.cities.filter(city => 
+        city.name.toLowerCase().includes(lowerQuery)
+      ).slice(0, 10);
+    }
+    
+    setupAutocomplete(inputElement) {
+      inputElement.addEventListener('input', (e) => {
+        const results = this.search(e.target.value);
+        // Display results in dropdown
+        this.displaySuggestions(results);
+      });
+    }
+  }
+  ```
+</Accordion>
+
+<Accordion title="Delivery Zone Setup">
+  Group cities for shipping or service area calculations.
+  
+  ```javascript
+  const setupDeliveryZones = async (countryCode) => {
+    const cities = await getCitiesByCountry(countryCode);
+    
+    // Group cities alphabetically for easier management
+    const zones = cities.reduce((acc, city) => {
+      const firstLetter = city.name.charAt(0).toUpperCase();
+      acc[firstLetter] = acc[firstLetter] || [];
+      acc[firstLetter].push(city);
+      return acc;
+    }, {});
+    
+    return zones;
+  };
+  ```
+</Accordion>
+</AccordionGroup>
+
+<Warning>
+**Large Datasets**: Countries like the United States, India, and China have thousands of cities. Consider implementing pagination or using the state-filtered endpoint for better performance.
+</Warning>
+
+<Tip>
+For better user experience, consider loading cities by state instead of by country for countries with many administrative divisions.
+</Tip>

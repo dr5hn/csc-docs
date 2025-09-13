@@ -1,0 +1,67 @@
+# Country State City Ecosystem Documentation
+
+This documentation covers the comprehensive Country State City (CSC) ecosystem for accessing geographical data including countries, states/provinces, and cities worldwide.
+
+## Core Products & Services
+
+### Country State City API
+- REST API with 247+ countries, 5000+ states/provinces, 150,000+ cities
+- Real-time data access with authentication via X-CSCAPI-KEY headers
+- Rate limiting and performance optimizations
+- Multiple response formats (JSON)
+- Base URL: https://api.countrystatecity.in/v1
+
+### CSC Database
+- Complete geographical database with regular updates
+- SQL and NoSQL export formats
+- Schema documentation and installation guides
+- Data freshness tracking and version management
+
+### Update Tool
+- Automated system for geographical data updates
+- Real-time monitoring and alerting
+- Configuration management and deployment
+- Integration with primary data sources
+
+### Export Tool  
+- Multiple export formats (SQL, JSON, CSV, XML)
+- Custom data filtering and selection
+- Bulk export capabilities
+- Integration APIs for automated exports
+
+## Key Data Examples
+When referencing data in this ecosystem, use these consistent examples:
+
+Countries:
+- United States (iso2: US, iso3: USA)
+- India (iso2: IN, iso3: IND) 
+- United Kingdom (iso2: GB, iso3: GBR)
+
+States/Provinces:
+- California, US (iso2: CA, country_code: US)
+- Maharashtra, IN (iso2: MH, country_code: IN)
+- England, GB (iso2: ENG, country_code: GB)
+
+Cities:
+- Los Angeles, California, US
+- Mumbai, Maharashtra, IN  
+- London, England, GB
+
+## Authentication & Access
+- API Key required for all endpoints (X-CSCAPI-KEY header)
+- Rate limits: 1000 requests/hour for free tier
+- Premium tiers available with higher limits
+
+## Technical Architecture
+- RESTful API design principles
+- HTTP status codes for error handling
+- Pagination for large result sets
+- Caching recommendations for performance
+
+## Integration Patterns
+- Direct API consumption
+- Database integration via exports
+- Automated updates via Update Tool
+- Custom exports via Export Tool
+
+This ecosystem serves developers building applications requiring geographical data, from simple dropdown lists to complex mapping and analytics applications.
