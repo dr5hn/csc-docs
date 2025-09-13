@@ -1,97 +1,165 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Country State City Documentation"
+description: "Complete geographical data ecosystem with API, database tools, and export utilities for developers worldwide"
 ---
 
-## Setting up
+# Welcome to Country State City
 
-Get your documentation site up and running in minutes.
+The most comprehensive geographical data platform providing accurate, up-to-date information for **247+ countries**, **5,000+ states/provinces**, and **150,000+ cities** worldwide. Our ecosystem includes a powerful REST API, database tools, and export utilities designed for developers building location-aware applications.
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
+<Note>
+All data includes ISO codes, coordinates, timezones, phone codes, currencies, and administrative hierarchies to support any geographical use case.
+</Note>
+
+## Quick Start
+
+Get up and running with Country State City data in minutes.
+
+<CardGroup cols={2}>
+<Card title="Get API Key" icon="key" href="https://countrystatecity.in">
+  Register for free API access with 1000 requests per day
 </Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
-
-## Create beautiful pages
-
-Everything you need to create world-class documentation.
-
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
+<Card title="API Introduction" icon="code" href="/api/introduction">
+  Learn the basics and make your first API call
 </Card>
+</CardGroup>
+
+## Core Products
+
+### 🌐 REST API
+Production-ready API serving geographical data with sub-100ms response times globally.
+
+<CardGroup cols={2}>
+<Card title="Countries API" icon="globe" href="/api/endpoints/get-all-countries">
+  Access data for 247+ countries with ISO codes, phone codes, and currencies
+</Card>
+<Card title="States API" icon="map" href="/api/endpoints/get-states-by-country">
+  Get states, provinces, and regions for any country
+</Card>
+<Card title="Cities API" icon="building" href="/api/endpoints/get-cities-by-state">
+  Access 150,000+ cities with coordinates and timezone data
+</Card>
+<Card title="Authentication" icon="shield" href="/api/authentication">
+  Secure API access with API keys and rate limiting
+</Card>
+</CardGroup>
+
+### 🗄️ Database Tools
+Self-hosted database solutions with installation guides for popular database systems.
+
+<CardGroup cols={3}>
+<Card title="MySQL" icon="database" href="/database/installation/mysql">
+  Complete MySQL setup and optimization guide
+</Card>
+<Card title="PostgreSQL" icon="server" href="/database/installation/postgresql">
+  PostgreSQL installation with performance tuning
+</Card>
+<Card title="MongoDB" icon="leaf" href="/database/installation/mongodb">
+  NoSQL setup for flexible geographical queries
+</Card>
+<Card title="SQLite" icon="hard-drive" href="/database/installation/sqlite">
+  Lightweight database for mobile and desktop apps
+</Card>
+<Card title="DuckDB" icon="duck" href="/database/installation/duckdb">
+  Analytics-focused in-process SQL database
+</Card>
+<Card title="SQL Server" icon="microsoft" href="/database/installation/sql-server">
+  Enterprise-grade Microsoft SQL Server setup
+</Card>
+</CardGroup>
+
+### 🔧 Management Tools
+Keep your geographical data current with our update and export tools.
+
+<CardGroup cols={2}>
+<Card title="Update Tool" icon="arrows-rotate" href="/tools/update-tool">
+  Submit and track geographical data updates
+</Card>
+<Card title="Export Tool" icon="download" href="/tools/export-tool">
+  Export data in multiple formats (JSON, CSV, SQL, XML)
+</Card>
+</CardGroup>
+
+## Developer Resources
+
+### SDKs & Integration
+
+<CardGroup cols={2}>
+<Card title="Official SDKs" icon="code" href="/api/sdks">
+  JavaScript, Python, PHP, and more language SDKs
+</Card>
+<Card title="Code Examples" icon="brackets-curly" href="/api/examples">
+  Real-world examples and integration patterns
+</Card>
+</CardGroup>
+
+### AI Tools Integration
+
+<CardGroup cols={3}>
+<Card title="Claude Integration" icon="robot" href="/ai-tools/claude-code">
+  Use CSC data with Anthropic's Claude
+</Card>
+<Card title="Cursor IDE" icon="cursor" href="/ai-tools/cursor">
+  Enhanced development with Cursor AI
+</Card>
+<Card title="Windsurf" icon="wind" href="/ai-tools/windsurf">
+  Streamlined workflows with Windsurf AI
+</Card>
+</CardGroup>
+
+## Use Cases
+
+<AccordionGroup>
+<Accordion title="E-commerce & Shipping">
+Build location-aware checkout flows, shipping calculators, and address validation systems with accurate geographical data and timezone support.
+</Accordion>
+
+<Accordion title="Analytics & Business Intelligence">
+Enhance your analytics dashboards with geographical insights, regional performance metrics, and location-based user segmentation.
+</Accordion>
+
+<Accordion title="Mobile & Web Applications">
+Create location pickers, store locators, weather apps, and travel applications with comprehensive city and coordinate data.
+</Accordion>
+
+<Accordion title="Government & Research">
+Support policy analysis, demographic studies, and administrative systems with standardized geographical hierarchies and ISO codes.
+</Accordion>
+</AccordionGroup>
+
+## Getting Started
+
+<Steps>
+<Step title="Choose Your Integration">
+  Decide whether you need API access, self-hosted database, or data exports based on your use case and requirements.
+</Step>
+
+<Step title="Get API Access">
+  [Register for a free API key](https://countrystatecity.in) to start with 1000 requests per day, or explore database installation guides for self-hosted solutions.
+</Step>
+
+<Step title="Explore the Data">
+  Review our [API documentation](/api/introduction) or [database schema](/database/schema) to understand the available data structure and relationships.
+</Step>
+
+<Step title="Start Building">
+  Follow our [code examples](/api/examples) or use one of our [official SDKs](/api/sdks) to integrate geographical data into your application.
+</Step>
+</Steps>
+
+## Support the Project
+
+<CardGroup cols={2}>
+<Card title="Donate" icon="heart" href="/donate">
+  Support continued development and data maintenance
+</Card>
+<Card title="Contribute" icon="code-pull-request" href="/database/contributing">
+  Help improve geographical data accuracy
+</Card>
+</CardGroup>
+
+---
+
+<Info>
+**Need help?** Check our [changelog](/changelog) for the latest updates, or reach out to our team at [api@countrystatecity.in](mailto:api@countrystatecity.in).
+</Info>

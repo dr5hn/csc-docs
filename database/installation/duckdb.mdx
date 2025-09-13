@@ -1,0 +1,945 @@
+---
+title: "DuckDB Installation"
+description: "Complete guide to installing the Countries States Cities database in DuckDB for analytical workloads and data science"
+icon: "database"
+---
+
+DuckDB is an analytical database designed for data science and OLAP workloads. It's optimized for fast analytical queries and integrates seamlessly with Python, R, and other data science tools. This guide covers installing the Countries States Cities database in DuckDB.
+
+<Info>
+DuckDB installation typically takes 1-2 minutes and requires approximately 60MB of disk space.
+</Info>
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+- Python 3.7+ (for the conversion script)
+- DuckDB installed (`pip install duckdb`)
+- At least 200MB free disk space
+- Downloaded the SQLite database files from our [GitHub repository](https://github.com/dr5hn/countries-states-cities-database)
+
+<Note>
+DuckDB format is created by converting SQLite files using our conversion script, as DuckDB can directly read and import from SQLite databases.
+</Note>
+
+## Installation Methods
+
+### Method 1: Direct SQLite Import
+
+DuckDB can directly query SQLite databases without conversion:
+
+<Steps>
+<Step title="Install DuckDB">
+  ```bash
+  pip install duckdb
+  ```
+</Step>
+
+<Step title="Import SQLite Database">
+  ```python
+  import duckdb
+  
+  # Connect to DuckDB (creates file if doesn't exist)
+  conn = duckdb.connect('world.duckdb')
+  
+  # Attach SQLite database
+  conn.execute("ATTACH 'sqlite/world.sqlite3' AS sqlite_db")
+  
+  # Copy tables from SQLite to DuckDB
+  conn.execute("CREATE TABLE countries AS SELECT * FROM sqlite_db.countries")
+  conn.execute("CREATE TABLE states AS SELECT * FROM sqlite_db.states") 
+  conn.execute("CREATE TABLE cities AS SELECT * FROM sqlite_db.cities")
+  
+  # Detach SQLite database
+  conn.execute("DETACH sqlite_db")
+  
+  print("Database imported successfully!")
+  conn.close()
+  ```
+</Step>
+
+<Step title="Verify Installation">
+  ```python
+  import duckdb
+  
+  conn = duckdb.connect('world.duckdb')
+  
+  # Check table counts
+  result = conn.execute("""
+    SELECT 'countries' as table_name, COUNT(*) as count FROM countries
+    UNION ALL
+    SELECT 'states', COUNT(*) FROM states
+    UNION ALL
+    SELECT 'cities', COUNT(*) FROM cities
+  """).fetchall()
+  
+  for row in result:
+      print(f"{row[0]}: {row[1]}")
+  
+  conn.close()
+  ```
+  
+  Expected output:
+  ```
+  countries: 250
+  states: 5038
+  cities: 151024
+  ```
+</Step>
+</Steps>
+
+### Method 2: Using Conversion Script
+
+<Steps>
+<Step title="Download Conversion Script">
+  ```bash
+  wget https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/bin/import_duckdb.py
+  ```
+  
+  Or create your own script:
+  ```python
+  import duckdb
+  import sqlite3
+  import argparse
+  import os
+  
+  def convert_sqlite_to_duckdb(sqlite_path, duckdb_path):
+      """Convert SQLite database to DuckDB format"""
+      
+      # Connect to both databases
+      sqlite_conn = sqlite3.connect(sqlite_path)
+      duckdb_conn = duckdb.connect(duckdb_path)
+      
+      # Get all tables from SQLite
+      sqlite_cursor = sqlite_conn.cursor()
+      tables = sqlite_cursor.execute(
+          "SELECT name FROM sqlite_master WHERE type='table'"
+      ).fetchall()
+      
+      for table_name, in tables:
+          print(f"Converting table: {table_name}")
+          
+          # Get table schema
+          schema = sqlite_cursor.execute(f"PRAGMA table_info({table_name})").fetchall()
+          
+          # Create table in DuckDB
+          columns = []
+          for col_info in schema:
+              col_name = col_info[1]
+              col_type = col_info[2]
+              # Map SQLite types to DuckDB types
+              if col_type.upper() == 'INTEGER':
+                  col_type = 'INTEGER'
+              elif col_type.upper() in ['TEXT', 'VARCHAR']:
+                  col_type = 'VARCHAR'
+              elif col_type.upper() in ['REAL', 'FLOAT', 'DOUBLE']:
+                  col_type = 'DOUBLE'
+              columns.append(f"{col_name} {col_type}")
+          
+          create_sql = f"CREATE TABLE {table_name} ({', '.join(columns)})"
+          duckdb_conn.execute(create_sql)
+          
+          # Copy data
+          data = sqlite_cursor.execute(f"SELECT * FROM {table_name}").fetchall()
+          if data:
+              placeholders = ','.join(['?' for _ in data[0]])
+              insert_sql = f"INSERT INTO {table_name} VALUES ({placeholders})"
+              duckdb_conn.executemany(insert_sql, data)
+          
+          print(f"  Copied {len(data)} rows")
+      
+      # Close connections
+      sqlite_conn.close()
+      duckdb_conn.close()
+      
+      print(f"Conversion complete: {sqlite_path} -> {duckdb_path}")
+  
+  if __name__ == "__main__":
+      parser = argparse.ArgumentParser(description='Convert SQLite to DuckDB')
+      parser.add_argument('--input', required=True, help='Input SQLite file path')
+      parser.add_argument('--output', required=True, help='Output DuckDB file path')
+      
+      args = parser.parse_args()
+      convert_sqlite_to_duckdb(args.input, args.output)
+  ```
+</Step>
+
+<Step title="Convert SQLite to DuckDB">
+  ```bash
+  # Convert complete database
+  python import_duckdb.py --input sqlite/world.sqlite3 --output duckdb/world.duckdb
+  ```
+</Step>
+
+<Step title="Convert Individual Tables">
+  ```bash
+  # Convert individual table databases if available
+  python import_duckdb.py --input sqlite/countries.sqlite3 --output duckdb/countries.duckdb
+  python import_duckdb.py --input sqlite/states.sqlite3 --output duckdb/states.duckdb
+  python import_duckdb.py --input sqlite/cities.sqlite3 --output duckdb/cities.duckdb
+  ```
+</Step>
+</Steps>
+
+### Method 3: Command Line Interface
+
+<Steps>
+<Step title="Install DuckDB CLI">
+  ```bash
+  # On macOS
+  brew install duckdb
+  
+  # On Ubuntu/Debian
+  sudo apt install duckdb
+  
+  # Or download from https://duckdb.org/docs/installation/
+  ```
+</Step>
+
+<Step title="Import Using CLI">
+  ```bash
+  # Start DuckDB CLI
+  duckdb world.duckdb
+  
+  # Import from SQLite
+  .mode csv
+  .import sqlite/countries.csv countries
+  .import sqlite/states.csv states  
+  .import sqlite/cities.csv cities
+  
+  # Or use SQL to attach SQLite
+  ATTACH 'sqlite/world.sqlite3' AS sqlite_db;
+  CREATE TABLE countries AS SELECT * FROM sqlite_db.countries;
+  CREATE TABLE states AS SELECT * FROM sqlite_db.states;
+  CREATE TABLE cities AS SELECT * FROM sqlite_db.cities;
+  DETACH sqlite_db;
+  ```
+</Step>
+</Steps>
+
+## Performance Optimization
+
+### Create Indexes and Views
+
+<CodeGroup>
+```sql Indexes
+-- Create indexes for better query performance
+CREATE INDEX idx_countries_iso2 ON countries(iso2);
+CREATE INDEX idx_countries_iso3 ON countries(iso3);
+CREATE INDEX idx_countries_region ON countries(region);
+
+CREATE INDEX idx_states_country_id ON states(country_id);
+CREATE INDEX idx_states_name ON states(name);
+
+CREATE INDEX idx_cities_country_id ON cities(country_id);
+CREATE INDEX idx_cities_state_id ON cities(state_id);
+CREATE INDEX idx_cities_coordinates ON cities(latitude, longitude);
+CREATE INDEX idx_cities_name ON cities(name);
+```
+
+```sql Analytical Views
+-- Create views for common analytical queries
+CREATE VIEW countries_summary AS
+SELECT 
+    region,
+    COUNT(*) as country_count,
+    string_agg(DISTINCT currency, ', ') as currencies
+FROM countries 
+WHERE region IS NOT NULL
+GROUP BY region;
+
+CREATE VIEW city_density_by_country AS
+SELECT 
+    country_name,
+    COUNT(*) as city_count,
+    AVG(TRY_CAST(latitude AS DOUBLE)) as avg_latitude,
+    AVG(TRY_CAST(longitude AS DOUBLE)) as avg_longitude
+FROM cities
+GROUP BY country_name
+HAVING COUNT(*) > 10
+ORDER BY city_count DESC;
+```
+</CodeGroup>
+
+### DuckDB-Specific Optimizations
+
+<CodeGroup>
+```sql Columnar Storage
+-- DuckDB automatically uses columnar storage
+-- Create materialized views for frequently accessed data
+CREATE VIEW top_cities_by_country AS
+SELECT 
+    country_name,
+    name as city_name,
+    latitude,
+    longitude,
+    ROW_NUMBER() OVER (PARTITION BY country_name ORDER BY name) as rank
+FROM cities;
+```
+
+```sql Parallel Processing
+-- DuckDB automatically uses all CPU cores
+-- Configure thread count if needed
+SET threads = 4;
+
+-- Check current configuration
+SELECT * FROM duckdb_settings() WHERE name LIKE '%thread%';
+```
+</CodeGroup>
+
+## Connection Examples
+
+<Tabs>
+<Tab title="Python">
+```python
+import duckdb
+import pandas as pd
+from typing import List, Dict, Any, Optional
+
+class WorldDatabase:
+    def __init__(self, db_path: str = 'world.duckdb'):
+        self.db_path = db_path
+        self.conn = duckdb.connect(db_path)
+        
+    def query(self, sql: str, params: List = None) -> List[Dict]:
+        """Execute query and return results as list of dictionaries"""
+        if params:
+            result = self.conn.execute(sql, params)
+        else:
+            result = self.conn.execute(sql)
+        
+        columns = [desc[0] for desc in result.description]
+        return [dict(zip(columns, row)) for row in result.fetchall()]
+    
+    def query_df(self, sql: str, params: List = None) -> pd.DataFrame:
+        """Execute query and return results as pandas DataFrame"""
+        if params:
+            return self.conn.execute(sql, params).df()
+        else:
+            return self.conn.execute(sql).df()
+    
+    def get_countries(self, region: Optional[str] = None, limit: Optional[int] = None) -> pd.DataFrame:
+        sql = "SELECT * FROM countries"
+        params = []
+        
+        if region:
+            sql += " WHERE region = ?"
+            params.append(region)
+            
+        if limit:
+            sql += f" LIMIT {limit}"
+            
+        return self.query_df(sql, params if params else None)
+    
+    def get_cities_by_country(self, country_name: str, limit: Optional[int] = None) -> pd.DataFrame:
+        sql = "SELECT * FROM cities WHERE country_name = ?"
+        params = [country_name]
+        
+        if limit:
+            sql += f" LIMIT {limit}"
+            
+        return self.query_df(sql, params)
+    
+    def analyze_population_by_region(self) -> pd.DataFrame:
+        """Analytical query example"""
+        sql = """
+        SELECT 
+            region,
+            COUNT(DISTINCT c.name) as countries,
+            COUNT(DISTINCT s.name) as states,
+            COUNT(DISTINCT cities.name) as cities,
+            AVG(TRY_CAST(cities.latitude AS DOUBLE)) as avg_latitude,
+            AVG(TRY_CAST(cities.longitude AS DOUBLE)) as avg_longitude
+        FROM countries c
+        LEFT JOIN states s ON c.id = s.country_id  
+        LEFT JOIN cities ON c.id = cities.country_id
+        WHERE c.region IS NOT NULL
+        GROUP BY c.region
+        ORDER BY cities DESC
+        """
+        return self.query_df(sql)
+    
+    def find_cities_near_coordinates(self, lat: float, lon: float, max_distance_km: float = 100) -> pd.DataFrame:
+        """Find cities within a certain distance using Haversine formula"""
+        sql = """
+        SELECT 
+            name,
+            country_name,
+            state_name,
+            latitude,
+            longitude,
+            6371 * acos(
+                cos(radians(?)) * cos(radians(TRY_CAST(latitude AS DOUBLE))) *
+                cos(radians(TRY_CAST(longitude AS DOUBLE)) - radians(?)) +
+                sin(radians(?)) * sin(radians(TRY_CAST(latitude AS DOUBLE)))
+            ) as distance_km
+        FROM cities
+        WHERE latitude IS NOT NULL 
+        AND longitude IS NOT NULL
+        AND 6371 * acos(
+            cos(radians(?)) * cos(radians(TRY_CAST(latitude AS DOUBLE))) *
+            cos(radians(TRY_CAST(longitude AS DOUBLE)) - radians(?)) +
+            sin(radians(?)) * sin(radians(TRY_CAST(latitude AS DOUBLE)))
+        ) <= ?
+        ORDER BY distance_km
+        """
+        return self.query_df(sql, [lat, lon, lat, lat, lon, lat, max_distance_km])
+    
+    def get_country_statistics(self) -> pd.DataFrame:
+        """Get comprehensive country statistics"""
+        sql = """
+        SELECT 
+            c.region,
+            COUNT(DISTINCT c.name) as countries,
+            COUNT(DISTINCT c.currency) as currencies,  
+            COUNT(DISTINCT s.name) as states,
+            COUNT(cities.name) as cities,
+            string_agg(DISTINCT c.currency, ', ') as currency_list
+        FROM countries c
+        LEFT JOIN states s ON c.id = s.country_id
+        LEFT JOIN cities ON c.id = cities.country_id  
+        WHERE c.region IS NOT NULL
+        GROUP BY c.region
+        ORDER BY cities DESC
+        """
+        return self.query_df(sql)
+    
+    def close(self):
+        self.conn.close()
+
+# Usage example
+db = WorldDatabase()
+
+try:
+    # Basic queries
+    print("=== European Countries ===")
+    europe_countries = db.get_countries(region="Europe", limit=5)
+    print(europe_countries[['name', 'iso2', 'capital', 'currency']])
+    
+    print("\n=== US Cities ===")
+    us_cities = db.get_cities_by_country("United States", limit=5)
+    print(us_cities[['name', 'state_name', 'latitude', 'longitude']])
+    
+    # Analytical queries
+    print("\n=== Population Analysis by Region ===")
+    population_analysis = db.analyze_population_by_region()
+    print(population_analysis)
+    
+    print("\n=== Cities near New York (within 100km) ===")
+    nearby_cities = db.find_cities_near_coordinates(40.7128, -74.0060, 100)
+    print(nearby_cities.head(10))
+    
+    print("\n=== Country Statistics ===")
+    stats = db.get_country_statistics()
+    print(stats)
+
+finally:
+    db.close()
+```
+</Tab>
+
+<Tab title="R">
+```r
+library(duckdb)
+library(DBI)
+library(dplyr)
+
+# Connect to DuckDB
+con <- dbConnect(duckdb::duckdb(), dbdir = "world.duckdb", read_only = FALSE)
+
+# Helper function to query with dplyr
+query_db <- function(table_name) {
+  tbl(con, table_name)
+}
+
+# Basic queries using dplyr syntax
+countries <- query_db("countries") %>%
+  filter(region == "Europe") %>%
+  select(name, iso2, iso3, capital, currency) %>%
+  collect()
+
+print("European Countries:")
+print(countries)
+
+# Cities in United States
+us_cities <- query_db("cities") %>%
+  filter(country_name == "United States") %>%
+  select(name, state_name, latitude, longitude) %>%
+  head(10) %>%
+  collect()
+
+print("US Cities:")
+print(us_cities)
+
+# Analytical query - cities by region
+cities_by_region <- query_db("cities") %>%
+  left_join(query_db("countries") %>% select(id, region), 
+            by = c("country_id" = "id")) %>%
+  filter(!is.na(region)) %>%
+  group_by(region) %>%
+  summarise(
+    city_count = n(),
+    avg_latitude = mean(as.numeric(latitude), na.rm = TRUE),
+    avg_longitude = mean(as.numeric(longitude), na.rm = TRUE)
+  ) %>%
+  arrange(desc(city_count)) %>%
+  collect()
+
+print("Cities by Region:")
+print(cities_by_region)
+
+# Raw SQL query for complex analysis
+population_density <- dbGetQuery(con, "
+  SELECT 
+    c.region,
+    COUNT(DISTINCT c.name) as countries,
+    COUNT(cities.name) as total_cities,
+    ROUND(AVG(TRY_CAST(cities.latitude AS DOUBLE)), 2) as avg_lat,
+    ROUND(AVG(TRY_CAST(cities.longitude AS DOUBLE)), 2) as avg_lon
+  FROM countries c
+  LEFT JOIN cities ON c.id = cities.country_id
+  WHERE c.region IS NOT NULL
+  GROUP BY c.region
+  ORDER BY total_cities DESC
+")
+
+print("Population Density by Region:")
+print(population_density)
+
+# Close connection
+dbDisconnect(con, shutdown = TRUE)
+```
+</Tab>
+
+<Tab title="Node.js">
+```javascript
+const duckdb = require('duckdb');
+
+class WorldDatabase {
+    constructor(dbPath = 'world.duckdb') {
+        this.db = new duckdb.Database(dbPath);
+        this.conn = this.db.connect();
+    }
+    
+    query(sql, params = []) {
+        return new Promise((resolve, reject) => {
+            if (params.length > 0) {
+                this.conn.all(sql, ...params, (err, rows) => {
+                    if (err) reject(err);
+                    else resolve(rows);
+                });
+            } else {
+                this.conn.all(sql, (err, rows) => {
+                    if (err) reject(err);
+                    else resolve(rows);
+                });
+            }
+        });
+    }
+    
+    async getCountries(region = null, limit = null) {
+        let sql = 'SELECT * FROM countries';
+        const params = [];
+        
+        if (region) {
+            sql += ' WHERE region = ?';
+            params.push(region);
+        }
+        
+        if (limit) {
+            sql += ` LIMIT ${limit}`;
+        }
+        
+        return await this.query(sql, params);
+    }
+    
+    async getCitiesByCountry(countryName, limit = null) {
+        let sql = 'SELECT * FROM cities WHERE country_name = ?';
+        const params = [countryName];
+        
+        if (limit) {
+            sql += ` LIMIT ${limit}`;
+        }
+        
+        return await this.query(sql, params);
+    }
+    
+    async analyzePopulationByRegion() {
+        const sql = `
+            SELECT 
+                region,
+                COUNT(DISTINCT c.name) as countries,
+                COUNT(DISTINCT s.name) as states,
+                COUNT(DISTINCT cities.name) as cities,
+                ROUND(AVG(TRY_CAST(cities.latitude AS DOUBLE)), 2) as avg_latitude,
+                ROUND(AVG(TRY_CAST(cities.longitude AS DOUBLE)), 2) as avg_longitude
+            FROM countries c
+            LEFT JOIN states s ON c.id = s.country_id  
+            LEFT JOIN cities ON c.id = cities.country_id
+            WHERE c.region IS NOT NULL
+            GROUP BY c.region
+            ORDER BY cities DESC
+        `;
+        return await this.query(sql);
+    }
+    
+    async findNearbyCities(lat, lon, maxDistanceKm = 100) {
+        const sql = `
+            SELECT 
+                name,
+                country_name,
+                state_name,
+                latitude,
+                longitude,
+                ROUND(6371 * acos(
+                    cos(radians(?)) * cos(radians(TRY_CAST(latitude AS DOUBLE))) *
+                    cos(radians(TRY_CAST(longitude AS DOUBLE)) - radians(?)) +
+                    sin(radians(?)) * sin(radians(TRY_CAST(latitude AS DOUBLE)))
+                ), 2) as distance_km
+            FROM cities
+            WHERE latitude IS NOT NULL 
+            AND longitude IS NOT NULL
+            AND 6371 * acos(
+                cos(radians(?)) * cos(radians(TRY_CAST(latitude AS DOUBLE))) *
+                cos(radians(TRY_CAST(longitude AS DOUBLE)) - radians(?)) +
+                sin(radians(?)) * sin(radians(TRY_CAST(latitude AS DOUBLE)))
+            ) <= ?
+            ORDER BY distance_km
+            LIMIT 20
+        `;
+        return await this.query(sql, [lat, lon, lat, lat, lon, lat, maxDistanceKm]);
+    }
+    
+    close() {
+        this.conn.close();
+        this.db.close();
+    }
+}
+
+// Usage example
+async function example() {
+    const db = new WorldDatabase();
+    
+    try {
+        console.log('=== European Countries ===');
+        const countries = await db.getCountries('Europe', 5);
+        countries.forEach(country => {
+            console.log(`${country.name} (${country.iso2}) - ${country.capital}`);
+        });
+        
+        console.log('\n=== US Cities ===');
+        const usCities = await db.getCitiesByCountry('United States', 5);
+        usCities.forEach(city => {
+            console.log(`${city.name}, ${city.state_name}`);
+        });
+        
+        console.log('\n=== Population Analysis ===');
+        const analysis = await db.analyzePopulationByRegion();
+        analysis.forEach(region => {
+            console.log(`${region.region}: ${region.countries} countries, ${region.cities} cities`);
+        });
+        
+        console.log('\n=== Cities near New York ===');
+        const nearby = await db.findNearbyCity ies(40.7128, -74.0060, 100);
+        nearby.slice(0, 10).forEach(city => {
+            console.log(`${city.name}, ${city.state_name}: ${city.distance_km} km`);
+        });
+        
+    } catch (error) {
+        console.error('Database error:', error);
+    } finally {
+        db.close();
+    }
+}
+
+example();
+```
+</Tab>
+</Tabs>
+
+## Advanced Analytics Features
+
+### Time Series Analysis
+
+```python
+# Example: Analyze city data distribution over time
+import duckdb
+import matplotlib.pyplot as plt
+
+conn = duckdb.connect('world.duckdb')
+
+# Create time-based analysis views
+conn.execute("""
+CREATE OR REPLACE VIEW city_coordinates_analysis AS
+SELECT 
+    CASE 
+        WHEN TRY_CAST(latitude AS DOUBLE) >= 60 THEN 'Arctic'
+        WHEN TRY_CAST(latitude AS DOUBLE) >= 23.5 THEN 'Northern Temperate' 
+        WHEN TRY_CAST(latitude AS DOUBLE) >= -23.5 THEN 'Tropical'
+        WHEN TRY_CAST(latitude AS DOUBLE) >= -60 THEN 'Southern Temperate'
+        ELSE 'Antarctic'
+    END as climate_zone,
+    COUNT(*) as city_count,
+    AVG(TRY_CAST(latitude AS DOUBLE)) as avg_lat,
+    AVG(TRY_CAST(longitude AS DOUBLE)) as avg_lon
+FROM cities 
+WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+GROUP BY climate_zone
+ORDER BY city_count DESC
+""")
+
+# Get results
+climate_data = conn.execute("SELECT * FROM city_coordinates_analysis").df()
+print(climate_data)
+```
+
+### Geospatial Analytics
+
+```python
+# Advanced geospatial analysis
+def analyze_city_clusters(conn):
+    """Find city clusters using spatial density"""
+    
+    sql = """
+    WITH city_grid AS (
+        SELECT 
+            name,
+            country_name,
+            FLOOR(TRY_CAST(latitude AS DOUBLE) / 5) * 5 as lat_grid,
+            FLOOR(TRY_CAST(longitude AS DOUBLE) / 5) * 5 as lon_grid
+        FROM cities 
+        WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+    ),
+    grid_density AS (
+        SELECT 
+            lat_grid,
+            lon_grid,
+            COUNT(*) as city_count,
+            string_agg(DISTINCT country_name, ', ') as countries
+        FROM city_grid
+        GROUP BY lat_grid, lon_grid
+        HAVING COUNT(*) >= 5
+    )
+    SELECT * FROM grid_density 
+    ORDER BY city_count DESC
+    LIMIT 20
+    """
+    
+    return conn.execute(sql).df()
+
+# Usage
+conn = duckdb.connect('world.duckdb')
+clusters = analyze_city_clusters(conn)
+print("Top City Clusters:")
+print(clusters)
+```
+
+## Data Science Integration
+
+### Jupyter Notebook Integration
+
+```python
+# Install in Jupyter
+# !pip install duckdb pandas matplotlib seaborn
+
+import duckdb
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Connect and create data for visualization
+conn = duckdb.connect('world.duckdb')
+
+# Create summary statistics
+summary_stats = conn.execute("""
+SELECT 
+    region,
+    COUNT(DISTINCT c.name) as countries,
+    COUNT(cities.name) as cities,
+    ROUND(AVG(TRY_CAST(cities.latitude AS DOUBLE)), 2) as avg_latitude,
+    ROUND(AVG(TRY_CAST(cities.longitude AS DOUBLE)), 2) as avg_longitude
+FROM countries c
+LEFT JOIN cities ON c.id = cities.country_id
+WHERE c.region IS NOT NULL
+GROUP BY c.region
+ORDER BY cities DESC
+""").df()
+
+# Create visualizations
+plt.figure(figsize=(12, 8))
+
+plt.subplot(2, 2, 1)
+sns.barplot(data=summary_stats, x='cities', y='region', orient='h')
+plt.title('Cities by Region')
+
+plt.subplot(2, 2, 2)
+sns.scatterplot(data=summary_stats, x='avg_longitude', y='avg_latitude', 
+                size='cities', hue='region')
+plt.title('Geographic Distribution')
+
+plt.tight_layout()
+plt.show()
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Installation Issues">
+**Problem**: DuckDB installation fails
+
+**Solutions**:
+1. Update pip: `pip install --upgrade pip`
+2. Install specific version: `pip install duckdb==0.9.0`  
+3. Check Python version compatibility (3.7+)
+4. Try installing from conda: `conda install -c conda-forge duckdb`
+5. Verify system requirements and available memory
+</Accordion>
+
+<Accordion title="SQLite Import Errors">
+**Problem**: Cannot import from SQLite database
+
+**Solutions**:
+1. Verify SQLite file exists and is readable
+2. Check SQLite file integrity: `sqlite3 world.sqlite3 "PRAGMA integrity_check;"`
+3. Ensure DuckDB has read permissions
+4. Try importing individual tables
+5. Use absolute file paths
+</Accordion>
+
+<Accordion title="Performance Issues">
+**Problem**: Queries are running slowly
+
+**Solutions**:
+1. Create appropriate indexes (see Performance section)
+2. Increase thread count: `SET threads = 8`
+3. Use columnar operations instead of row-by-row processing
+4. Optimize SQL queries with `EXPLAIN` command
+5. Consider using views for complex repeated queries
+</Accordion>
+
+<Accordion title="Memory Issues">
+**Problem**: Out of memory errors during processing
+
+**Solutions**:
+1. Reduce memory usage: `SET memory_limit = '1GB'`
+2. Process data in chunks using LIMIT and OFFSET
+3. Use streaming operations instead of loading all data
+4. Close connections when not needed
+5. Monitor memory usage during operations
+</Accordion>
+</AccordionGroup>
+
+## Backup and Maintenance
+
+### Backup Strategies
+
+<CodeGroup>
+```bash File Copy Backup
+# DuckDB files can be backed up by copying
+cp world.duckdb world_backup_$(date +%Y%m%d).duckdb
+
+# Compress backup
+gzip world_backup_$(date +%Y%m%d).duckdb
+```
+
+```python Export to Other Formats
+import duckdb
+
+conn = duckdb.connect('world.duckdb')
+
+# Export to CSV
+conn.execute("COPY countries TO 'backup_countries.csv' (FORMAT CSV, HEADER)")
+conn.execute("COPY cities TO 'backup_cities.csv' (FORMAT CSV, HEADER)")
+
+# Export to Parquet (efficient columnar format)
+conn.execute("COPY countries TO 'backup_countries.parquet' (FORMAT PARQUET)")
+conn.execute("COPY cities TO 'backup_cities.parquet' (FORMAT PARQUET)")
+
+# Export entire database to SQL
+conn.execute("EXPORT DATABASE 'backup_sql_dump'")
+```
+</CodeGroup>
+
+### Maintenance Commands
+
+```python
+import duckdb
+
+conn = duckdb.connect('world.duckdb')
+
+# Check database size and statistics
+stats = conn.execute("""
+SELECT 
+    table_name,
+    estimated_size,
+    column_count,
+    row_count
+FROM duckdb_tables()
+WHERE table_name IN ('countries', 'states', 'cities')
+""").df()
+
+print("Table Statistics:")
+print(stats)
+
+# Optimize database (checkpoint and compress)
+conn.execute("CHECKPOINT")
+
+# Check query performance
+conn.execute("PRAGMA enable_profiling")
+result = conn.execute("SELECT COUNT(*) FROM cities WHERE country_name = 'United States'")
+conn.execute("PRAGMA disable_profiling")
+
+conn.close()
+```
+
+<Tip>
+DuckDB automatically optimizes storage and doesn't require frequent maintenance like traditional databases. Regular backups and occasional checkpoints are usually sufficient.
+</Tip>
+
+## Integration with Data Science Stack
+
+### Apache Arrow Integration
+
+```python
+# DuckDB integrates seamlessly with Apache Arrow
+import duckdb
+import pyarrow as pa
+
+conn = duckdb.connect('world.duckdb')
+
+# Query to Arrow Table
+arrow_table = conn.execute("SELECT * FROM countries WHERE region = 'Europe'").arrow()
+print(f"Arrow table with {arrow_table.num_rows} rows")
+
+# Convert back to pandas if needed
+df = arrow_table.to_pandas()
+```
+
+### Polars Integration
+
+```python
+# DuckDB works great with Polars for fast data processing
+import duckdb
+import polars as pl
+
+conn = duckdb.connect('world.duckdb')
+
+# Query with Polars
+df = pl.read_database("SELECT * FROM cities WHERE country_name = 'United States'", conn)
+print(df.head())
+```
+
+## Next Steps
+
+After successful installation:
+
+1. **Explore analytical queries** using DuckDB's powerful SQL extensions
+2. **Integrate with your data science workflow** using pandas, R, or other tools
+3. **Set up automated backups** using the provided scripts
+4. **Experiment with advanced features** like spatial functions and time series analysis  
+5. **Consider scaling** to larger datasets using DuckDB's columnar storage
+
+<Card title="Need Help?" icon="support">
+  Join our [community discussions](https://github.com/dr5hn/countries-states-cities-database/discussions) for DuckDB-specific questions and data science integration tips.
+</Card>

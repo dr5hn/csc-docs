@@ -1,0 +1,552 @@
+---
+title: "PostgreSQL Installation"
+description: "Complete guide to installing the Countries States Cities database in PostgreSQL with advanced features and spatial queries"
+icon: "database"
+---
+
+PostgreSQL is a powerful, advanced open-source relational database with excellent support for complex queries, JSON data, and spatial operations. This guide covers the complete installation process for the Countries States Cities database.
+
+<Info>
+PostgreSQL installation typically takes 3-6 minutes and requires approximately 220MB of disk space.
+</Info>
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+- PostgreSQL 10+ installed (PostgreSQL 13+ recommended)
+- Administrative access to your PostgreSQL server
+- At least 500MB free disk space
+- Downloaded the `pgsql/world.sql` file from our [GitHub repository](https://github.com/dr5hn/countries-states-cities-database)
+
+## Method 1: Command Line Import
+
+<Steps>
+<Step title="Create Database">
+  ```bash
+  createdb -U postgres world
+  ```
+  
+  Or using psql:
+  ```sql
+  psql -U postgres -c "CREATE DATABASE world WITH ENCODING='UTF8';"
+  ```
+  
+  <Note>
+  PostgreSQL uses UTF-8 encoding by default, which properly handles all international characters.
+  </Note>
+</Step>
+
+<Step title="Import Database">
+  ```bash
+  psql -U postgres -d world -f pgsql/world.sql
+  ```
+  
+  <Check>
+  PostgreSQL import includes automatic index creation for optimal performance.
+  </Check>
+</Step>
+
+<Step title="Verify Installation">
+  ```bash
+  psql -U postgres -d world -c "
+  SELECT 'countries' as table_name, COUNT(*) as count FROM countries
+  UNION ALL
+  SELECT 'states', COUNT(*) FROM states
+  UNION ALL  
+  SELECT 'cities', COUNT(*) FROM cities;
+  "
+  ```
+  
+  Expected output:
+  ```
+   table_name | count  
+  ------------|--------
+   countries  |   250
+   states     |  5038
+   cities     | 151024
+  ```
+</Step>
+</Steps>
+
+## Method 2: pgAdmin GUI
+
+For users who prefer a graphical interface:
+
+<Steps>
+<Step title="Connect to Server">
+  Open pgAdmin and connect to your PostgreSQL server.
+</Step>
+
+<Step title="Create Database">
+  - Right-click on "Databases"
+  - Select "Create" → "Database"
+  - Name: "world"
+  - Encoding: "UTF8"
+  - Template: "template0"
+</Step>
+
+<Step title="Import SQL File">
+  - Right-click on the "world" database
+  - Select "Query Tool"
+  - Click the folder icon to open file
+  - Select `pgsql/world.sql`
+  - Execute the script (F5)
+</Step>
+</Steps>
+
+## PostgreSQL-Specific Features
+
+### Spatial Queries with PostGIS
+
+<Steps>
+<Step title="Enable PostGIS Extension">
+  ```sql
+  -- Enable PostGIS for advanced spatial queries (optional)
+  CREATE EXTENSION IF NOT EXISTS postgis;
+  ```
+</Step>
+
+<Step title="Create Spatial Indexes">
+  ```sql
+  -- Add geometry columns for spatial operations
+  ALTER TABLE cities ADD COLUMN geom geometry(POINT, 4326);
+  UPDATE cities SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326);
+  
+  -- Create spatial index
+  CREATE INDEX idx_cities_geom ON cities USING GIST(geom);
+  ```
+</Step>
+
+<Step title="Example Spatial Queries">
+  ```sql
+  -- Find cities within 100km of New York City
+  SELECT name, country_name, latitude, longitude 
+  FROM cities 
+  WHERE ST_DWithin(
+    geom,
+    ST_SetSRID(ST_MakePoint(-74.006, 40.7128), 4326)::geography,
+    100000  -- 100km in meters
+  );
+  
+  -- Find nearest cities to a point
+  SELECT name, country_name,
+         ST_Distance(geom, ST_SetSRID(ST_MakePoint(-74.006, 40.7128), 4326)::geography) as distance
+  FROM cities 
+  ORDER BY geom <-> ST_SetSRID(ST_MakePoint(-74.006, 40.7128), 4326)
+  LIMIT 10;
+  ```
+</Step>
+</Steps>
+
+### Full-Text Search
+
+PostgreSQL provides powerful full-text search capabilities:
+
+<CodeGroup>
+```sql Create Search Indexes
+-- Create full-text search indexes
+CREATE INDEX idx_countries_name_fts ON countries USING gin(to_tsvector('english', name));
+CREATE INDEX idx_cities_name_fts ON cities USING gin(to_tsvector('english', name));
+CREATE INDEX idx_states_name_fts ON states USING gin(to_tsvector('english', name));
+```
+
+```sql Search Queries
+-- Search for countries containing "united"
+SELECT name, region 
+FROM countries 
+WHERE to_tsvector('english', name) @@ to_tsquery('english', 'united');
+
+-- Search cities with complex queries
+SELECT name, country_name, state_name
+FROM cities 
+WHERE to_tsvector('english', name || ' ' || country_name) @@ 
+      to_tsquery('english', 'Los & Angeles | York & New');
+
+-- Ranked search results
+SELECT name, country_name,
+       ts_rank(to_tsvector('english', name), to_tsquery('english', 'francisco')) as rank
+FROM cities 
+WHERE to_tsvector('english', name) @@ to_tsquery('english', 'francisco')
+ORDER BY rank DESC;
+```
+</CodeGroup>
+
+## Advanced Configuration
+
+### Create Application User and Database
+
+<Steps>
+<Step title="Create Role">
+  ```sql
+  CREATE ROLE csc_user WITH LOGIN PASSWORD 'secure_password_here';
+  ```
+  
+  <Warning>
+  Replace 'secure_password_here' with a strong, unique password.
+  </Warning>
+</Step>
+
+<Step title="Grant Permissions">
+  ```sql
+  -- Grant database access
+  GRANT CONNECT ON DATABASE world TO csc_user;
+  
+  -- Grant schema usage
+  GRANT USAGE ON SCHEMA public TO csc_user;
+  
+  -- Grant table permissions
+  GRANT SELECT ON ALL TABLES IN SCHEMA public TO csc_user;
+  
+  -- Grant permissions on future tables
+  ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO csc_user;
+  ```
+</Step>
+</Steps>
+
+### Performance Optimization
+
+<CodeGroup>
+```sql Additional Indexes
+-- Performance indexes for common queries
+CREATE INDEX idx_countries_iso2 ON countries(iso2);
+CREATE INDEX idx_countries_iso3 ON countries(iso3);
+CREATE INDEX idx_countries_region ON countries(region);
+CREATE INDEX idx_countries_subregion ON countries(subregion);
+
+CREATE INDEX idx_states_country_id ON states(country_id);
+CREATE INDEX idx_states_name ON states(name);
+CREATE INDEX idx_states_country_name ON states(country_name);
+
+CREATE INDEX idx_cities_country_id ON cities(country_id);
+CREATE INDEX idx_cities_state_id ON cities(state_id);
+CREATE INDEX idx_cities_name ON cities(name);
+CREATE INDEX idx_cities_coordinates ON cities(latitude, longitude);
+CREATE INDEX idx_cities_country_name ON cities(country_name);
+```
+
+```sql Update Statistics
+-- Update table statistics for query planner
+ANALYZE countries, states, cities;
+
+-- Check index usage
+SELECT schemaname, tablename, indexname, idx_scan, idx_tup_read, idx_tup_fetch
+FROM pg_stat_user_indexes 
+WHERE schemaname = 'public'
+ORDER BY idx_scan DESC;
+```
+</CodeGroup>
+
+## Database Structure Verification
+
+<CodeGroup>
+```sql Table Information
+-- List all tables
+\dt
+
+-- Describe table structures
+\d countries
+\d states  
+\d cities
+
+-- Check table sizes
+SELECT 
+    schemaname as schema,
+    tablename as table,
+    pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) as size,
+    pg_size_pretty(pg_relation_size(schemaname||'.'||tablename)) as table_size,
+    pg_size_pretty(pg_indexes_size(schemaname||'.'||tablename)) as index_size
+FROM pg_tables 
+WHERE schemaname = 'public'
+ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
+```
+
+```sql Sample Data
+-- View sample data from each table
+SELECT id, name, iso2, iso3, region, subregion FROM countries LIMIT 5;
+
+SELECT id, name, state_code, country_id, country_name FROM states 
+WHERE country_name = 'United States' LIMIT 5;
+
+SELECT id, name, latitude, longitude, country_name, state_name FROM cities 
+WHERE country_name = 'United States' AND state_name = 'California' LIMIT 5;
+```
+</CodeGroup>
+
+## Connection Examples
+
+<Tabs>
+<Tab title="Python (psycopg2)">
+```python
+import psycopg2
+from psycopg2.extras import RealDictCursor
+
+config = {
+    'host': 'localhost',
+    'database': 'world',
+    'user': 'csc_user',
+    'password': 'your_password',
+    'port': 5432
+}
+
+try:
+    connection = psycopg2.connect(**config)
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
+    
+    # Test query
+    cursor.execute("SELECT COUNT(*) as count FROM countries")
+    result = cursor.fetchone()
+    print(f"Countries in database: {result['count']}")
+    
+    # Example query with parameters
+    cursor.execute("""
+        SELECT name, latitude, longitude 
+        FROM cities 
+        WHERE country_name = %s 
+        LIMIT 5
+    """, ('United States',))
+    
+    cities = cursor.fetchall()
+    for city in cities:
+        print(f"{city['name']}: {city['latitude']}, {city['longitude']}")
+        
+except psycopg2.Error as error:
+    print(f"Database error: {error}")
+    
+finally:
+    if connection:
+        cursor.close()
+        connection.close()
+```
+</Tab>
+
+<Tab title="Node.js (pg)">
+```javascript
+const { Pool } = require('pg');
+
+const pool = new Pool({
+  user: 'csc_user',
+  host: 'localhost',
+  database: 'world',
+  password: 'your_password',
+  port: 5432,
+});
+
+async function testConnection() {
+  const client = await pool.connect();
+  
+  try {
+    // Test query
+    const result = await client.query('SELECT COUNT(*) as count FROM countries');
+    console.log(`Countries in database: ${result.rows[0].count}`);
+    
+    // Example parameterized query
+    const cities = await client.query(
+      'SELECT name, latitude, longitude FROM cities WHERE country_name = $1 LIMIT 5',
+      ['United States']
+    );
+    
+    cities.rows.forEach(city => {
+      console.log(`${city.name}: ${city.latitude}, ${city.longitude}`);
+    });
+    
+  } catch (err) {
+    console.error('Database error:', err.message);
+  } finally {
+    client.release();
+  }
+}
+
+testConnection();
+```
+</Tab>
+
+<Tab title="Java (JDBC)">
+```java
+import java.sql.*;
+import java.util.Properties;
+
+public class PostgreSQLConnection {
+    public static void main(String[] args) {
+        String url = "jdbc:postgresql://localhost:5432/world";
+        Properties props = new Properties();
+        props.setProperty("user", "csc_user");
+        props.setProperty("password", "your_password");
+        
+        try (Connection conn = DriverManager.getConnection(url, props)) {
+            // Test query
+            try (PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(*) FROM countries")) {
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    System.out.println("Countries in database: " + rs.getInt(1));
+                }
+            }
+            
+            // Example query with parameters
+            String query = "SELECT name, latitude, longitude FROM cities WHERE country_name = ? LIMIT 5";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, "United States");
+                ResultSet rs = stmt.executeQuery();
+                
+                while (rs.next()) {
+                    System.out.printf("%s: %f, %f%n", 
+                        rs.getString("name"), 
+                        rs.getDouble("latitude"), 
+                        rs.getDouble("longitude"));
+                }
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+        }
+    }
+}
+```
+</Tab>
+</Tabs>
+
+## JSON Support
+
+PostgreSQL has excellent JSON support. Here are some examples:
+
+<CodeGroup>
+```sql JSON Aggregation
+-- Aggregate cities by country as JSON
+SELECT country_name, json_agg(
+  json_build_object(
+    'name', name,
+    'latitude', latitude,
+    'longitude', longitude
+  )
+) as cities
+FROM cities 
+WHERE country_name = 'Switzerland'
+GROUP BY country_name;
+```
+
+```sql JSON Queries
+-- If you have JSON columns, you can query them efficiently
+-- Example: Adding metadata as JSON
+ALTER TABLE countries ADD COLUMN metadata jsonb;
+
+-- Update with sample JSON data
+UPDATE countries 
+SET metadata = jsonb_build_object(
+  'continent', region,
+  'area_km2', NULL,
+  'timezone_count', 1
+) 
+WHERE region IS NOT NULL;
+
+-- Query JSON data
+SELECT name, metadata->>'continent' as continent
+FROM countries 
+WHERE metadata->>'continent' = 'Europe';
+```
+</CodeGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Connection Refused Error">
+**Problem**: `could not connect to server: Connection refused`
+
+**Solutions**:
+1. Check if PostgreSQL service is running: `sudo systemctl status postgresql`
+2. Verify PostgreSQL is listening on correct port: `netstat -an | grep 5432`
+3. Check pg_hba.conf for connection permissions
+4. Ensure firewall allows connections on port 5432
+</Accordion>
+
+<Accordion title="Authentication Failed">
+**Problem**: `FATAL: password authentication failed`
+
+**Solutions**:
+1. Verify username and password are correct
+2. Check pg_hba.conf authentication method
+3. Reset password: `ALTER USER username PASSWORD 'newpassword';`
+4. Ensure user has login privileges: `ALTER USER username LOGIN;`
+</Accordion>
+
+<Accordion title="Permission Denied">
+**Problem**: `ERROR: permission denied for table countries`
+
+**Solutions**:
+1. Grant table permissions: `GRANT SELECT ON ALL TABLES IN SCHEMA public TO username;`
+2. Check current permissions: `\dp` in psql
+3. Ensure user has schema usage: `GRANT USAGE ON SCHEMA public TO username;`
+4. Grant database connection: `GRANT CONNECT ON DATABASE world TO username;`
+</Accordion>
+
+<Accordion title="Slow Query Performance">
+**Problem**: Queries are running slowly
+
+**Solutions**:
+1. Add appropriate indexes (see Performance Optimization section)
+2. Update table statistics: `ANALYZE;`
+3. Check query plan: `EXPLAIN ANALYZE your_query;`
+4. Increase shared_buffers in postgresql.conf
+5. Consider using connection pooling (pgbouncer)
+</Accordion>
+</AccordionGroup>
+
+## Backup and Maintenance
+
+### Create Backup Script
+
+```bash
+#!/bin/bash
+# backup_world_db.sh
+
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/path/to/backups"
+DB_NAME="world"
+
+# Create compressed backup
+pg_dump -U postgres -h localhost $DB_NAME | gzip > "$BACKUP_DIR/world_backup_$DATE.sql.gz"
+
+# Create custom format backup (faster restore)
+pg_dump -U postgres -h localhost -Fc $DB_NAME > "$BACKUP_DIR/world_backup_$DATE.dump"
+
+# Keep only last 7 backups
+find $BACKUP_DIR -name "world_backup_*.sql.gz" -type f -mtime +7 -delete
+find $BACKUP_DIR -name "world_backup_*.dump" -type f -mtime +7 -delete
+
+echo "Backup completed: world_backup_$DATE"
+```
+
+### Regular Maintenance
+
+```sql
+-- Vacuum and analyze tables
+VACUUM ANALYZE countries, states, cities;
+
+-- Check database statistics
+SELECT schemaname, tablename, n_tup_ins, n_tup_upd, n_tup_del, n_live_tup, n_dead_tup
+FROM pg_stat_user_tables 
+WHERE schemaname = 'public';
+
+-- Check index usage
+SELECT schemaname, tablename, indexname, idx_scan, idx_tup_read
+FROM pg_stat_user_indexes 
+WHERE schemaname = 'public'
+ORDER BY idx_scan DESC;
+```
+
+<Tip>
+PostgreSQL's autovacuum process handles most maintenance automatically, but manual VACUUM ANALYZE can help after large data changes.
+</Tip>
+
+## Next Steps
+
+After successful installation:
+
+1. **Configure connection pooling** with pgbouncer for production
+2. **Set up monitoring** with pg_stat_monitor or similar tools
+3. **Implement backup strategy** using the provided script
+4. **Explore spatial features** with PostGIS extension
+5. **Optimize queries** using EXPLAIN ANALYZE
+
+<Card title="Need Help?" icon="support">
+  Join our [community discussions](https://github.com/dr5hn/countries-states-cities-database/discussions) for PostgreSQL-specific questions and advanced optimization tips.
+</Card>

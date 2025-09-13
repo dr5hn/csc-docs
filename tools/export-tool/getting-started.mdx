@@ -1,0 +1,336 @@
+---
+title: "Getting Started"
+description: "Complete guide to signing up, understanding credits, and creating your first custom geographical data export in minutes."
+icon: "rocket"
+---
+
+Get up and running with custom geographical data exports in just a few minutes. This guide walks you through account setup, understanding the credit system, and creating your first export.
+
+## Step 1: Create Your Account
+
+Choose your preferred sign-up method to get started with 3 free trial credits.
+
+<Tabs>
+<Tab title="GitHub Sign-Up">
+**Quick One-Click Registration**
+
+1. Visit [CSC Export Tool](https://export.countrystatecity.in)
+2. Click "Sign up with GitHub"
+3. Authorize the application
+4. You're ready to go!
+
+<Check>
+**Instant Setup**: Your account is created immediately with 3 free credits added automatically.
+</Check>
+</Tab>
+
+<Tab title="Email Sign-Up">
+**Magic Link Authentication**
+
+1. Visit [CSC Export Tool](https://export.countrystatecity.in)
+2. Click "Sign up with Email"
+3. Enter your email address
+4. Check your inbox for the magic link
+5. Click the link to complete registration
+
+<Tip>
+**No Password Required**: We use secure magic links for authentication - no need to remember another password!
+</Tip>
+</Tab>
+</Tabs>
+
+## Step 2: Understanding the Credit System
+
+Credits are the currency used to generate exports. Here's everything you need to know:
+
+### How Credits Work
+
+<CardGroup cols={2}>
+<Card title="Dataset Costs" icon="database">
+**Per Dataset Pricing**
+- Countries: 1 credit
+- States: 2 credits
+- Cities: 3 credits
+</Card>
+
+<Card title="Format Costs" icon="file-code">
+**Additional Format Fees**
+- JSON: Free (0 credits)
+- CSV: +1 credit
+- XML: +2 credits
+- YAML: +2 credits
+- SQL: +3 credits
+</Card>
+</CardGroup>
+
+### Credit Calculation Examples
+
+<AccordionGroup>
+<Accordion title="Simple Country Export">
+**Scenario**: Countries data in JSON format
+- Countries dataset: 1 credit
+- JSON format: +0 credits
+- **Total: 1 credit**
+
+Perfect for basic country dropdowns in web forms.
+</Accordion>
+
+<Accordion title="E-commerce Checkout">
+**Scenario**: Countries with states data in JSON format
+- Countries dataset: 1 credit
+- States dataset: 2 credits
+- JSON format: +0 credits
+- **Total: 3 credits**
+
+Ideal for multi-level location selection in checkout forms.
+</Accordion>
+
+<Accordion title="Analytics Dashboard">
+**Scenario**: All datasets in CSV format for Excel analysis
+- Countries dataset: 1 credit
+- States dataset: 2 credits
+- Cities dataset: 3 credits
+- CSV format: +1 credit
+- **Total: 7 credits**
+
+Great for comprehensive data analysis and visualization.
+</Accordion>
+
+<Accordion title="Database Migration">
+**Scenario**: Countries data ready for database import
+- Countries dataset: 1 credit
+- SQL format: +3 credits
+- **Total: 4 credits**
+
+Perfect for populating database tables with geographical data.
+</Accordion>
+</AccordionGroup>
+
+### Free Trial Credits
+
+<Info>
+**Every new user receives 3 free credits** to test the system and explore different export options before purchasing additional credits.
+</Info>
+
+What you can do with your 3 free credits:
+- Export all countries in JSON format (1 credit) + export all states in JSON format (2 credits) = 3 credits
+- Export countries in CSV format for spreadsheet analysis (1 + 1 = 2 credits)
+- Export cities data in JSON format (3 credits)
+
+## Step 3: Your First Export
+
+Let's create a simple countries export to get familiar with the process.
+
+<Steps>
+<Step title="Select Dataset">
+1. Log into your account
+2. Click "Create New Export"
+3. Under "Datasets," select **Countries**
+4. You'll see "1 credit" cost indicator
+
+<Frame>
+<img src="/images/export-tool/select-dataset.png" alt="Dataset selection interface showing Countries option selected" />
+</Frame>
+</Step>
+
+<Step title="Choose Fields">
+Select the specific data fields you need:
+
+**Recommended for first export:**
+- `name` - Country name
+- `iso2` - 2-letter country code
+- `currency` - Currency code
+- `phone_code` - International dialing code
+
+<Tip>
+**Start Simple**: Choose 4-5 essential fields for your first export to see how the system works.
+</Tip>
+</Step>
+
+<Step title="Select Format">
+Choose **JSON** for your first export since it's free and works great for web applications.
+
+<CodeGroup>
+```json JSON Output Preview
+{
+  "countries": [
+    {
+      "name": "United States",
+      "iso2": "US",
+      "currency": "USD", 
+      "phone_code": "1"
+    },
+    {
+      "name": "Canada",
+      "iso2": "CA",
+      "currency": "CAD",
+      "phone_code": "1"
+    }
+  ]
+}
+```
+
+```csv Alternative: CSV Format (+1 credit)
+name,iso2,currency,phone_code
+United States,US,USD,1
+Canada,CA,CAD,1
+```
+</CodeGroup>
+</Step>
+
+<Step title="Preview & Confirm">
+1. Click **"Preview Export"** to see a sample of your data
+2. Review the credit cost (should show "1 credit")
+3. If satisfied, click **"Create Export"**
+
+<Warning>
+**Credit Deduction**: Credits are deducted only when you click "Create Export," not during preview.
+</Warning>
+</Step>
+
+<Step title="Download Your Data">
+1. Wait for processing (usually 10-30 seconds)
+2. Click **"Download ZIP"** when ready
+3. Extract the ZIP file to access your JSON data
+
+<Check>
+**Success!** You've created your first custom geographical data export.
+</Check>
+</Step>
+</Steps>
+
+## Managing Your Credits
+
+### Checking Your Balance
+
+<Tabs>
+<Tab title="Dashboard View">
+Your credit balance is prominently displayed on the main dashboard:
+- Current credits remaining
+- Recent transaction history  
+- Usage patterns and recommendations
+</Tab>
+
+<Tab title="Account Page">
+Access detailed credit information:
+- Complete transaction history
+- Credit purchase receipts
+- Usage analytics and insights
+- Upcoming credit expiration (credits never expire!)
+</Tab>
+</Tabs>
+
+### When You Need More Credits
+
+<CardGroup cols={3}>
+<Card title="Basic Package" icon="package">
+**10 Credits - $4.99**
+- Perfect for small projects
+- Covers 2-3 comprehensive exports
+- Great for testing and prototyping
+</Card>
+
+<Card title="Standard Package" icon="box">
+**25 Credits - $9.99**
+- Ideal for active development
+- Best value per credit
+- Covers most project needs
+</Card>
+
+<Card title="Premium Package" icon="star">
+**60 Credits - $19.99**
+- Perfect for large projects
+- Maximum bulk discount
+- Enterprise-ready volume
+</Card>
+</CardGroup>
+
+### Purchasing Credits
+
+<Steps>
+<Step title="Select Package">
+Choose the credit package that fits your needs from the pricing page.
+</Step>
+
+<Step title="Secure Payment">
+- Powered by Dodo Payments
+- Major credit cards accepted
+- Secure, encrypted transactions
+- Instant credit delivery
+</Step>
+
+<Step title="Confirmation">
+- Credits added to your account immediately
+- Email receipt sent automatically
+- Ready to use for exports instantly
+</Step>
+</Steps>
+
+## Account Dashboard Overview
+
+Your dashboard provides everything you need to manage exports and credits:
+
+### Main Features
+
+<AccordionGroup>
+<Accordion title="Export History">
+- View all previous exports
+- Re-download files for 30 days
+- See credit costs for each export
+- Track usage patterns over time
+</Accordion>
+
+<Accordion title="Credit Management">
+- Current balance display
+- Purchase history with receipts
+- Usage analytics and recommendations
+- No expiration dates on credits
+</Accordion>
+
+<Accordion title="Account Settings">
+- Personal information management
+- Email notification preferences
+- API access (coming soon)
+- Security settings and login methods
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+Now that you've got the basics down, explore these advanced features:
+
+<CardGroup cols={2}>
+<Card title="Explore Use Cases" icon="lightbulb" href="/tools/export-tool/use-cases">
+See real-world examples for e-commerce, mobile apps, and analytics
+</Card>
+
+<Card title="Learn Export Formats" icon="file-code" href="/tools/export-tool/formats">
+Deep dive into JSON, CSV, XML, YAML, and SQL format options
+</Card>
+</CardGroup>
+
+## Common Getting Started Questions
+
+<AccordionGroup>
+<Accordion title="How quickly can I create an export?">
+Most users complete their first export within 2-3 minutes of signing up. The process is designed to be intuitive and fast.
+</Accordion>
+
+<Accordion title="What if I make a mistake in my export?">
+Use the preview feature before confirming to see exactly what you'll get. Preview is free and doesn't use credits.
+</Accordion>
+
+<Accordion title="Can I modify an export after creating it?">
+You'll need to create a new export for different fields or formats. However, you can re-download the same export for 30 days.
+</Accordion>
+
+<Accordion title="What happens if I run out of credits?">
+Simply purchase more credits - they're added instantly to your account and never expire.
+</Accordion>
+</AccordionGroup>
+
+---
+
+<Note>
+**Ready to create more exports?** Check out our [use cases guide](/tools/export-tool/use-cases) for inspiration and practical examples.
+</Note>

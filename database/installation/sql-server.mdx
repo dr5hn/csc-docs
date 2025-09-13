@@ -1,0 +1,847 @@
+---
+title: "SQL Server Installation"
+description: "Complete guide to installing the Countries States Cities database in Microsoft SQL Server with enterprise features"
+icon: "database"
+---
+
+Microsoft SQL Server is a powerful enterprise-grade relational database management system. This guide covers installing the Countries States Cities database in SQL Server using the provided SQL scripts.
+
+<Info>
+SQL Server installation typically takes 5-10 minutes and requires approximately 250MB of disk space.
+</Info>
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+- SQL Server 2016+ (SQL Server 2019+ recommended)
+- SQL Server Management Studio (SSMS) or Azure Data Studio
+- Administrative access to your SQL Server instance
+- At least 500MB free disk space
+- Downloaded the `sqlserver/world.sql` file from our [GitHub repository](https://github.com/dr5hn/countries-states-cities-database)
+
+<Note>
+SQL Server provides advanced enterprise features like partitioning, columnstore indexes, and in-memory processing that can significantly improve performance for large datasets.
+</Note>
+
+## Method 1: SQL Server Management Studio (SSMS)
+
+<Steps>
+<Step title="Create Database">
+  ```sql
+  CREATE DATABASE [world]
+  ON (
+    NAME = 'world_data',
+    FILENAME = 'C:\Data\world.mdf',
+    SIZE = 100MB,
+    MAXSIZE = 1GB,
+    FILEGROWTH = 10MB
+  )
+  LOG ON (
+    NAME = 'world_log',
+    FILENAME = 'C:\Data\world.ldf',
+    SIZE = 10MB,
+    MAXSIZE = 100MB,
+    FILEGROWTH = 5MB
+  );
+  ```
+  
+  <Warning>
+  Adjust the file paths according to your SQL Server data directory. Default is usually `C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\`.
+  </Warning>
+</Step>
+
+<Step title="Execute SQL Script">
+  - Open SSMS and connect to your server
+  - Open a new query window
+  - Set the database context: `USE [world]`
+  - Open the `sqlserver/world.sql` file
+  - Execute the script (F5)
+  
+  <Check>
+  The script includes table creation, data insertion, and index creation optimized for SQL Server.
+  </Check>
+</Step>
+
+<Step title="Verify Installation">
+  ```sql
+  USE [world];
+  
+  SELECT 
+    'countries' as table_name, COUNT(*) as record_count 
+  FROM countries
+  UNION ALL
+  SELECT 'states', COUNT(*) FROM states
+  UNION ALL  
+  SELECT 'cities', COUNT(*) FROM cities;
+  ```
+  
+  Expected output:
+  ```
+  table_name    record_count
+  countries     250
+  states        5038
+  cities        151024
+  ```
+</Step>
+</Steps>
+
+## Method 2: Command Line (sqlcmd)
+
+<Steps>
+<Step title="Create Database">
+  ```bash
+  sqlcmd -S localhost -E -Q "CREATE DATABASE world"
+  ```
+  
+  Or for SQL Server Authentication:
+  ```bash
+  sqlcmd -S localhost -U sa -P your_password -Q "CREATE DATABASE world"
+  ```
+</Step>
+
+<Step title="Import SQL File">
+  ```bash
+  sqlcmd -S localhost -E -d world -i sqlserver/world.sql
+  ```
+  
+  <Info>
+  Use `-U username -P password` instead of `-E` if not using Windows Authentication.
+  </Info>
+</Step>
+
+<Step title="Verify Installation">
+  ```bash
+  sqlcmd -S localhost -E -d world -Q "
+  SELECT 'countries' as table_name, COUNT(*) as count FROM countries
+  UNION ALL SELECT 'states', COUNT(*) FROM states  
+  UNION ALL SELECT 'cities', COUNT(*) FROM cities"
+  ```
+</Step>
+</Steps>
+
+## Method 3: Import/Export Wizard
+
+<Steps>
+<Step title="Launch Import Wizard">
+  - Right-click on the database in SSMS
+  - Select "Tasks" → "Import Data"
+  - Choose "SQL Server Native Client" as data source
+</Step>
+
+<Step title="Configure Source">
+  - Server name: your SQL Server instance
+  - Authentication: Windows or SQL Server
+  - Database: select source if importing from another SQL Server
+</Step>
+
+<Step title="Select Destination">
+  - Choose your target `world` database
+  - Select tables to import
+  - Configure any data type mappings
+</Step>
+</Steps>
+
+## Advanced Configuration
+
+### Create Application User and Login
+
+<Steps>
+<Step title="Create Login">
+  ```sql
+  USE master;
+  CREATE LOGIN [csc_user] 
+  WITH PASSWORD = 'SecurePassword123!',
+       DEFAULT_DATABASE = [world],
+       CHECK_POLICY = ON,
+       CHECK_EXPIRATION = OFF;
+  ```
+  
+  <Warning>
+  Use a strong password that meets your organization's security requirements.
+  </Warning>
+</Step>
+
+<Step title="Create Database User">
+  ```sql
+  USE [world];
+  CREATE USER [csc_user] FOR LOGIN [csc_user];
+  
+  -- Grant permissions
+  ALTER ROLE [db_datareader] ADD MEMBER [csc_user];
+  -- Add db_datawriter if write access needed
+  -- ALTER ROLE [db_datawriter] ADD MEMBER [csc_user];
+  ```
+</Step>
+</Steps>
+
+### Performance Optimization
+
+<CodeGroup>
+```sql Additional Indexes
+-- Performance indexes optimized for SQL Server
+CREATE NONCLUSTERED INDEX IX_Countries_ISO2 
+ON countries (iso2) 
+INCLUDE (name, region);
+
+CREATE NONCLUSTERED INDEX IX_Countries_Region 
+ON countries (region) 
+INCLUDE (name, iso2, iso3);
+
+CREATE NONCLUSTERED INDEX IX_States_CountryID 
+ON states (country_id) 
+INCLUDE (name, state_code);
+
+CREATE NONCLUSTERED INDEX IX_Cities_CountryID 
+ON cities (country_id) 
+INCLUDE (name, state_id, latitude, longitude);
+
+CREATE NONCLUSTERED INDEX IX_Cities_StateID 
+ON cities (state_id) 
+INCLUDE (name, latitude, longitude);
+
+CREATE NONCLUSTERED INDEX IX_Cities_Coordinates 
+ON cities (latitude, longitude) 
+INCLUDE (name, country_name, state_name);
+```
+
+```sql Columnstore Index
+-- Create columnstore index for analytical queries
+CREATE NONCLUSTERED COLUMNSTORE INDEX NCCI_Cities_Analytics
+ON cities (
+    country_id, state_id, name, country_name, 
+    state_name, latitude, longitude
+);
+```
+
+```sql Partitioning
+-- Partition large cities table by region (requires Enterprise edition)
+CREATE PARTITION FUNCTION PF_Region (NVARCHAR(100))
+AS RANGE LEFT FOR VALUES 
+('Africa', 'Asia', 'Europe', 'North America', 'Oceania');
+
+CREATE PARTITION SCHEME PS_Region
+AS PARTITION PF_Region
+TO (PRIMARY, PRIMARY, PRIMARY, PRIMARY, PRIMARY, PRIMARY);
+
+-- Apply partitioning when creating the table
+CREATE TABLE cities_partitioned (
+    -- columns...
+) ON PS_Region (region);
+```
+</CodeGroup>
+
+### Memory-Optimized Tables
+
+```sql
+-- Create memory-optimized filegroup (SQL Server 2014+)
+ALTER DATABASE [world] ADD FILEGROUP [world_memory] CONTAINS MEMORY_OPTIMIZED_DATA;
+ALTER DATABASE [world] ADD FILE (
+    name='world_memory', 
+    filename='C:\Data\world_memory'
+) TO FILEGROUP [world_memory];
+
+-- Create memory-optimized table for frequently accessed countries
+CREATE TABLE countries_memory (
+    id INT NOT NULL PRIMARY KEY NONCLUSTERED,
+    name NVARCHAR(100) NOT NULL,
+    iso2 NCHAR(2) NOT NULL,
+    iso3 NCHAR(3) NOT NULL,
+    region NVARCHAR(100),
+    
+    INDEX IX_Countries_Memory_ISO2 NONCLUSTERED (iso2),
+    INDEX IX_Countries_Memory_Region NONCLUSTERED (region)
+) WITH (MEMORY_OPTIMIZED = ON, DURABILITY = SCHEMA_AND_DATA);
+```
+
+## Database Structure Verification
+
+<CodeGroup>
+```sql Table Information
+-- Get table information
+SELECT 
+    t.name AS TableName,
+    s.name AS SchemaName,
+    p.rows AS RecordCount,
+    CAST(ROUND(((SUM(a.total_pages) * 8) / 1024.00), 2) AS NUMERIC(36, 2)) AS TotalSpaceMB,
+    CAST(ROUND(((SUM(a.used_pages) * 8) / 1024.00), 2) AS NUMERIC(36, 2)) AS UsedSpaceMB
+FROM sys.tables t
+INNER JOIN sys.indexes i ON t.object_id = i.object_id
+INNER JOIN sys.partitions p ON i.object_id = p.object_id AND i.index_id = p.index_id
+INNER JOIN sys.allocation_units a ON p.partition_id = a.container_id
+INNER JOIN sys.schemas s ON t.schema_id = s.schema_id
+WHERE t.name IN ('countries', 'states', 'cities')
+    AND i.index_id <= 1
+GROUP BY t.name, s.name, p.rows
+ORDER BY t.name;
+```
+
+```sql Index Analysis
+-- Check index usage statistics
+SELECT 
+    OBJECT_NAME(s.object_id) AS TableName,
+    i.name AS IndexName,
+    i.type_desc,
+    s.user_seeks,
+    s.user_scans,
+    s.user_lookups,
+    s.user_updates
+FROM sys.dm_db_index_usage_stats s
+INNER JOIN sys.indexes i ON s.object_id = i.object_id AND s.index_id = i.index_id
+WHERE OBJECT_NAME(s.object_id) IN ('countries', 'states', 'cities')
+ORDER BY TableName, IndexName;
+```
+
+```sql Sample Data
+-- View sample data with SQL Server specific functions
+SELECT TOP 5
+    id, name, iso2, iso3, region,
+    LEN(name) as name_length,
+    UPPER(iso2) as iso2_upper
+FROM countries;
+
+SELECT TOP 5
+    c.name, c.latitude, c.longitude,
+    GEOGRAPHY::Point(c.latitude, c.longitude, 4326) as geo_point,
+    c.country_name, c.state_name
+FROM cities c
+WHERE c.country_name = 'United States';
+```
+</CodeGroup>
+
+## Connection Examples
+
+<Tabs>
+<Tab title="C# (.NET)">
+```csharp
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+
+public class WorldDatabase : IDisposable
+{
+    private readonly string _connectionString;
+    private SqlConnection _connection;
+    
+    public WorldDatabase(string connectionString)
+    {
+        _connectionString = connectionString;
+        _connection = new SqlConnection(_connectionString);
+        _connection.Open();
+    }
+    
+    public List<Country> GetCountries(string region = null, int? limit = null)
+    {
+        var countries = new List<Country>();
+        var query = "SELECT id, name, iso2, iso3, region FROM countries";
+        var parameters = new List<SqlParameter>();
+        
+        if (!string.IsNullOrEmpty(region))
+        {
+            query += " WHERE region = @region";
+            parameters.Add(new SqlParameter("@region", region));
+        }
+        
+        if (limit.HasValue)
+        {
+            query += $" ORDER BY name OFFSET 0 ROWS FETCH NEXT {limit} ROWS ONLY";
+        }
+        
+        using var command = new SqlCommand(query, _connection);
+        command.Parameters.AddRange(parameters.ToArray());
+        
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            countries.Add(new Country
+            {
+                Id = reader.GetInt32("id"),
+                Name = reader.GetString("name"),
+                Iso2 = reader.GetString("iso2"),
+                Iso3 = reader.GetString("iso3"),
+                Region = reader.IsDBNull("region") ? null : reader.GetString("region")
+            });
+        }
+        
+        return countries;
+    }
+    
+    public List<City> GetCitiesByCountry(string countryName, int? limit = null)
+    {
+        var cities = new List<City>();
+        var query = @"
+            SELECT name, latitude, longitude, state_name, country_name
+            FROM cities 
+            WHERE country_name = @countryName";
+            
+        if (limit.HasValue)
+        {
+            query += $" ORDER BY name OFFSET 0 ROWS FETCH NEXT {limit} ROWS ONLY";
+        }
+        
+        using var command = new SqlCommand(query, _connection);
+        command.Parameters.AddWithValue("@countryName", countryName);
+        
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            cities.Add(new City
+            {
+                Name = reader.GetString("name"),
+                Latitude = reader.IsDBNull("latitude") ? null : reader.GetDouble("latitude"),
+                Longitude = reader.IsDBNull("longitude") ? null : reader.GetDouble("longitude"),
+                StateName = reader.IsDBNull("state_name") ? null : reader.GetString("state_name"),
+                CountryName = reader.GetString("country_name")
+            });
+        }
+        
+        return cities;
+    }
+    
+    public void Dispose()
+    {
+        _connection?.Dispose();
+    }
+}
+
+// Usage
+string connectionString = "Server=localhost;Database=world;Trusted_Connection=true;";
+using var db = new WorldDatabase(connectionString);
+
+var countries = db.GetCountries("Europe", 5);
+foreach (var country in countries)
+{
+    Console.WriteLine($"{country.Name} ({country.Iso2})");
+}
+```
+</Tab>
+
+<Tab title="Python (pyodbc)">
+```python
+import pyodbc
+from typing import List, Optional, Dict, Any
+
+class WorldDatabase:
+    def __init__(self, connection_string: str):
+        self.connection_string = connection_string
+        self.connection = pyodbc.connect(connection_string)
+        
+    def get_countries(self, region: Optional[str] = None, limit: Optional[int] = None) -> List[Dict[str, Any]]:
+        query = "SELECT id, name, iso2, iso3, region FROM countries"
+        params = []
+        
+        if region:
+            query += " WHERE region = ?"
+            params.append(region)
+            
+        if limit:
+            query += f" ORDER BY name OFFSET 0 ROWS FETCH NEXT {limit} ROWS ONLY"
+            
+        cursor = self.connection.cursor()
+        cursor.execute(query, params)
+        
+        columns = [column[0] for column in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+    
+    def get_cities_by_country(self, country_name: str, limit: Optional[int] = None) -> List[Dict[str, Any]]:
+        query = """
+            SELECT name, latitude, longitude, state_name, country_name
+            FROM cities 
+            WHERE country_name = ?
+        """
+        
+        if limit:
+            query += f" ORDER BY name OFFSET 0 ROWS FETCH NEXT {limit} ROWS ONLY"
+            
+        cursor = self.connection.cursor()
+        cursor.execute(query, [country_name])
+        
+        columns = [column[0] for column in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+    
+    def search_cities_fulltext(self, search_term: str, limit: int = 10) -> List[Dict[str, Any]]:
+        # Using SQL Server full-text search (requires full-text indexes)
+        query = """
+            SELECT name, country_name, state_name, latitude, longitude
+            FROM cities
+            WHERE CONTAINS(name, ?)
+            ORDER BY name
+            OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY
+        """
+        
+        cursor = self.connection.cursor()
+        cursor.execute(query, [search_term, limit])
+        
+        columns = [column[0] for column in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+    
+    def get_nearby_cities(self, latitude: float, longitude: float, radius_km: float = 100) -> List[Dict[str, Any]]:
+        # Using SQL Server spatial functions
+        query = """
+            SELECT name, country_name, state_name, latitude, longitude,
+                   geography::Point(?, ?, 4326).STDistance(geography::Point(latitude, longitude, 4326))/1000 as distance_km
+            FROM cities
+            WHERE geography::Point(?, ?, 4326).STDistance(geography::Point(latitude, longitude, 4326))/1000 <= ?
+            ORDER BY distance_km
+        """
+        
+        cursor = self.connection.cursor()
+        cursor.execute(query, [latitude, longitude, latitude, longitude, radius_km])
+        
+        columns = [column[0] for column in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+    
+    def close(self):
+        self.connection.close()
+
+# Usage example
+connection_string = (
+    "DRIVER={ODBC Driver 17 for SQL Server};"
+    "SERVER=localhost;"
+    "DATABASE=world;"
+    "Trusted_Connection=yes;"
+)
+
+db = WorldDatabase(connection_string)
+
+try:
+    # Get European countries
+    countries = db.get_countries(region="Europe", limit=5)
+    print("European Countries:")
+    for country in countries:
+        print(f"  {country['name']} ({country['iso2']})")
+    
+    # Get US cities
+    us_cities = db.get_cities_by_country("United States", limit=5)
+    print(f"\nUS Cities:")
+    for city in us_cities:
+        print(f"  {city['name']}, {city['state_name']}")
+    
+    # Find nearby cities (example: near New York)
+    nearby = db.get_nearby_cities(40.7128, -74.0060, radius_km=50)
+    print(f"\nCities near NYC:")
+    for city in nearby[:5]:
+        print(f"  {city['name']}: {city['distance_km']:.1f} km")
+
+finally:
+    db.close()
+```
+</Tab>
+
+<Tab title="Java (JDBC)">
+```java
+import java.sql.*;
+import java.util.*;
+
+public class WorldDatabase implements AutoCloseable {
+    private final Connection connection;
+    
+    public WorldDatabase(String connectionString) throws SQLException {
+        this.connection = DriverManager.getConnection(connectionString);
+    }
+    
+    public List<Map<String, Object>> getCountries(String region, Integer limit) throws SQLException {
+        StringBuilder query = new StringBuilder("SELECT id, name, iso2, iso3, region FROM countries");
+        List<Object> params = new ArrayList<>();
+        
+        if (region != null) {
+            query.append(" WHERE region = ?");
+            params.add(region);
+        }
+        
+        if (limit != null) {
+            query.append(" ORDER BY name OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY");
+            params.add(limit);
+        }
+        
+        try (PreparedStatement stmt = connection.prepareStatement(query.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
+            
+            ResultSet rs = stmt.executeQuery();
+            List<Map<String, Object>> results = new ArrayList<>();
+            
+            while (rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("id", rs.getInt("id"));
+                row.put("name", rs.getString("name"));
+                row.put("iso2", rs.getString("iso2"));
+                row.put("iso3", rs.getString("iso3"));
+                row.put("region", rs.getString("region"));
+                results.add(row);
+            }
+            
+            return results;
+        }
+    }
+    
+    public List<Map<String, Object>> getCitiesByCountry(String countryName, Integer limit) throws SQLException {
+        StringBuilder query = new StringBuilder(
+            "SELECT name, latitude, longitude, state_name, country_name FROM cities WHERE country_name = ?"
+        );
+        
+        if (limit != null) {
+            query.append(" ORDER BY name OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY");
+        }
+        
+        try (PreparedStatement stmt = connection.prepareStatement(query.toString())) {
+            stmt.setString(1, countryName);
+            if (limit != null) {
+                stmt.setInt(2, limit);
+            }
+            
+            ResultSet rs = stmt.executeQuery();
+            List<Map<String, Object>> results = new ArrayList<>();
+            
+            while (rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("name", rs.getString("name"));
+                row.put("latitude", rs.getDouble("latitude"));
+                row.put("longitude", rs.getDouble("longitude"));
+                row.put("state_name", rs.getString("state_name"));
+                row.put("country_name", rs.getString("country_name"));
+                results.add(row);
+            }
+            
+            return results;
+        }
+    }
+    
+    @Override
+    public void close() throws SQLException {
+        if (connection != null) {
+            connection.close();
+        }
+    }
+    
+    public static void main(String[] args) {
+        String connectionString = "jdbc:sqlserver://localhost:1433;databaseName=world;integratedSecurity=true;";
+        
+        try (WorldDatabase db = new WorldDatabase(connectionString)) {
+            // Get European countries
+            List<Map<String, Object>> countries = db.getCountries("Europe", 5);
+            System.out.println("European Countries:");
+            for (Map<String, Object> country : countries) {
+                System.out.printf("  %s (%s)%n", country.get("name"), country.get("iso2"));
+            }
+            
+            // Get US cities
+            List<Map<String, Object>> cities = db.getCitiesByCountry("United States", 5);
+            System.out.println("\nUS Cities:");
+            for (Map<String, Object> city : cities) {
+                System.out.printf("  %s, %s%n", city.get("name"), city.get("state_name"));
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+        }
+    }
+}
+```
+</Tab>
+</Tabs>
+
+## Enterprise Features
+
+### Spatial Data and Geography
+
+<CodeGroup>
+```sql Spatial Data Types
+-- Add geography column for precise spatial operations
+ALTER TABLE cities ADD geolocation GEOGRAPHY;
+
+-- Update geography data
+UPDATE cities 
+SET geolocation = geography::Point(latitude, longitude, 4326)
+WHERE latitude IS NOT NULL AND longitude IS NOT NULL;
+
+-- Create spatial index
+CREATE SPATIAL INDEX IX_Cities_Geolocation ON cities (geolocation);
+```
+
+```sql Spatial Queries
+-- Find cities within 100km of New York
+DECLARE @center GEOGRAPHY = geography::Point(40.7128, -74.0060, 4326);
+
+SELECT name, country_name, state_name,
+       @center.STDistance(geolocation)/1000 as distance_km
+FROM cities
+WHERE @center.STDistance(geolocation) <= 100000
+ORDER BY distance_km;
+
+-- Find cities within a polygon
+DECLARE @polygon GEOGRAPHY = geography::STGeomFromText(
+    'POLYGON((-74.1 40.6, -74.1 40.8, -73.9 40.8, -73.9 40.6, -74.1 40.6))', 4326
+);
+
+SELECT * FROM cities 
+WHERE @polygon.STContains(geolocation) = 1;
+```
+</CodeGroup>
+
+### Full-Text Search
+
+<CodeGroup>
+```sql Setup Full-Text Search
+-- Create full-text catalog
+CREATE FULLTEXT CATALOG ft_world_catalog;
+
+-- Create full-text indexes
+CREATE FULLTEXT INDEX ON countries (name) KEY INDEX PK_Countries;
+CREATE FULLTEXT INDEX ON cities (name) KEY INDEX PK_Cities;
+```
+
+```sql Full-Text Queries
+-- Search for countries
+SELECT name, region FROM countries 
+WHERE CONTAINS(name, '"United*"');
+
+-- Search cities with ranking
+SELECT name, country_name, 
+       KEY_TBL.RANK
+FROM cities 
+INNER JOIN CONTAINSTABLE(cities, name, 'paris OR london') AS KEY_TBL
+    ON cities.id = KEY_TBL.[KEY]
+ORDER BY KEY_TBL.RANK DESC;
+```
+</CodeGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Cannot Connect to Server">
+**Problem**: `A network-related or instance-specific error occurred`
+
+**Solutions**:
+1. Check if SQL Server service is running
+2. Verify SQL Server Browser service is running
+3. Check firewall settings (default port 1433)
+4. Enable TCP/IP protocol in SQL Server Configuration Manager
+5. Verify connection string format
+</Accordion>
+
+<Accordion title="Login Failed">
+**Problem**: `Login failed for user`
+
+**Solutions**:
+1. Check username and password
+2. Verify SQL Server authentication mode (Mixed Mode vs Windows)
+3. Check user permissions: `SELECT * FROM sys.server_principals`
+4. Ensure user is mapped to database: `SELECT * FROM sys.database_principals`
+5. Check if account is locked or disabled
+</Accordion>
+
+<Accordion title="Insufficient Memory">
+**Problem**: Import fails with memory errors
+
+**Solutions**:
+1. Increase SQL Server max memory setting
+2. Import data in smaller batches
+3. Temporarily disable indexes during import
+4. Check available disk space for tempdb
+5. Monitor memory usage during import
+</Accordion>
+
+<Accordion title="Slow Query Performance">
+**Problem**: Queries are running slowly
+
+**Solutions**:
+1. Check execution plans using `SET STATISTICS IO ON`
+2. Create appropriate indexes (see Performance section)
+3. Update statistics: `UPDATE STATISTICS table_name`
+4. Check for missing indexes: `sys.dm_db_missing_index_details`
+5. Consider columnstore indexes for analytical queries
+</Accordion>
+</AccordionGroup>
+
+## Backup and Maintenance
+
+### Backup Strategy
+
+<CodeGroup>
+```sql Full Database Backup
+-- Create full backup
+BACKUP DATABASE [world] 
+TO DISK = 'C:\Backups\world_full_backup.bak'
+WITH FORMAT, COMPRESSION, CHECKSUM;
+
+-- Verify backup
+RESTORE VERIFYONLY FROM DISK = 'C:\Backups\world_full_backup.bak';
+```
+
+```sql Automated Backup Script
+-- Create backup job (requires SQL Server Agent)
+DECLARE @BackupPath NVARCHAR(500);
+SET @BackupPath = 'C:\Backups\world_' + 
+    FORMAT(GETDATE(), 'yyyyMMdd_HHmmss') + '.bak';
+
+BACKUP DATABASE [world] 
+TO DISK = @BackupPath
+WITH FORMAT, COMPRESSION, CHECKSUM,
+     DESCRIPTION = 'Automated full backup of world database';
+
+-- Clean up old backups (keep last 7)
+DECLARE @CleanupDate DATETIME = DATEADD(day, -7, GETDATE());
+EXEC xp_delete_file 0, 'C:\Backups\', 'bak', @CleanupDate;
+```
+</CodeGroup>
+
+### Maintenance Tasks
+
+<CodeGroup>
+```sql Index Maintenance
+-- Check index fragmentation
+SELECT 
+    OBJECT_NAME(i.object_id) AS TableName,
+    i.name AS IndexName,
+    s.avg_fragmentation_in_percent,
+    s.page_count
+FROM sys.dm_db_index_physical_stats(DB_ID(), NULL, NULL, NULL, 'DETAILED') s
+INNER JOIN sys.indexes i ON s.object_id = i.object_id AND s.index_id = i.index_id
+WHERE s.avg_fragmentation_in_percent > 10
+ORDER BY s.avg_fragmentation_in_percent DESC;
+
+-- Rebuild fragmented indexes
+ALTER INDEX ALL ON countries REBUILD WITH (ONLINE = ON);
+ALTER INDEX ALL ON cities REBUILD WITH (ONLINE = ON);
+```
+
+```sql Statistics Maintenance
+-- Update all statistics
+UPDATE STATISTICS countries WITH FULLSCAN;
+UPDATE STATISTICS states WITH FULLSCAN;
+UPDATE STATISTICS cities WITH FULLSCAN;
+
+-- Check statistics information
+SELECT 
+    t.name AS TableName,
+    s.name AS StatName,
+    STATS_DATE(s.object_id, s.stats_id) AS LastUpdated,
+    s.auto_created,
+    s.user_created
+FROM sys.stats s
+INNER JOIN sys.tables t ON s.object_id = t.object_id
+WHERE t.name IN ('countries', 'states', 'cities')
+ORDER BY LastUpdated;
+```
+</CodeGroup>
+
+<Tip>
+Use SQL Server Maintenance Plans to automate backup, index maintenance, and statistics updates for production environments.
+</Tip>
+
+## Next Steps
+
+After successful installation:
+
+1. **Configure security** with proper user roles and permissions
+2. **Set up monitoring** with SQL Server Management Studio or third-party tools
+3. **Implement backup strategy** including full, differential, and log backups
+4. **Optimize for your workload** using columnstore indexes or partitioning
+5. **Configure Always On** availability groups for high availability
+
+<Card title="Need Help?" icon="support">
+  Join our [community discussions](https://github.com/dr5hn/countries-states-cities-database/discussions) for SQL Server-specific questions and enterprise optimization tips.
+</Card>

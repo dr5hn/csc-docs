@@ -1,0 +1,671 @@
+---
+title: "Use Cases"
+description: "Real-world examples showing how to use CSC Export Tool for e-commerce, mobile apps, analytics, and more with exact cost breakdowns."
+icon: "lightbulb"
+---
+
+Discover how developers across different industries use the CSC Export Tool to solve real-world challenges. Each use case includes exact field selections, format recommendations, and cost breakdowns.
+
+## E-commerce & Online Stores
+
+### 🛒 Checkout Country Dropdown
+
+**Challenge**: Create a country selection dropdown for checkout forms with currency information.
+
+<Tabs>
+<Tab title="Requirements">
+**What You Need:**
+- Country names for the dropdown
+- ISO codes for form processing
+- Currency codes for payment processing
+- Currency symbols for price display
+
+**Expected Outcome:**
+Clean dropdown with ~195 countries, each with currency information for seamless checkout experience.
+</Tab>
+
+<Tab title="Export Configuration">
+**Dataset Selection:**
+- ✅ Countries
+
+**Field Selection:**
+- `name` - Display name for dropdown
+- `iso2` - For form processing and validation
+- `currency` - Payment processing integration
+- `currency_symbol` - Price display formatting
+- `emoji` - Enhanced UX (optional)
+
+**Format:** JSON (perfect for web applications)
+
+**Total Cost:** 1 credit
+</Tab>
+
+<Tab title="Implementation">
+```json Sample Output
+{
+  "countries": [
+    {
+      "name": "United States",
+      "iso2": "US",
+      "currency": "USD", 
+      "currency_symbol": "$",
+      "emoji": "🇺🇸"
+    },
+    {
+      "name": "United Kingdom",
+      "iso2": "GB", 
+      "currency": "GBP",
+      "currency_symbol": "£", 
+      "emoji": "🇬🇧"
+    }
+  ]
+}
+```
+
+```javascript Frontend Integration
+// Load countries data
+const countries = exportData.countries;
+
+// Populate dropdown
+countries.forEach(country => {
+  const option = document.createElement('option');
+  option.value = country.iso2;
+  option.textContent = `${country.emoji} ${country.name}`;
+  countrySelect.appendChild(option);
+});
+
+// Update currency display when country changes
+countrySelect.addEventListener('change', (e) => {
+  const selectedCountry = countries.find(c => c.iso2 === e.target.value);
+  updatePriceDisplay(selectedCountry.currency_symbol);
+});
+```
+</Tab>
+</Tabs>
+
+### 🌍 Multi-Region Shipping Calculator
+
+**Challenge**: Build a shipping calculator that works across countries and states.
+
+<CardGroup cols={2}>
+<Card title="Dataset Requirements" icon="database">
+- Countries with regions
+- States with country relationships
+- Geographic coordinates for distance calculation
+</Card>
+<Card title="Cost Breakdown" icon="calculator">
+- Countries: 1 credit
+- States: 2 credits
+- JSON format: Free
+- **Total: 3 credits**
+</Card>
+</CardGroup>
+
+<AccordionGroup>
+<Accordion title="Export Configuration">
+**Datasets:** Countries + States
+
+**Countries Fields:**
+- `name`, `iso2`, `currency`, `region`, `subregion`
+
+**States Fields:**
+- `name`, `iso2`, `country_code`, `latitude`, `longitude`
+
+**Format:** JSON
+</Accordion>
+
+<Accordion title="Sample Implementation">
+```javascript Shipping Calculator
+// Group states by country for efficient lookup
+const statesByCountry = {};
+exportData.states.forEach(state => {
+  if (!statesByCountry[state.country_code]) {
+    statesByCountry[state.country_code] = [];
+  }
+  statesByCountry[state.country_code].push(state);
+});
+
+// Calculate shipping based on location
+function calculateShipping(countryCode, stateCode = null) {
+  const country = exportData.countries.find(c => c.iso2 === countryCode);
+  
+  if (stateCode && statesByCountry[countryCode]) {
+    const state = statesByCountry[countryCode].find(s => s.iso2 === stateCode);
+    return calculateDistanceShipping(state.latitude, state.longitude);
+  }
+  
+  return getRegionalShippingRate(country.region);
+}
+```
+</Accordion>
+</AccordionGroup>
+
+## Mobile Application Development
+
+### 📱 Location-Based Service App
+
+**Challenge**: Create a travel app with city-based recommendations and weather integration.
+
+<Tabs>
+<Tab title="Scenario">
+**App Type:** Travel recommendations app
+**Need:** Cities with coordinates for weather API integration and location services
+**Target:** All available cities with coordinate data
+</Tab>
+
+<Tab title="Export Strategy">
+**Dataset:** Cities
+
+**Essential Fields:**
+- `name` - City display name
+- `country_code` - Country context
+- `state_code` - State/province context  
+- `latitude`, `longitude` - Weather API integration
+
+**Format:** JSON
+
+**Cost:** 3 credits
+</Tab>
+
+<Tab title="Mobile Integration">
+```swift iOS Implementation
+struct City: Codable {
+    let name: String
+    let countryCode: String
+    let stateCode: String
+    let latitude: Double
+    let longitude: Double
+}
+
+// Filter cities by country or region if needed
+let filteredCities = cities.filter { $0.countryCode == "US" }
+
+// Integrate with weather service
+func getWeatherForCity(_ city: City) {
+    let weatherAPI = "https://api.weather.com/v1/current"
+    let url = "\(weatherAPI)?lat=\(city.latitude)&lng=\(city.longitude)"
+    
+    // Use coordinates for weather API integration
+    // ... weather integration
+}
+```
+</Tab>
+</Tabs>
+
+### 🗺️ Offline Maps Application
+
+**Challenge**: Pre-load geographical boundaries for offline map functionality.
+
+<Warning>
+**Data Volume Consideration**: Cities dataset contains 150,000+ records. Consider filtering by country or region to optimize app size and performance.
+</Warning>
+
+<Steps>
+<Step title="Country Filtering Strategy">
+Use the built-in country filter to export only relevant regions:
+
+```json Export Configuration
+{
+  "datasets": ["states"],
+  "country_filter": ["US", "CA", "MX"], // North America only
+  "fields": ["name", "state_code", "country_code", "latitude", "longitude"],
+  "format": "json"
+}
+```
+**Cost:** 2 credits (States only, JSON format)
+</Step>
+
+<Step title="Data Optimization">
+```javascript Data Processing
+// Group by country for efficient storage
+const statesByCountry = exportData.states.reduce((acc, state) => {
+  acc[state.country_code] = acc[state.country_code] || [];
+  acc[state.country_code].push({
+    name: state.name,
+    code: state.state_code,
+    coords: [state.latitude, state.longitude]
+  });
+  return acc;
+}, {});
+
+// Store in mobile app's local database
+await storeOfflineData('geographical_boundaries', statesByCountry);
+```
+</Step>
+</Steps>
+
+## Data Analytics & Business Intelligence
+
+### 📊 Market Analysis Dashboard
+
+**Challenge**: Create a comprehensive dashboard showing global market data with geographic and currency insights.
+
+<CardGroup cols={3}>
+<Card title="Data Requirements" icon="chart-bar">
+**Countries with:**
+- Regional classifications
+- Currency information
+- Geographic data
+- Language and timezone data
+</Card>
+<Card title="Export Format" icon="file-csv">
+**CSV for Excel/Tableau**
+- Easy pivot table creation
+- Chart integration
+- Stakeholder sharing
+</Card>
+<Card title="Total Investment" icon="credit-card">
+**2 Credits Total**
+- Countries: 1 credit
+- CSV format: +1 credit
+</Card>
+</CardGroup>
+
+<Tabs>
+<Tab title="Field Selection">
+**Comprehensive Analytics Fields:**
+
+```csv Field Configuration
+name,iso2,iso3,region,subregion,currency,currency_name,
+currency_symbol,phonecode,capital,latitude,longitude,
+timezones,translations,native,emoji,nationality
+```
+
+**Why These Fields:**
+- **Geographic**: region, subregion, coordinates for mapping
+- **Currency**: currency codes, names, symbols for market analysis  
+- **Communication**: phonecode, timezones for business operations
+- **Cultural**: native names, translations, nationality for localization
+</Tab>
+
+<Tab title="Excel Integration">
+```excel Power Query Integration
+// Excel Power Query M formula
+let
+    Source = Csv.Document(File.Contents("C:\exports\countries_analytics.csv")),
+    Headers = Table.PromoteHeaders(Source),
+    
+    // Add calculated columns
+    WithPhonePrefix = Table.AddColumn(Headers, "PhonePrefix", 
+        each "+" & [phonecode]),
+    
+    WithCurrencyInfo = Table.AddColumn(WithPhonePrefix, "CurrencyDisplay",
+        each [currency_symbol] & " (" & [currency] & ")"),
+        
+    // Group by region for analysis
+    GroupedByRegion = Table.Group(WithCurrencyInfo, {"region"}, 
+        {{"Countries", each _, type table}})
+in
+    GroupedByRegion
+```
+</Tab>
+
+<Tab title="Tableau Dashboard">
+**Key Visualizations:**
+1. **World Map**: Currency zones by country
+2. **Regional Distribution**: Country count by region  
+3. **Communication Coverage**: Phone code analysis
+4. **Time Zone Analysis**: Global business hours overlap
+
+```sql Tableau Calculated Fields
+// Currency Zone Display
+[currency_symbol] + " " + [currency_name]
+
+// Phone Code Formatting  
+"+" + [phonecode]
+
+// Regional Country Count
+COUNT([name])
+```
+</Tab>
+</Tabs>
+
+### 📈 Sales Territory Planning
+
+**Challenge**: Optimize sales territories based on geographic and regional data.
+
+<AccordionGroup>
+<Accordion title="Territory Mapping Strategy">
+**Datasets Needed:**
+- Countries: Base territory definition
+- States: Sub-territory planning
+- Cities: Account distribution analysis
+
+**Export Configuration:**
+- Countries + States + Cities
+- CSV format for spreadsheet analysis
+- Cost: 1 + 2 + 3 + 1 = **7 credits**
+
+**ROI Justification:** Saves 20+ hours of data collection and cleaning
+</Accordion>
+
+<Accordion title="Sales Analytics Implementation">
+```sql Territory Analysis Queries
+-- Create territory performance views
+CREATE VIEW territory_performance AS
+SELECT 
+    co.region as territory,
+    COUNT(DISTINCT co.iso2) as countries_covered,
+    COUNT(DISTINCT co.currency) as currencies_supported,
+    COUNT(DISTINCT s.id) as states_count,
+    COUNT(DISTINCT ci.id) as cities_count,
+    GROUP_CONCAT(DISTINCT co.currency) as currency_list
+FROM countries co
+LEFT JOIN states s ON co.iso2 = s.country_code  
+LEFT JOIN cities ci ON s.id = ci.state_id
+GROUP BY co.region;
+
+-- Identify expansion opportunities
+SELECT territory, countries_covered, currencies_supported, currency_list
+FROM territory_performance 
+WHERE countries_covered < 5  -- Underrepresented territories
+ORDER BY countries_covered DESC;
+```
+</Accordion>
+</AccordionGroup>
+
+## Web Development & APIs
+
+### 🌐 Multi-language Website Localization
+
+**Challenge**: Support international users with localized country/region names.
+
+<Info>
+**Localization Tip**: CSC data includes native country names and translations, perfect for international websites serving global audiences.
+</Info>
+
+<Tabs>
+<Tab title="Export Configuration">
+**Dataset:** Countries
+
+**Localization Fields:**
+- `name` - English name
+- `native` - Native language name
+- `translations` - Multiple language support
+- `currency` - Local currency
+- `nationality` - Country nationality
+- `emoji` - Country flag emoji
+
+**Format:** JSON
+**Cost:** 1 credit
+</Tab>
+
+<Tab title="Implementation">
+```javascript i18n Integration
+// Country data with translations
+const countryData = {
+  "US": {
+    "name": "United States", 
+    "native": "United States",
+    "translations": {
+      "es": "Estados Unidos",
+      "fr": "États-Unis", 
+      "de": "Vereinigte Staaten"
+    },
+    "nationality": "American",
+    "emoji": "🇺🇸"
+  }
+};
+
+// Localization function
+function getLocalizedCountryName(countryCode, locale = 'en') {
+  const country = countryData[countryCode];
+  
+  if (locale === 'en') return country.name;
+  if (locale === country.native.toLowerCase().slice(0, 2)) return country.native;
+  if (country.translations[locale]) return country.translations[locale];
+  
+  return country.name; // Fallback to English
+}
+
+// Usage in React component
+function CountrySelector({ locale }) {
+  return (
+    <select>
+      {Object.keys(countryData).map(code => (
+        <option key={code} value={code}>
+          {countryData[code].emoji} {getLocalizedCountryName(code, locale)}
+        </option>
+      ))}
+    </select>
+  );
+}
+```
+</Tab>
+</Tabs>
+
+### 🔗 API Response Enhancement
+
+**Challenge**: Enhance existing API responses with geographical context.
+
+<Steps>
+<Step title="User Location Context">
+**Scenario**: Add country/region context to user profiles
+
+```json Before Enhancement
+{
+  "user_id": "123",
+  "name": "John Doe", 
+  "country_code": "US"
+}
+```
+
+```json After Enhancement
+{
+  "user_id": "123",
+  "name": "John Doe",
+  "location": {
+    "country": "United States",
+    "country_code": "US", 
+    "region": "Northern America",
+    "currency": "USD",
+    "timezone": "America/New_York",
+    "flag": "🇺🇸"
+  }
+}
+```
+</Step>
+
+<Step title="Implementation Strategy">
+```javascript API Enhancement
+// Load geographical data at server startup
+const geoData = loadCSCExport('./countries_enhanced.json');
+const countryLookup = new Map(
+  geoData.countries.map(c => [c.iso2, c])
+);
+
+// Enhance API responses  
+app.get('/users/:id', async (req, res) => {
+  const user = await User.findById(req.params.id);
+  const countryInfo = countryLookup.get(user.country_code);
+  
+  res.json({
+    ...user.toJSON(),
+    location: {
+      country: countryInfo.name,
+      country_code: countryInfo.iso2,
+      region: countryInfo.region, 
+      currency: countryInfo.currency,
+      timezone: countryInfo.timezones[0], // Primary timezone
+      flag: countryInfo.emoji
+    }
+  });
+});
+```
+</Step>
+</Steps>
+
+## Database & DevOps
+
+### 🗄️ Database Seeding & Migration
+
+**Challenge**: Populate database tables with geographical reference data.
+
+<Warning>
+**Production Tip**: Always use SQL format for database imports to ensure proper data types, constraints, and relationships.
+</Warning>
+
+<Tabs>
+<Tab title="PostgreSQL Setup">
+**Export Configuration:**
+- Dataset: Countries + States
+- Format: SQL (+3 credits)
+- Total Cost: 1 + 2 + 3 = **6 credits**
+
+```sql Generated Output Example
+-- Table creation (automatically included)
+CREATE TABLE IF NOT EXISTS countries (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    iso2 CHAR(2) UNIQUE NOT NULL,
+    iso3 CHAR(3) UNIQUE NOT NULL,
+    phonecode VARCHAR(255),
+    currency CHAR(3),
+    region VARCHAR(100),
+    subregion VARCHAR(100)
+);
+
+-- Data insertion
+INSERT INTO countries (name, iso2, iso3, phonecode, currency, region, subregion) 
+VALUES 
+('United States', 'US', 'USA', '1', 'USD', 'Americas', 'Northern America'),
+('Canada', 'CA', 'CAN', '1', 'CAD', 'Americas', 'Northern America');
+
+-- Foreign key relationships automatically handled
+CREATE TABLE IF NOT EXISTS states (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    state_code VARCHAR(10) NOT NULL,
+    country_id INTEGER REFERENCES countries(id),
+    latitude DECIMAL(10, 8),
+    longitude DECIMAL(11, 8)
+);
+```
+</Tab>
+
+<Tab title="Migration Integration">
+```javascript Node.js Migration
+// database/migrations/001_seed_geographical_data.js
+const fs = require('fs');
+const path = require('path');
+
+exports.up = async function(knex) {
+  // Read the CSC-generated SQL file
+  const sqlFile = path.join(__dirname, '../seeds/csc_export.sql');
+  const sqlContent = fs.readFileSync(sqlFile, 'utf8');
+  
+  // Execute the SQL statements
+  const statements = sqlContent.split(';').filter(stmt => stmt.trim());
+  
+  for (const statement of statements) {
+    if (statement.trim()) {
+      await knex.raw(statement);
+    }
+  }
+  
+  console.log('Geographical data seeded successfully');
+};
+
+exports.down = async function(knex) {
+  await knex('states').del();
+  await knex('countries').del();
+};
+```
+</Tab>
+
+<Tab title="Docker Integration">
+```dockerfile Database Container
+# Dockerfile for PostgreSQL with geographical data
+FROM postgres:14
+
+# Copy CSC export SQL file
+COPY ./exports/geographical_data.sql /docker-entrypoint-initdb.d/
+
+# Environment variables
+ENV POSTGRES_DB=myapp
+ENV POSTGRES_USER=app_user 
+ENV POSTGRES_PASSWORD=secure_password
+
+# The SQL file will be automatically executed on container startup
+```
+
+```yaml Docker Compose
+version: '3.8'
+services:
+  database:
+    build: ./database
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./exports:/tmp/exports
+    environment:
+      - POSTGRES_DB=myapp
+      
+volumes:
+  pgdata:
+```
+</Tab>
+</Tabs>
+
+## Cost Optimization Strategies
+
+### 💡 Minimize Credit Usage
+
+<CardGroup cols={2}>
+<Card title="Smart Field Selection" icon="bullseye">
+**Only export fields you actually need**
+- Audit your code to identify used fields
+- Remove debugging/testing fields
+- Consider computed fields vs exported fields
+</Card>
+
+<Card title="Format Optimization" icon="code">
+**Choose the right format**
+- JSON: Free for web apps
+- CSV: +1 credit for analysis
+- SQL: +3 credits for databases only
+</Card>
+</CardGroup>
+
+### 🎯 Strategic Export Planning
+
+<AccordionGroup>
+<Accordion title="Combine Related Exports">
+**Instead of:** 3 separate exports (3 transactions, potential for higher costs)
+- Countries for dropdown (1 credit)  
+- States for shipping (2 credits)
+- Countries for currency (1 credit) - duplicate!
+
+**Smart approach:** 1 combined export (4 credits total)
+- Countries + States with all needed fields
+- Single download, unified data structure
+- Better data consistency
+</Accordion>
+
+<Accordion title="Leverage 30-Day Access">
+**Re-download Strategy:**
+- Create comprehensive exports monthly
+- Re-download for different projects within 30 days
+- Share exports across team members
+- Plan exports around sprint cycles
+</Accordion>
+
+<Accordion title="Development vs Production">
+**Development Phase:**
+- Use free JSON format for prototyping
+- Export minimal field sets for testing
+- Iterate with preview feature (free)
+
+**Production Deployment:**
+- Create final export with all needed fields
+- Choose production-appropriate format
+- Document export configuration for future updates
+</Accordion>
+</AccordionGroup>
+
+---
+
+<Note>
+**Ready to implement your use case?** Start with the [getting started guide](/tools/export-tool/getting-started) to create your account and get 3 free credits for testing.
+</Note>

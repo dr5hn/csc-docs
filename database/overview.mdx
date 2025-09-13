@@ -1,0 +1,193 @@
+---
+title: "Database Overview"
+description: "Complete geographical database with 250+ countries, 5000+ states, and 150,000+ cities in multiple formats"
+icon: "database"
+---
+
+## Introduction
+
+The Countries States Cities Database is the world's most comprehensive open-source geographical database, providing structured data for countries, states/provinces, and cities worldwide. With regular updates and multiple export formats, it serves as the foundation for countless applications requiring geographical data.
+
+<CardGroup cols={2}>
+  <Card title="Live Database Demo" icon="play" href="https://demo.countrystatecity.in/">
+    Explore the complete database online with search and filtering capabilities.
+  </Card>
+  <Card title="Download Database" icon="download" href="https://github.com/dr5hn/countries-states-cities-database">
+    Access the latest database files in all supported formats from GitHub.
+  </Card>
+</CardGroup>
+
+## Database Statistics
+
+Our database contains comprehensive geographical data covering the entire world:
+
+<div className="grid grid-cols-2 md:grid-cols-5 gap-4 my-6">
+  <div className="text-center p-4 bg-blue-50 rounded-lg">
+    <div className="text-2xl font-bold text-blue-600">6</div>
+    <div className="text-sm text-blue-600">Regions</div>
+  </div>
+  <div className="text-center p-4 bg-green-50 rounded-lg">
+    <div className="text-2xl font-bold text-green-600">22</div>
+    <div className="text-sm text-green-600">Subregions</div>
+  </div>
+  <div className="text-center p-4 bg-purple-50 rounded-lg">
+    <div className="text-2xl font-bold text-purple-600">250</div>
+    <div className="text-sm text-purple-600">Countries</div>
+  </div>
+  <div className="text-center p-4 bg-orange-50 rounded-lg">
+    <div className="text-2xl font-bold text-orange-600">5,038</div>
+    <div className="text-sm text-orange-600">States</div>
+  </div>
+  <div className="text-center p-4 bg-red-50 rounded-lg">
+    <div className="text-2xl font-bold text-red-600">151,024</div>
+    <div className="text-sm text-red-600">Cities</div>
+  </div>
+</div>
+
+<Info>
+Last Updated: 17th August 2025
+</Info>
+
+## Available Formats
+
+The database is available in multiple formats to suit different technical requirements and use cases:
+
+### Database Formats
+
+<Tabs>
+  <Tab title="SQL Databases">
+    <div className="space-y-3">
+      - **MySQL** (.sql) - Popular open-source relational database
+      - **PostgreSQL** (.sql) - Advanced open-source relational database  
+      - **SQLite** (.sqlite3) - Lightweight file-based database
+      - **SQL Server** (.sql) - Microsoft SQL Server compatible format
+    </div>
+  </Tab>
+  
+  <Tab title="NoSQL & Document">
+    <div className="space-y-3">
+      - **MongoDB** (.tar.gz) - Document-oriented NoSQL database
+      - **JSON** (.json) - Structured data format for APIs and applications
+    </div>
+  </Tab>
+  
+  <Tab title="Data Exchange">
+    <div className="space-y-3">
+      - **CSV** (.csv) - Comma-separated values for spreadsheets
+      - **XML** (.xml) - Structured markup format
+      - **YAML** (.yaml) - Human-readable data serialization
+    </div>
+  </Tab>
+  
+  <Tab title="Analytics">
+    <div className="space-y-3">
+      - **DuckDB** - Analytical database (via conversion from SQLite)
+      - **Parquet** - Columnar storage format (planned)
+    </div>
+  </Tab>
+</Tabs>
+
+## File Distribution Matrix
+
+Different data combinations are available depending on your needs:
+
+| File Type | JSON | MySQL | PostgreSQL | SQLite | SQL Server | MongoDB | XML | YAML | CSV |
+|-----------|------|-------|------------|--------|------------|---------|-----|------|-----|
+| **Regions** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Subregions** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Countries** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **States** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Cities** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Country+States** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Country+Cities** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Complete World** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+
+<Note>
+Hierarchical combinations (Country+States, Country+Cities) are primarily available in JSON format for optimal nested data representation.
+</Note>
+
+## Key Features
+
+### Comprehensive Coverage
+- **Complete geographical hierarchy** from regions down to cities
+- **Standardized naming** using official sources and international standards
+- **ISO codes** for countries (ISO 3166-1) and states where available
+- **Coordinate data** with latitude and longitude for cities
+- **Timezone information** for accurate time-based applications
+
+### Data Quality
+- **Regular updates** with community contributions and automated monitoring
+- **Multiple validation layers** ensuring data consistency and accuracy
+- **Source attribution** for transparency and verification
+- **Version control** with detailed changelog tracking
+
+### Developer-Friendly
+- **Multiple export formats** supporting different technology stacks
+- **Consistent schema** across all formats
+- **Well-documented** structure with clear relationships
+- **API integration** for real-time access alongside offline database usage
+
+## Common Use Cases
+
+<CardGroup cols={2}>
+  <Card title="E-commerce Platforms" icon="cart-shopping">
+    Address forms, shipping calculations, tax regions, and location-based services.
+  </Card>
+  <Card title="Analytics & BI" icon="chart-bar">
+    Geographic data analysis, regional reporting, and location-based insights.
+  </Card>
+  <Card title="Mobile Applications" icon="mobile">
+    Location selection, offline maps, regional content delivery.
+  </Card>
+  <Card title="Government & Public Sector" icon="landmark">
+    Census data integration, administrative boundaries, public service delivery.
+  </Card>
+</CardGroup>
+
+## Quick Start Options
+
+Choose the approach that best fits your project:
+
+<Steps>
+<Step title="Direct Database Download">
+  Download pre-built database files from [GitHub](https://github.com/dr5hn/countries-states-cities-database) in your preferred format.
+  
+  <Check>
+  Perfect for offline applications or when you need complete control over the data.
+  </Check>
+</Step>
+
+<Step title="API Integration">
+  Use our [REST API](/api/introduction) for real-time data access without managing database files.
+  
+  <Tip>
+  Ideal for applications that need always up-to-date data and don't want to handle updates.
+  </Tip>
+</Step>
+
+<Step title="Custom Export">
+  Use our [Export Tool](/tools/export-tool) to create customized datasets with specific filters and formats.
+  
+  <Info>
+  Great for specific regional focus or when you only need subset of the data.
+  </Info>
+</Step>
+</Steps>
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="Schema Documentation" icon="sitemap" href="/database/schema">
+    Understand the database structure, tables, and relationships.
+  </Card>
+  <Card title="Installation Guide" icon="download" href="/database/installation">
+    Step-by-step instructions for setting up the database in different environments.
+  </Card>
+  <Card title="Data Sources" icon="database" href="/database/data-sources">
+    Learn about our data sources and quality assurance process.
+  </Card>
+</CardGroup>
+
+<Warning>
+While we strive for accuracy, geographical data can change due to political developments, administrative reorganization, or other factors. Always verify critical data against official sources when needed.
+</Warning>

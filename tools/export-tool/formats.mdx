@@ -1,0 +1,1577 @@
+---
+title: "Export Formats"
+description: "Complete guide to all available export formats including JSON, CSV, XML, YAML, and SQL with code examples and use case recommendations."
+icon: "file-code"
+---
+
+Choose the perfect format for your project. Each format is optimized for specific use cases and comes with different credit costs and integration patterns.
+
+## Format Overview
+
+<CardGroup cols={3}>
+<Card title="JSON" icon="brackets-curly">
+**Free Format**
+- Web applications
+- APIs and microservices  
+- JavaScript/Node.js projects
+- Mobile app backends
+</Card>
+
+<Card title="CSV" icon="table">
+**+1 Credit**
+- Spreadsheet analysis
+- Data science workflows
+- Excel/Google Sheets
+- BI tools and dashboards
+</Card>
+
+<Card title="XML" icon="code">
+**+2 Credits**
+- Enterprise systems
+- SOAP APIs
+- Legacy system integration
+- Configuration files
+</Card>
+
+<Card title="YAML" icon="file-lines">
+**+2 Credits**
+- Configuration files
+- DevOps and CI/CD
+- Documentation
+- Human-readable data
+</Card>
+
+<Card title="SQL" icon="database">
+**+3 Credits**  
+- Database seeding
+- Data migration
+- Direct imports
+- Production deployments
+</Card>
+</CardGroup>
+
+## JSON Format (Free)
+
+The most popular format for modern web development. Perfect for APIs, web applications, and mobile backends.
+
+<Tabs>
+<Tab title="Structure & Examples">
+**Clean, nested structure with logical grouping:**
+
+```json Sample Countries Export
+{
+  "countries": [
+    {
+      "name": "United States",
+      "iso2": "US",
+      "iso3": "USA", 
+      "phonecode": "1",
+      "currency": "USD",
+      "currency_symbol": "$",
+      "region": "Americas",
+      "subregion": "Northern America",
+      "latitude": 37.09024,
+      "longitude": -95.712891,
+      "emoji": "🇺🇸",
+      "native": "United States"
+    },
+    {
+      "name": "Canada", 
+      "iso2": "CA",
+      "iso3": "CAN",
+      "phonecode": "1", 
+      "currency": "CAD",
+      "currency_symbol": "C$",
+      "region": "Americas",
+      "subregion": "Northern America", 
+      "latitude": 56.130366,
+      "longitude": -106.346771,
+      "emoji": "🇨🇦",
+      "native": "Canada"
+    }
+  ],
+  "metadata": {
+    "total_countries": 2,
+    "export_date": "2024-01-15T10:30:00Z",
+    "fields": ["name", "iso2", "iso3", "phonecode", "currency"],
+    "version": "1.0"
+  }
+}
+```
+
+**Multi-dataset structure:**
+```json Countries + States Export
+{
+  "countries": [
+    {
+      "name": "United States",
+      "iso2": "US",
+      "states_count": 50
+    }
+  ],
+  "states": [
+    {
+      "name": "California", 
+      "iso2": "CA",
+      "country_code": "US",
+      "latitude": 36.778261,
+      "longitude": -119.417932
+    }
+  ],
+  "metadata": {
+    "countries_count": 1,
+    "states_count": 50,
+    "export_date": "2024-01-15T10:30:00Z"
+  }
+}
+```
+</Tab>
+
+<Tab title="Integration Examples">
+**JavaScript/Node.js Integration:**
+
+```javascript Frontend Usage
+// Load and parse JSON data
+const geoData = await fetch('/data/export.json').then(r => r.json());
+
+// Create country dropdown
+function populateCountryDropdown(selectElement) {
+  geoData.countries.forEach(country => {
+    const option = new Option(
+      `${country.emoji} ${country.name}`, 
+      country.iso2
+    );
+    selectElement.add(option);
+  });
+}
+
+// Quick lookup functions
+const countryLookup = new Map(
+  geoData.countries.map(c => [c.iso2, c])
+);
+
+function getCountryByCode(code) {
+  return countryLookup.get(code);
+}
+
+function getCurrencySymbol(countryCode) {
+  const country = countryLookup.get(countryCode);
+  return country?.currency_symbol || '$';
+}
+```
+
+**React Component Example:**
+```jsx React Integration
+import { useState, useEffect } from 'react';
+
+function CountrySelector({ onCountryChange }) {
+  const [countries, setCountries] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState('');
+  
+  useEffect(() => {
+    fetch('/data/countries-export.json')
+      .then(response => response.json())
+      .then(data => setCountries(data.countries));
+  }, []);
+  
+  const handleChange = (e) => {
+    const countryCode = e.target.value;
+    const country = countries.find(c => c.iso2 === countryCode);
+    setSelectedCountry(countryCode);
+    onCountryChange(country);
+  };
+  
+  return (
+    <div>
+      <select value={selectedCountry} onChange={handleChange}>
+        <option value="">Select Country</option>
+        {countries.map(country => (
+          <option key={country.iso2} value={country.iso2}>
+            {country.emoji} {country.name}
+          </option>
+        ))}
+      </select>
+      
+      {selectedCountry && (
+        <div className="country-info">
+          <p>Currency: {getSelectedCountry()?.currency_symbol}</p>
+          <p>Region: {getSelectedCountry()?.region}</p>
+        </div>
+      )}
+    </div>
+  );
+  
+  function getSelectedCountry() {
+    return countries.find(c => c.iso2 === selectedCountry);
+  }
+}
+```
+
+**API Response Enhancement:**
+```javascript Express.js API
+const geoData = require('./exports/countries.json');
+const countryMap = new Map(geoData.countries.map(c => [c.iso2, c]));
+
+app.get('/api/users/:id', async (req, res) => {
+  const user = await User.findById(req.params.id);
+  const countryInfo = countryMap.get(user.country_code);
+  
+  res.json({
+    ...user,
+    location: {
+      country_name: countryInfo?.name,
+      country_emoji: countryInfo?.emoji,
+      currency: countryInfo?.currency,
+      region: countryInfo?.region
+    }
+  });
+});
+```
+</Tab>
+
+<Tab title="Best Practices">
+**Performance Optimization:**
+
+```javascript Efficient Data Loading
+// Lazy load large datasets
+class GeoDataManager {
+  constructor() {
+    this.countriesCache = null;
+    this.statesCache = new Map(); // Country code -> states
+  }
+  
+  async getCountries() {
+    if (!this.countriesCache) {
+      const response = await fetch('/data/countries.json');
+      this.countriesCache = (await response.json()).countries;
+    }
+    return this.countriesCache;
+  }
+  
+  async getStatesByCountry(countryCode) {
+    if (!this.statesCache.has(countryCode)) {
+      // Load states on demand
+      const response = await fetch(`/data/states-${countryCode}.json`);
+      const states = (await response.json()).states;
+      this.statesCache.set(countryCode, states);
+    }
+    return this.statesCache.get(countryCode);
+  }
+}
+```
+
+**Data Validation:**
+```javascript Input Validation
+function validateCountryCode(code) {
+  const country = geoData.countries.find(c => c.iso2 === code);
+  if (!country) {
+    throw new Error(`Invalid country code: ${code}`);
+  }
+  return country;
+}
+
+function validateStateForCountry(stateCode, countryCode) {
+  const states = geoData.states.filter(s => s.country_code === countryCode);
+  const state = states.find(s => s.iso2 === stateCode);
+  if (!state) {
+    throw new Error(`Invalid state ${stateCode} for country ${countryCode}`);
+  }
+  return state;
+}
+```
+</Tab>
+</Tabs>
+
+## CSV Format (+1 Credit)
+
+Perfect for spreadsheet analysis, data science workflows, and business intelligence tools.
+
+<Tabs>
+<Tab title="Structure & Format">
+**Clean, standardized CSV with headers:**
+
+```csv Countries Export
+name,iso2,iso3,phonecode,currency,currency_symbol,region,subregion,latitude,longitude,capital,emoji
+United States,US,USA,1,USD,$,Americas,Northern America,37.09024,-95.712891,Washington,🇺🇸
+Canada,CA,CAN,1,CAD,C$,Americas,Northern America,56.130366,-106.346771,Ottawa,🇨🇦
+United Kingdom,GB,GBR,44,GBP,£,Europe,Northern Europe,55.378051,-3.435973,London,🇬🇧
+```
+
+**Multi-sheet structure for combined datasets:**
+```csv countries.csv
+name,iso2,currency,capital
+United States,US,USD,Washington
+Canada,CA,CAD,Ottawa
+```
+
+```csv states.csv  
+name,iso2,country_code,latitude,longitude
+California,CA,US,36.778261,-119.417932
+Texas,TX,US,31.968599,-99.901813
+```
+</Tab>
+
+<Tab title="Excel Integration">
+**Power Query Import:**
+
+```excel Power Query M Formula
+let
+    Source = Csv.Document(File.Contents("C:\exports\countries.csv"),[Delimiter=",", Encoding=1252]),
+    PromotedHeaders = Table.PromoteHeaders(Source,[PromoteAllScalars=true]),
+    
+    // Type conversions
+    ChangedTypes = Table.TransformColumnTypes(PromotedHeaders,{
+        {"latitude", type number},
+        {"longitude", type number},
+        {"phonecode", type text}
+    }),
+    
+    // Add calculated columns
+    AddedPhoneDisplay = Table.AddColumn(ChangedTypes, "PhoneDisplay", 
+        each "+" & [phonecode]),
+        
+    AddedCurrencyDisplay = Table.AddColumn(AddedPhoneDisplay, "CurrencyDisplay",
+        each [currency_symbol] & " " & [currency])
+in
+    AddedCurrencyDisplay
+```
+
+**Pivot Table Analysis:**
+```excel VBA Macro
+Sub CreateCountryAnalysis()
+    Dim ws As Worksheet
+    Dim pt As PivotTable
+    
+    ' Create pivot table from imported data
+    Set ws = ActiveSheet
+    Set pt = ws.PivotTableWizard(xlDatabase, ws.Range("A1").CurrentRegion)
+    
+    With pt.PivotFields("region")
+        .Orientation = xlRowField
+    End With
+    
+    With pt.PivotFields("name")
+        .Orientation = xlDataField
+        .Function = xlCount
+    End With
+    
+    With pt.PivotFields("currency") 
+        .Orientation = xlColumnField
+    End With
+End Sub
+```
+</Tab>
+
+<Tab title="Python/Pandas Usage">
+**Data Analysis with Pandas:**
+
+```python Data Science Workflow
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load CSV data
+countries = pd.read_csv('exports/countries.csv')
+states = pd.read_csv('exports/states.csv') 
+
+# Basic analysis
+print(countries.describe())
+print(countries['region'].value_counts())
+
+# Advanced analytics
+countries['phone_display'] = '+' + countries['phonecode'].astype(str)
+countries['currency_display'] = countries['currency_symbol'] + ' ' + countries['currency']
+
+# Regional analysis
+regional_stats = countries.groupby('region').agg({
+    'name': 'count',
+    'currency': 'nunique', 
+    'phonecode': 'nunique',
+    'latitude': 'mean',
+    'longitude': 'mean'
+}).round(2)
+
+print(regional_stats)
+
+# Visualization
+plt.figure(figsize=(12, 8))
+sns.scatterplot(data=countries, x='longitude', y='latitude', 
+                hue='region', style='currency', s=60)
+plt.title('Countries by Geographic Location and Currency')
+plt.show()
+
+# Export analysis results
+regional_stats.to_csv('analysis/regional_summary.csv')
+```
+
+**Machine Learning Preprocessing:**
+```python ML Feature Engineering
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.cluster import KMeans
+import numpy as np
+
+# Prepare features for clustering (using numeric fields only)
+features = ['latitude', 'longitude']
+X = countries[features].fillna(countries[features].mean())
+
+# Add encoded categorical features
+le_region = LabelEncoder()
+le_currency = LabelEncoder()
+countries['region_encoded'] = le_region.fit_transform(countries['region'])
+countries['currency_encoded'] = le_currency.fit_transform(countries['currency'])
+
+# Combine features
+features_extended = features + ['region_encoded', 'currency_encoded']
+X_extended = countries[features_extended]
+
+# Normalize features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X_extended)
+
+# Country clustering
+kmeans = KMeans(n_clusters=5, random_state=42)
+countries['cluster'] = kmeans.fit_predict(X_scaled)
+
+# Analyze clusters
+cluster_summary = countries.groupby('cluster')[['latitude', 'longitude', 'region']].agg({
+    'latitude': 'mean',
+    'longitude': 'mean', 
+    'region': lambda x: x.mode().iloc[0]  # Most common region
+})
+
+print(cluster_summary)
+```
+</Tab>
+</Tabs>
+
+## XML Format (+2 Credits)
+
+Ideal for enterprise systems, SOAP APIs, and legacy system integrations that require structured, schema-validated data.
+
+<Tabs>
+<Tab title="Structure & Schema">
+**Well-formed XML with proper namespaces:**
+
+```xml Countries Export
+<?xml version="1.0" encoding="UTF-8"?>
+<csc:export xmlns:csc="https://countrystatecity.in/schemas/v1" 
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="https://countrystatecity.in/schemas/v1 csc-schema.xsd">
+  
+  <csc:metadata>
+    <csc:export_date>2024-01-15T10:30:00Z</csc:export_date>
+    <csc:version>1.0</csc:version>
+    <csc:total_records>247</csc:total_records>
+  </csc:metadata>
+  
+  <csc:countries>
+    <csc:country>
+      <csc:basic_info>
+        <csc:name>United States</csc:name>
+        <csc:native_name>United States</csc:native_name>
+        <csc:iso2>US</csc:iso2>
+        <csc:iso3>USA</csc:iso3>
+        <csc:emoji>🇺🇸</csc:emoji>
+      </csc:basic_info>
+      
+      <csc:contact_info>
+        <csc:phonecode>1</csc:phonecode>
+        <csc:capital>Washington</csc:capital>
+      </csc:contact_info>
+      
+      <csc:economic_info>
+        <csc:currency code="USD" symbol="$">US Dollar</csc:currency>
+        <csc:currency_name>US Dollar</csc:currency_name>
+      </csc:economic_info>
+      
+      <csc:geographic_info>
+        <csc:region>Americas</csc:region>
+        <csc:subregion>Northern America</csc:subregion>
+        <csc:coordinates>
+          <csc:latitude>37.09024</csc:latitude>
+          <csc:longitude>-95.712891</csc:longitude>
+        </csc:coordinates>
+      </csc:geographic_info>
+      
+      <csc:cultural_info>
+        <csc:nationality>American</csc:nationality>
+        <csc:native_name>United States</csc:native_name>
+      </csc:cultural_info>
+      
+      <csc:timezones>
+        <csc:timezone>America/New_York</csc:timezone>
+        <csc:timezone>America/Chicago</csc:timezone>
+        <csc:timezone>America/Denver</csc:timezone>
+        <csc:timezone>America/Los_Angeles</csc:timezone>
+      </csc:timezones>
+    </csc:country>
+  </csc:countries>
+</csc:export>
+```
+</Tab>
+
+<Tab title="Enterprise Integration">
+**Java/Spring Boot Integration:**
+
+```java XML Processing with JAXB
+@XmlRootElement(name = "export", namespace = "https://countrystatecity.in/schemas/v1")
+public class CSCExport {
+    @XmlElement(name = "countries")
+    private Countries countries;
+    
+    @XmlElement(name = "metadata") 
+    private Metadata metadata;
+    
+    // Getters and setters
+}
+
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Countries {
+    @XmlElement(name = "country")
+    private List<Country> countryList;
+}
+
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Country {
+    @XmlElement(name = "basic_info")
+    private BasicInfo basicInfo;
+    
+    @XmlElement(name = "economic_info")
+    private EconomicInfo economicInfo;
+    
+    @XmlElement(name = "geographic_info")
+    private GeographicInfo geographicInfo;
+}
+
+// Service class for XML processing
+@Service
+public class GeographicalDataService {
+    
+    @Autowired
+    private JAXBContext jaxbContext;
+    
+    public CSCExport loadGeographicalData(String xmlFilePath) throws Exception {
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        return (CSCExport) unmarshaller.unmarshal(new File(xmlFilePath));
+    }
+    
+    public List<Country> getCountriesByRegion(String region) {
+        return loadedData.getCountries().getCountryList().stream()
+            .filter(c -> region.equals(c.getGeographicInfo().getRegion()))
+            .collect(Collectors.toList());
+    }
+}
+```
+
+**SOAP Web Service Integration:**
+```java SOAP Service
+@WebService
+@SOAPBinding(style = SOAPBinding.Style.DOCUMENT)
+public class GeographicalWebService {
+    
+    @WebMethod
+    public CountryInfo getCountryByCode(@WebParam(name = "countryCode") String code) {
+        // Load from CSC XML export
+        CSCExport data = geographicalDataService.loadGeographicalData("csc-export.xml");
+        
+        Country country = data.getCountries().getCountryList().stream()
+            .filter(c -> code.equals(c.getBasicInfo().getIso2()))
+            .findFirst()
+            .orElse(null);
+            
+        return convertToCountryInfo(country);
+    }
+    
+    @WebMethod
+    public List<CountryInfo> getCountriesByRegion(@WebParam(name = "region") String region) {
+        return geographicalDataService.getCountriesByRegion(region).stream()
+            .map(this::convertToCountryInfo)
+            .collect(Collectors.toList());
+    }
+}
+```
+</Tab>
+
+<Tab title="XPath Queries">
+**Advanced XML Querying:**
+
+```xquery XPath Examples
+(: Get all countries in Americas region :)
+//csc:country[csc:geographic_info/csc:region='Americas']/csc:basic_info/csc:name
+
+(: Find countries with USD currency :)
+//csc:country[csc:economic_info/csc:currency/@code='USD']/csc:basic_info/csc:name
+
+(: Get currency codes for European countries :)
+//csc:country[csc:geographic_info/csc:region='Europe']/csc:economic_info/csc:currency/@code
+
+(: Find countries with multiple timezones :)
+//csc:country[count(csc:timezones/csc:timezone) > 1]/csc:basic_info/csc:name
+```
+
+**C# .NET XML Processing:**
+```csharp XML Document Processing
+using System.Xml;
+using System.Xml.Linq;
+
+public class GeographicalDataProcessor 
+{
+    private XDocument xmlDoc;
+    private XNamespace ns = "https://countrystatecity.in/schemas/v1";
+    
+    public void LoadData(string xmlFilePath) 
+    {
+        xmlDoc = XDocument.Load(xmlFilePath);
+    }
+    
+    public IEnumerable<CountryModel> GetCountriesByRegion(string region) 
+    {
+        return xmlDoc.Descendants(ns + "country")
+            .Where(c => c.Element(ns + "geographic_info")
+                         ?.Element(ns + "region")?.Value == region)
+            .Select(c => new CountryModel 
+            {
+                Name = c.Element(ns + "basic_info")?.Element(ns + "name")?.Value,
+                Iso2 = c.Element(ns + "basic_info")?.Element(ns + "iso2")?.Value,
+                Currency = c.Element(ns + "economic_info")?.Element(ns + "currency")?.Attribute("code")?.Value
+            });
+    }
+    
+    public int GetCountryCountByRegion(string region) 
+    {
+        return xmlDoc.Descendants(ns + "country")
+            .Where(c => c.Element(ns + "geographic_info")?.Element(ns + "region")?.Value == region)
+            .Count();
+    }
+}
+```
+</Tab>
+</Tabs>
+
+## YAML Format (+2 Credits)
+
+Human-readable format perfect for configuration files, documentation, and DevOps workflows.
+
+<Tabs>
+<Tab title="Structure & Format">
+**Clean, hierarchical YAML structure:**
+
+```yaml Countries Export
+metadata:
+  export_date: "2024-01-15T10:30:00Z"
+  version: "1.0"
+  total_countries: 247
+  fields:
+    - name
+    - iso2
+    - currency
+    - region
+
+countries:
+  - name: "United States"
+    iso2: "US"
+    iso3: "USA"
+    basic_info:
+      native_name: "United States"
+      emoji: "🇺🇸"
+      capital: "Washington"
+    
+    contact_info:
+      phonecode: "1"
+      tld: ".us"
+    
+    economic_info:
+      currency: "USD"
+      currency_symbol: "$"
+      currency_name: "US Dollar"
+    
+    geographic_info:
+      region: "Americas"
+      subregion: "Northern America"
+      coordinates:
+        latitude: 37.09024
+        longitude: -95.712891
+    
+    cultural_info:
+      nationality: "American"
+      native_name: "United States"
+    
+    timezones:
+      - "America/New_York"
+      - "America/Chicago"
+      - "America/Denver"
+      - "America/Los_Angeles"
+
+  - name: "Canada"
+    iso2: "CA" 
+    iso3: "CAN"
+    basic_info:
+      native_name: "Canada"
+      emoji: "🇨🇦"
+      capital: "Ottawa"
+    
+    economic_info:
+      currency: "CAD"
+      currency_symbol: "C$"
+      currency_name: "Canadian Dollar"
+    
+    geographic_info:
+      region: "Americas"
+      subregion: "Northern America"
+      coordinates:
+        latitude: 56.130366
+        longitude: -106.346771
+```
+</Tab>
+
+<Tab title="Configuration Usage">
+**Kubernetes Deployment Configuration:**
+
+```yaml k8s-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: geo-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: geo-service
+  template:
+    metadata:
+      labels:
+        app: geo-service
+    spec:
+      containers:
+      - name: geo-service
+        image: geo-service:latest
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: geo-data
+          mountPath: /app/data
+        env:
+        - name: GEO_DATA_PATH
+          value: "/app/data/countries.yaml"
+      volumes:
+      - name: geo-data
+        configMap:
+          name: geographical-data
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: geographical-data
+data:
+  countries.yaml: |
+    # CSC Export Data
+    countries:
+      - name: "United States"
+        iso2: "US"
+        currency: "USD"
+        region: "Americas"
+```
+
+**Docker Compose with YAML Config:**
+```yaml docker-compose.yml
+version: '3.8'
+services:
+  geo-api:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./exports/countries.yaml:/app/config/countries.yaml:ro
+    environment:
+      - CONFIG_FILE=/app/config/countries.yaml
+      - LOG_LEVEL=info
+    depends_on:
+      - redis
+      
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  geo-data:
+    driver: local
+```
+</Tab>
+
+<Tab title="Application Integration">
+**Python YAML Processing:**
+
+```python Python Integration
+import yaml
+from pathlib import Path
+
+class GeographicalConfig:
+    def __init__(self, config_path: str):
+        self.config_path = Path(config_path)
+        self.data = None
+        self.load_config()
+    
+    def load_config(self):
+        """Load YAML configuration file"""
+        with open(self.config_path, 'r', encoding='utf-8') as file:
+            self.data = yaml.safe_load(file)
+    
+    def get_countries_by_region(self, region: str) -> list:
+        """Filter countries by region"""
+        return [
+            country for country in self.data['countries']
+            if country['geographic_info']['region'] == region
+        ]
+    
+    def get_country_by_code(self, iso2_code: str) -> dict:
+        """Get country by ISO2 code"""
+        for country in self.data['countries']:
+            if country['iso2'] == iso2_code:
+                return country
+        return None
+    
+    def get_supported_currencies(self) -> set:
+        """Get all unique currencies"""
+        return {
+            country['economic_info']['currency'] 
+            for country in self.data['countries']
+        }
+
+# Usage in Flask application
+from flask import Flask, jsonify
+app = Flask(__name__)
+geo_config = GeographicalConfig('exports/countries.yaml')
+
+@app.route('/api/countries/<region>')
+def get_countries_by_region(region):
+    countries = geo_config.get_countries_by_region(region)
+    return jsonify(countries)
+
+@app.route('/api/currencies')  
+def get_currencies():
+    currencies = list(geo_config.get_supported_currencies())
+    return jsonify(sorted(currencies))
+```
+
+**Node.js YAML Configuration:**
+```javascript Node.js Integration
+const yaml = require('js-yaml');
+const fs = require('fs');
+const path = require('path');
+
+class GeoDataManager {
+  constructor(configPath) {
+    this.configPath = configPath;
+    this.data = null;
+    this.loadConfig();
+  }
+  
+  loadConfig() {
+    try {
+      const fileContents = fs.readFileSync(this.configPath, 'utf8');
+      this.data = yaml.load(fileContents);
+      console.log(`Loaded ${this.data.countries.length} countries`);
+    } catch (error) {
+      console.error('Error loading YAML config:', error);
+      throw error;
+    }
+  }
+  
+  // Hot reload configuration on file changes
+  watchConfig() {
+    fs.watchFile(this.configPath, (curr, prev) => {
+      console.log('Config file changed, reloading...');
+      this.loadConfig();
+    });
+  }
+  
+  getCountryByCode(iso2) {
+    return this.data.countries.find(c => c.iso2 === iso2);
+  }
+  
+  getRegionStats() {
+    const stats = {};
+    this.data.countries.forEach(country => {
+      const region = country.geographic_info.region;
+      stats[region] = (stats[region] || 0) + 1;
+    });
+    return stats;
+  }
+}
+
+// Express.js integration
+const express = require('express');
+const app = express();
+const geoData = new GeoDataManager('./exports/countries.yaml');
+
+// Enable hot reload in development
+if (process.env.NODE_ENV === 'development') {
+  geoData.watchConfig();
+}
+
+app.get('/api/stats/regions', (req, res) => {
+  res.json(geoData.getRegionStats());
+});
+```
+</Tab>
+</Tabs>
+
+## SQL Format (+3 Credits)
+
+Ready-to-execute SQL statements for direct database imports, perfect for production deployments and data migrations.
+
+<Tabs>
+<Tab title="Generated SQL Structure">
+**Complete database schema with relationships:**
+
+```sql Countries & States Export
+-- CSC Export Generated SQL
+-- Generated on: 2024-01-15T10:30:00Z
+-- Version: 1.0
+-- Contains: Countries, States
+
+-- Drop existing tables (optional)
+-- DROP TABLE IF EXISTS states;
+-- DROP TABLE IF EXISTS countries;
+
+-- Create countries table
+CREATE TABLE IF NOT EXISTS countries (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    iso2 CHAR(2) UNIQUE NOT NULL,
+    iso3 CHAR(3) UNIQUE NOT NULL,
+    numeric_code VARCHAR(10),
+    phonecode VARCHAR(20),
+    capital VARCHAR(255),
+    currency CHAR(3),
+    currency_name VARCHAR(100),
+    currency_symbol VARCHAR(10),
+    tld VARCHAR(10),
+    native VARCHAR(255),
+    region VARCHAR(100),
+    subregion VARCHAR(100),
+    latitude DECIMAL(10, 8),
+    longitude DECIMAL(11, 8),
+    emoji VARCHAR(10),
+    emojiU VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    flag BOOLEAN DEFAULT TRUE,
+    
+    -- Indexes for performance
+    INDEX idx_countries_iso2 (iso2),
+    INDEX idx_countries_iso3 (iso3),
+    INDEX idx_countries_region (region),
+    INDEX idx_countries_currency (currency)
+);
+
+-- Create states table
+CREATE TABLE IF NOT EXISTS states (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    country_id INTEGER NOT NULL,
+    country_code CHAR(2) NOT NULL,
+    fips_code VARCHAR(10),
+    iso2 VARCHAR(10),
+    type VARCHAR(50),
+    latitude DECIMAL(10, 8),
+    longitude DECIMAL(11, 8),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    flag BOOLEAN DEFAULT TRUE,
+    wikiDataId VARCHAR(50),
+    
+    -- Foreign key relationship
+    FOREIGN KEY (country_id) REFERENCES countries(id) ON DELETE CASCADE,
+    
+    -- Indexes
+    INDEX idx_states_country_id (country_id),
+    INDEX idx_states_country_code (country_code),
+    INDEX idx_states_name (name)
+);
+
+-- Insert countries data
+INSERT INTO countries (
+    name, iso2, iso3, numeric_code, phonecode, capital, currency, 
+    currency_name, currency_symbol, tld, native, region, subregion, 
+    latitude, longitude, emoji, emojiU
+) VALUES
+('United States', 'US', 'USA', '840', '1', 'Washington', 'USD', 'US dollar', '$', '.us', 'United States', 'Americas', 'Northern America', 37.09024000, -95.71289100, '🇺🇸', 'U+1F1FA U+1F1F8'),
+('Canada', 'CA', 'CAN', '124', '1', 'Ottawa', 'CAD', 'Canadian dollar', '$', '.ca', 'Canada', 'Americas', 'Northern America', 56.13036600, -106.34677100, '🇨🇦', 'U+1F1E8 U+1F1E6'),
+('United Kingdom', 'GB', 'GBR', '826', '44', 'London', 'GBP', 'British pound', '£', '.uk', 'United Kingdom', 'Europe', 'Northern Europe', 55.37805100, -3.43597300, '🇬🇧', 'U+1F1EC U+1F1E7');
+
+-- Insert states data (with proper country_id references)
+INSERT INTO states (
+    name, country_id, country_code, fips_code, iso2, type, 
+    latitude, longitude, wikiDataId
+) VALUES
+('Alabama', (SELECT id FROM countries WHERE iso2 = 'US'), 'US', '01', 'AL', 'state', 32.31823140, -86.90229800, 'Q173'),
+('Alaska', (SELECT id FROM countries WHERE iso2 = 'US'), 'US', '02', 'AK', 'state', 66.16044020, -153.36914700, 'Q797'),
+('Alberta', (SELECT id FROM countries WHERE iso2 = 'CA'), 'CA', NULL, 'AB', 'province', 53.93327060, -116.57664600, 'Q1951');
+
+-- Create views for common queries
+CREATE VIEW countries_with_stats AS
+SELECT 
+    c.*,
+    COUNT(s.id) as states_count,
+    AVG(s.latitude) as avg_state_latitude,
+    AVG(s.longitude) as avg_state_longitude
+FROM countries c
+LEFT JOIN states s ON c.id = s.country_id
+GROUP BY c.id;
+
+-- Create stored procedures for common operations
+DELIMITER //
+CREATE PROCEDURE GetCountryWithStates(IN country_code CHAR(2))
+BEGIN
+    SELECT c.*, s.name as state_name, s.iso2 as state_iso2
+    FROM countries c
+    LEFT JOIN states s ON c.id = s.country_id
+    WHERE c.iso2 = country_code
+    ORDER BY s.name;
+END //
+DELIMITER ;
+
+-- Grant permissions (adjust as needed)
+-- GRANT SELECT, INSERT, UPDATE ON countries TO 'app_user'@'%';
+-- GRANT SELECT, INSERT, UPDATE ON states TO 'app_user'@'%';
+```
+</Tab>
+
+<Tab title="Database Integration">
+**PostgreSQL Migration:**
+
+```sql PostgreSQL Optimized
+-- migration_001_geographical_data.sql
+-- PostgreSQL specific optimizations
+
+-- Enable extensions
+CREATE EXTENSION IF NOT EXISTS postgis; -- For geographic data types
+CREATE EXTENSION IF NOT EXISTS pg_trgm; -- For text search
+
+-- Create countries table with PostgreSQL features
+CREATE TABLE countries (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    iso2 CHAR(2) UNIQUE NOT NULL,
+    iso3 CHAR(3) UNIQUE NOT NULL,
+    phonecode VARCHAR(20),
+    currency CHAR(3),
+    region VARCHAR(100),
+    subregion VARCHAR(100),
+    
+    -- PostGIS geometry column for advanced geographic queries
+    geom GEOMETRY(POINT, 4326),
+    
+    -- JSON column for flexible data storage
+    metadata JSONB,
+    
+    -- Full text search
+    search_vector tsvector,
+    
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create advanced indexes
+CREATE INDEX CONCURRENTLY idx_countries_geom ON countries USING GIST (geom);
+CREATE INDEX CONCURRENTLY idx_countries_search ON countries USING GIN (search_vector);
+CREATE INDEX CONCURRENTLY idx_countries_metadata ON countries USING GIN (metadata);
+CREATE INDEX CONCURRENTLY idx_countries_region_hash ON countries USING HASH (region);
+
+-- Insert data with PostGIS points
+INSERT INTO countries (name, iso2, iso3, phonecode, currency, region, subregion, geom, metadata) VALUES
+('United States', 'US', 'USA', '1', 'USD', 'Americas', 'Northern America', 
+ ST_SetSRID(ST_MakePoint(-95.71289100, 37.09024000), 4326),
+ '{"capital": "Washington", "native": "United States", "nationality": "American"}'::jsonb);
+
+-- Update search vectors
+UPDATE countries SET search_vector = to_tsvector('english', name || ' ' || region || ' ' || subregion);
+
+-- Create trigger for automatic search vector updates
+CREATE OR REPLACE FUNCTION update_countries_search_vector() RETURNS trigger AS $$
+BEGIN
+    NEW.search_vector := to_tsvector('english', NEW.name || ' ' || NEW.region || ' ' || NEW.subregion);
+    NEW.updated_at := NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_countries_search_vector 
+    BEFORE INSERT OR UPDATE ON countries
+    FOR EACH ROW EXECUTE FUNCTION update_countries_search_vector();
+```
+
+**MySQL Production Setup:**
+```sql MySQL Optimized
+-- MySQL 8.0+ with JSON support
+CREATE TABLE countries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    iso2 CHAR(2) UNIQUE NOT NULL,
+    iso3 CHAR(3) UNIQUE NOT NULL,
+    phonecode VARCHAR(20),
+    currency CHAR(3),
+    region VARCHAR(100),
+    subregion VARCHAR(100),
+    
+    -- Spatial data type
+    coordinates POINT SRID 4326,
+    
+    -- JSON for flexible metadata
+    metadata JSON,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    -- Indexes
+    INDEX idx_countries_region (region),
+    INDEX idx_countries_currency (currency),
+    SPATIAL INDEX idx_countries_coordinates (coordinates),
+    
+    -- Full text search
+    FULLTEXT INDEX idx_countries_search (name, region, subregion)
+) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Insert with spatial data
+INSERT INTO countries (name, iso2, iso3, phonecode, currency, region, subregion, coordinates, metadata) VALUES
+('United States', 'US', 'USA', '1', 'USD', 'Americas', 'Northern America',
+ ST_GeomFromText('POINT(-95.71289100 37.09024000)', 4326),
+ JSON_OBJECT('capital', 'Washington', 'native', 'United States', 'nationality', 'American'));
+
+-- Create stored procedures
+DELIMITER //
+CREATE PROCEDURE GetNearbyCountries(IN target_lat DECIMAL(10,8), IN target_lng DECIMAL(11,8), IN radius_km INT)
+BEGIN
+    SELECT name, iso2, 
+           ST_Distance_Sphere(coordinates, ST_GeomFromText(CONCAT('POINT(', target_lng, ' ', target_lat, ')'), 4326)) / 1000 AS distance_km
+    FROM countries 
+    WHERE ST_Distance_Sphere(coordinates, ST_GeomFromText(CONCAT('POINT(', target_lng, ' ', target_lat, ')'), 4326)) / 1000 <= radius_km
+    ORDER BY distance_km;
+END //
+DELIMITER ;
+```
+</Tab>
+
+<Tab title="Application Integration">
+**Django Model Integration:**
+
+```python Django Models
+# models.py
+from django.contrib.gis.db import models
+from django.contrib.postgres.fields import ArrayField
+import uuid
+
+class Country(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    iso2 = models.CharField(max_length=2, unique=True, db_index=True)
+    iso3 = models.CharField(max_length=3, unique=True)
+    phonecode = models.CharField(max_length=20, null=True, blank=True)
+    currency = models.CharField(max_length=3, db_index=True)
+    region = models.CharField(max_length=100, db_index=True)
+    subregion = models.CharField(max_length=100)
+    
+    # PostGIS fields
+    coordinates = models.PointField(srid=4326, null=True, blank=True)
+    
+    # JSON field for flexible data
+    metadata = models.JSONField(default=dict, blank=True)
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'countries'
+        indexes = [
+            models.Index(fields=['region', 'currency']),
+            models.Index(fields=['name'], name='idx_country_name'),
+        ]
+    
+    def __str__(self):
+        return self.name
+
+# Management command to load CSC data
+# management/commands/load_csc_data.py
+from django.core.management.base import BaseCommand
+from django.db import connection
+import os
+
+class Command(BaseCommand):
+    help = 'Load CSC geographical data from SQL export'
+    
+    def add_arguments(self, parser):
+        parser.add_argument('--sql-file', type=str, required=True,
+                          help='Path to CSC SQL export file')
+    
+    def handle(self, *args, **options):
+        sql_file = options['sql_file']
+        
+        if not os.path.exists(sql_file):
+            self.stdout.write(
+                self.style.ERROR(f'SQL file not found: {sql_file}')
+            )
+            return
+        
+        with open(sql_file, 'r') as file:
+            sql_content = file.read()
+        
+        # Execute SQL statements
+        with connection.cursor() as cursor:
+            # Split and execute statements
+            statements = sql_content.split(';')
+            for statement in statements:
+                if statement.strip():
+                    cursor.execute(statement)
+        
+        self.stdout.write(
+            self.style.SUCCESS('Successfully loaded CSC data')
+        )
+
+# Usage: python manage.py load_csc_data --sql-file exports/countries_states.sql
+```
+
+**Laravel/PHP Integration:**
+```php Laravel Migration & Models
+<?php
+// Migration: create_geographical_tables.php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+
+class CreateGeographicalTables extends Migration
+{
+    public function up()
+    {
+        // Load and execute CSC SQL export
+        $sqlFile = database_path('seeds/csc_export.sql');
+        $sql = file_get_contents($sqlFile);
+        
+        // Split into individual statements
+        $statements = array_filter(
+            array_map('trim', explode(';', $sql)), 
+            function($stmt) { return !empty($stmt); }
+        );
+        
+        foreach ($statements as $statement) {
+            DB::unprepared($statement);
+        }
+    }
+    
+    public function down()
+    {
+        Schema::dropIfExists('states');
+        Schema::dropIfExists('countries');
+    }
+}
+
+// Model: Country.php
+<?php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Country extends Model
+{
+    protected $table = 'countries';
+    
+    protected $fillable = [
+        'name', 'iso2', 'iso3', 'phonecode', 'currency', 
+        'region', 'subregion', 'latitude', 'longitude'
+    ];
+    
+    protected $casts = [
+        'latitude' => 'decimal:8',
+        'longitude' => 'decimal:8',
+        'metadata' => 'array'
+    ];
+    
+    public function states(): HasMany
+    {
+        return $this->hasMany(State::class);
+    }
+    
+    // Scope for filtering by region
+    public function scopeByRegion($query, $region)
+    {
+        return $query->where('region', $region);
+    }
+    
+    // Get countries with state count
+    public static function withStateCount()
+    {
+        return static::withCount('states')->get();
+    }
+}
+
+// API Controller
+<?php
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Country;
+use Illuminate\Http\Request;
+
+class GeographicalController extends Controller
+{
+    public function countries(Request $request)
+    {
+        $query = Country::query();
+        
+        if ($request->has('region')) {
+            $query->byRegion($request->region);
+        }
+        
+        if ($request->has('currency')) {
+            $query->where('currency', $request->currency);
+        }
+        
+        return $query->get();
+    }
+    
+    public function countriesWithStates()
+    {
+        return Country::with('states')->get();
+    }
+}
+```
+</Tab>
+</Tabs>
+
+## Format Selection Guide
+
+Choosing the right format can save you credits and development time. Use this decision tree:
+
+<Steps>
+<Step title="Define Your Use Case">
+**Ask yourself:**
+- Where will this data be used?
+- Who will consume the data?
+- What tools do you have available?
+- Do you need real-time updates?
+</Step>
+
+<Step title="Consider Integration Complexity">
+**Development Time vs Credit Cost:**
+
+<AccordionGroup>
+<Accordion title="Web Applications & APIs">
+**Recommendation: JSON (Free)**
+- Native JavaScript support
+- Easy API integration
+- No additional parsing needed
+- Perfect for React, Vue, Angular
+</Accordion>
+
+<Accordion title="Data Analysis & BI">
+**Recommendation: CSV (+1 credit)**
+- Excel/Google Sheets ready
+- Pandas compatibility
+- Tableau/PowerBI import
+- Statistical analysis tools
+</Accordion>
+
+<Accordion title="Enterprise Systems">
+**Recommendation: XML (+2 credits)**
+- Schema validation
+- SOAP web services
+- Legacy system integration
+- Structured data requirements
+</Accordion>
+
+<Accordion title="Configuration & DevOps">
+**Recommendation: YAML (+2 credits)**
+- Human-readable format
+- Kubernetes configs
+- CI/CD pipelines
+- Documentation-friendly
+</Accordion>
+
+<Accordion title="Database Population">
+**Recommendation: SQL (+3 credits)**
+- Direct database import
+- Proper relationships
+- Production-ready
+- Migration-friendly
+</Accordion>
+</AccordionGroup>
+</Step>
+
+<Step title="Calculate Total Cost">
+**Final Cost Formula:**
+```
+Total Credits = Dataset Cost + Format Cost
+
+Examples:
+- Countries (1) + JSON (0) = 1 credit
+- Countries (1) + States (2) + CSV (1) = 4 credits  
+- Cities (3) + SQL (3) = 6 credits
+```
+</Step>
+</Steps>
+
+## Best Practices by Format
+
+<Tabs>
+<Tab title="JSON Optimization">
+**Performance Tips:**
+
+```javascript Lazy Loading
+// Don't load all data at once for large datasets
+class GeoDataLoader {
+  async loadCountries() {
+    if (!this.countriesCache) {
+      const response = await fetch('/data/countries.json');
+      this.countriesCache = await response.json();
+    }
+    return this.countriesCache;
+  }
+  
+  async loadStatesByCountry(countryCode) {
+    const cacheKey = `states_${countryCode}`;
+    if (!this.statesCache[cacheKey]) {
+      const response = await fetch(`/data/states/${countryCode}.json`);
+      this.statesCache[cacheKey] = await response.json();
+    }
+    return this.statesCache[cacheKey];
+  }
+}
+```
+
+**Memory Management:**
+```javascript Efficient Processing
+// Process large JSON files in chunks
+function processCountriesInBatches(countries, batchSize = 100) {
+  const results = [];
+  for (let i = 0; i < countries.length; i += batchSize) {
+    const batch = countries.slice(i, i + batchSize);
+    const processed = batch.map(processCountry);
+    results.push(...processed);
+    
+    // Allow garbage collection between batches
+    if (i % 1000 === 0) {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
+  }
+  return results;
+}
+```
+</Tab>
+
+<Tab title="CSV Best Practices">
+**Data Type Handling:**
+
+```python Pandas Optimization
+import pandas as pd
+import numpy as np
+
+# Optimize data types for memory efficiency
+def optimize_csv_dtypes(df):
+    # Optimize string columns
+    for col in df.select_dtypes(include=['object']).columns:
+        if df[col].nunique() < df.shape[0] * 0.5:  # Less than 50% unique
+            df[col] = df[col].astype('category')
+    
+    # Optimize numeric columns
+    for col in df.select_dtypes(include=['int64']).columns:
+        if df[col].min() >= 0:
+            if df[col].max() <= 255:
+                df[col] = df[col].astype('uint8')
+            elif df[col].max() <= 65535:
+                df[col] = df[col].astype('uint16')
+    
+    return df
+
+# Load and optimize
+df = pd.read_csv('exports/countries.csv')
+df = optimize_csv_dtypes(df)
+print(f"Memory usage reduced by {(1 - df.memory_usage(deep=True).sum() / original_memory) * 100:.1f}%")
+```
+
+**Excel Integration:**
+```python Excel Automation
+import pandas as pd
+from openpyxl import Workbook
+from openpyxl.chart import BarChart, Reference
+
+def create_analytical_report(csv_file):
+    df = pd.read_csv(csv_file)
+    
+    # Create workbook with multiple sheets
+    with pd.ExcelWriter('geographical_analysis.xlsx', engine='openpyxl') as writer:
+        # Raw data
+        df.to_excel(writer, sheet_name='Raw Data', index=False)
+        
+        # Regional summary
+        regional_summary = df.groupby('region').agg({
+            'name': 'count',
+            'currency': 'nunique',
+            'latitude': 'mean',
+            'longitude': 'mean'
+        }).round(2)
+        regional_summary.to_excel(writer, sheet_name='Regional Summary')
+        
+        # Countries by currency
+        currency_countries = df.groupby('currency')['name'].count().sort_values(ascending=False).head(20)
+        currency_countries.to_excel(writer, sheet_name='Currency Distribution')
+```
+</Tab>
+
+<Tab title="SQL Production Tips">
+**Performance Optimization:**
+
+```sql Index Strategy
+-- Create covering indexes for common queries
+CREATE INDEX idx_countries_region_currency_covering 
+ON countries (region, currency) 
+INCLUDE (name, iso2, phonecode);
+
+-- Partial indexes for active records
+CREATE INDEX idx_active_countries 
+ON countries (iso2) 
+WHERE flag = true;
+
+-- Composite indexes for complex queries
+CREATE INDEX idx_countries_location_search 
+ON countries (region, subregion, currency, name);
+```
+
+**Data Validation:**
+```sql Data Quality Checks
+-- Add constraints to ensure data integrity
+ALTER TABLE countries 
+ADD CONSTRAINT chk_iso2_length CHECK (LENGTH(iso2) = 2);
+
+ALTER TABLE countries 
+ADD CONSTRAINT chk_currency_format CHECK (currency ~ '^[A-Z]{3}$');
+
+ALTER TABLE countries
+ADD CONSTRAINT chk_phonecode_numeric CHECK (phonecode ~ '^[0-9+\s-]+$');
+
+-- Create validation views
+CREATE VIEW invalid_countries AS
+SELECT id, name, iso2, 'Missing currency' as issue
+FROM countries 
+WHERE currency IS NULL OR currency = ''
+UNION ALL
+SELECT id, name, iso2, 'Invalid ISO2 format' as issue
+FROM countries 
+WHERE LENGTH(iso2) != 2 OR iso2 !~ '^[A-Z]{2}$';
+```
+</Tab>
+</Tabs>
+
+---
+
+<Note>
+**Need help choosing a format?** Consider your primary use case:
+- **Quick prototyping**: Start with JSON (free)
+- **Data analysis**: Use CSV for spreadsheet compatibility  
+- **Production database**: Invest in SQL for proper setup
+- **Configuration management**: YAML for readability
+</Note>

@@ -1,0 +1,701 @@
+---
+title: "SQLite Installation"
+description: "Complete guide to installing the Countries States Cities database in SQLite for lightweight, embedded applications"
+icon: "database"
+---
+
+SQLite is a lightweight, file-based database that requires no separate server process. It's perfect for mobile applications, prototypes, and embedded systems. This guide covers installing the Countries States Cities database in SQLite.
+
+<Info>
+SQLite installation is the fastest option, typically taking less than 1 minute with approximately 50MB file size.
+</Info>
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+- SQLite 3.25+ installed (SQLite 3.35+ recommended)
+- At least 100MB free disk space
+- Downloaded the `sqlite/world.sql` file from our [GitHub repository](https://github.com/dr5hn/countries-states-cities-database)
+
+<Note>
+SQLite databases are self-contained files that don't require a separate server installation, making them ideal for development and embedded applications.
+</Note>
+
+## Method 1: SQLite Command Line
+
+<Steps>
+<Step title="Create Database File">
+  ```bash
+  sqlite3 world.db
+  ```
+  
+  This creates a new SQLite database file named `world.db` in your current directory.
+</Step>
+
+<Step title="Import SQL File">
+  ```sql
+  .read sqlite/world.sql
+  ```
+  
+  <Check>
+  SQLite import is typically the fastest due to its lightweight nature and single-file architecture.
+  </Check>
+</Step>
+
+<Step title="Verify Installation">
+  ```sql
+  -- List all tables
+  .tables
+  
+  -- Check table schema
+  .schema countries
+  
+  -- Count records in each table
+  SELECT 'countries' as table_name, COUNT(*) as count FROM countries
+  UNION ALL
+  SELECT 'states', COUNT(*) FROM states  
+  UNION ALL
+  SELECT 'cities', COUNT(*) FROM cities;
+  ```
+  
+  Expected output:
+  ```
+  table_name|count
+  countries|250
+  states|5038
+  cities|151024
+  ```
+</Step>
+</Steps>
+
+## Method 2: Using Programming Languages
+
+### Python Implementation
+
+<Steps>
+<Step title="Install Dependencies">
+  ```bash
+  # SQLite3 is included in Python standard library
+  # No additional installation needed
+  ```
+</Step>
+
+<Step title="Create Installation Script">
+  ```python
+  import sqlite3
+  import os
+  
+  def install_world_database():
+      # Connect to database (creates file if doesn't exist)
+      conn = sqlite3.connect('world.db')
+      cursor = conn.cursor()
+      
+      # Read and execute SQL file
+      try:
+          with open('sqlite/world.sql', 'r', encoding='utf-8') as f:
+              sql_script = f.read()
+              cursor.executescript(sql_script)
+              
+          print("Database installation completed successfully!")
+          
+          # Verify installation
+          cursor.execute("SELECT COUNT(*) FROM countries")
+          country_count = cursor.fetchone()[0]
+          
+          cursor.execute("SELECT COUNT(*) FROM cities") 
+          city_count = cursor.fetchone()[0]
+          
+          print(f"Installed {country_count} countries and {city_count} cities")
+          
+      except FileNotFoundError:
+          print("Error: sqlite/world.sql file not found")
+      except Exception as e:
+          print(f"Error during installation: {e}")
+      finally:
+          conn.close()
+  
+  if __name__ == "__main__":
+      install_world_database()
+  ```
+</Step>
+
+<Step title="Run Installation">
+  ```bash
+  python install_world_db.py
+  ```
+</Step>
+</Steps>
+
+### Node.js Implementation
+
+<Steps>
+<Step title="Install Dependencies">
+  ```bash
+  npm install sqlite3
+  ```
+</Step>
+
+<Step title="Create Installation Script">
+  ```javascript
+  const sqlite3 = require('sqlite3').verbose();
+  const fs = require('fs');
+  const path = require('path');
+  
+  function installWorldDatabase() {
+      // Open database
+      const db = new sqlite3.Database('world.db');
+      
+      // Read SQL file
+      const sqlPath = path.join(__dirname, 'sqlite', 'world.sql');
+      
+      try {
+          const sql = fs.readFileSync(sqlPath, 'utf8');
+          
+          // Execute SQL
+          db.exec(sql, (err) => {
+              if (err) {
+                  console.error('Installation failed:', err);
+                  return;
+              }
+              
+              console.log('Database installation completed successfully!');
+              
+              // Verify installation
+              db.get("SELECT COUNT(*) as count FROM countries", (err, row) => {
+                  if (!err) {
+                      console.log(`Installed ${row.count} countries`);
+                  }
+              });
+              
+              db.get("SELECT COUNT(*) as count FROM cities", (err, row) => {
+                  if (!err) {
+                      console.log(`Installed ${row.count} cities`);
+                  }
+                  db.close();
+              });
+          });
+          
+      } catch (err) {
+          console.error('Error reading SQL file:', err.message);
+      }
+  }
+  
+  installWorldDatabase();
+  ```
+</Step>
+
+<Step title="Run Installation">
+  ```bash
+  node install_world_db.js
+  ```
+</Step>
+</Steps>
+
+## Database Structure Verification
+
+<CodeGroup>
+```sql Table Information
+-- List all tables
+.tables
+
+-- Show table schemas
+.schema countries
+.schema states
+.schema cities
+
+-- Get table info
+PRAGMA table_info(countries);
+PRAGMA table_info(states);  
+PRAGMA table_info(cities);
+```
+
+```sql Sample Queries
+-- View sample countries
+SELECT id, name, iso2, iso3, region FROM countries LIMIT 10;
+
+-- View states for specific country  
+SELECT id, name, state_code, country_name 
+FROM states 
+WHERE country_name = 'United States' 
+LIMIT 10;
+
+-- View cities with coordinates
+SELECT id, name, latitude, longitude, country_name, state_name 
+FROM cities 
+WHERE country_name = 'Canada' 
+LIMIT 10;
+```
+</CodeGroup>
+
+## Performance Optimization
+
+### Create Indexes
+
+```sql
+-- Essential indexes for query performance
+CREATE INDEX IF NOT EXISTS idx_countries_iso2 ON countries(iso2);
+CREATE INDEX IF NOT EXISTS idx_countries_iso3 ON countries(iso3);
+CREATE INDEX IF NOT EXISTS idx_countries_region ON countries(region);
+
+CREATE INDEX IF NOT EXISTS idx_states_country_id ON states(country_id);
+CREATE INDEX IF NOT EXISTS idx_states_name ON states(name);
+CREATE INDEX IF NOT EXISTS idx_states_country_name ON states(country_name);
+
+CREATE INDEX IF NOT EXISTS idx_cities_country_id ON cities(country_id);
+CREATE INDEX IF NOT EXISTS idx_cities_state_id ON cities(state_id);
+CREATE INDEX IF NOT EXISTS idx_cities_name ON cities(name);
+CREATE INDEX IF NOT EXISTS idx_cities_coordinates ON cities(latitude, longitude);
+CREATE INDEX IF NOT EXISTS idx_cities_country_name ON cities(country_name);
+```
+
+### SQLite-Specific Optimizations
+
+<CodeGroup>
+```sql PRAGMA Settings
+-- Optimize SQLite for better performance
+PRAGMA journal_mode = WAL;
+PRAGMA synchronous = NORMAL;
+PRAGMA cache_size = 10000;
+PRAGMA temp_store = memory;
+PRAGMA mmap_size = 268435456; -- 256MB
+```
+
+```sql Analyze Statistics
+-- Update query planner statistics
+ANALYZE;
+
+-- Check index usage
+.eqp on
+SELECT * FROM cities WHERE country_name = 'United States' LIMIT 10;
+```
+</CodeGroup>
+
+## Connection Examples
+
+<Tabs>
+<Tab title="Python">
+```python
+import sqlite3
+from contextlib import contextmanager
+
+class WorldDatabase:
+    def __init__(self, db_path='world.db'):
+        self.db_path = db_path
+        
+    @contextmanager
+    def get_connection(self):
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row  # Enable column access by name
+        try:
+            yield conn
+        finally:
+            conn.close()
+    
+    def get_countries(self, limit=None):
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            query = "SELECT * FROM countries"
+            if limit:
+                query += f" LIMIT {limit}"
+            return cursor.execute(query).fetchall()
+    
+    def get_cities_by_country(self, country_name, limit=None):
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            query = """
+                SELECT name, latitude, longitude, state_name 
+                FROM cities 
+                WHERE country_name = ?
+            """
+            if limit:
+                query += f" LIMIT {limit}"
+            return cursor.execute(query, (country_name,)).fetchall()
+    
+    def search_cities(self, search_term, limit=10):
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            query = """
+                SELECT name, country_name, state_name, latitude, longitude
+                FROM cities 
+                WHERE name LIKE ? 
+                ORDER BY name 
+                LIMIT ?
+            """
+            return cursor.execute(query, (f'%{search_term}%', limit)).fetchall()
+
+# Usage example
+db = WorldDatabase()
+
+# Get all countries
+countries = db.get_countries(limit=10)
+for country in countries:
+    print(f"{country['name']} ({country['iso2']})")
+
+# Get cities in a specific country
+us_cities = db.get_cities_by_country('United States', limit=5)
+for city in us_cities:
+    print(f"{city['name']}, {city['state_name']}")
+
+# Search for cities
+london_cities = db.search_cities('London')
+for city in london_cities:
+    print(f"{city['name']}, {city['country_name']}")
+```
+</Tab>
+
+<Tab title="Node.js">
+```javascript
+const sqlite3 = require('sqlite3').verbose();
+
+class WorldDatabase {
+    constructor(dbPath = 'world.db') {
+        this.db = new sqlite3.Database(dbPath);
+    }
+    
+    getCountries(limit = null) {
+        return new Promise((resolve, reject) => {
+            let query = "SELECT * FROM countries";
+            if (limit) query += ` LIMIT ${limit}`;
+            
+            this.db.all(query, (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
+            });
+        });
+    }
+    
+    getCitiesByCountry(countryName, limit = null) {
+        return new Promise((resolve, reject) => {
+            let query = `
+                SELECT name, latitude, longitude, state_name 
+                FROM cities 
+                WHERE country_name = ?
+            `;
+            if (limit) query += ` LIMIT ${limit}`;
+            
+            this.db.all(query, [countryName], (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
+            });
+        });
+    }
+    
+    searchCities(searchTerm, limit = 10) {
+        return new Promise((resolve, reject) => {
+            const query = `
+                SELECT name, country_name, state_name, latitude, longitude
+                FROM cities 
+                WHERE name LIKE ? 
+                ORDER BY name 
+                LIMIT ?
+            `;
+            
+            this.db.all(query, [`%${searchTerm}%`, limit], (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
+            });
+        });
+    }
+    
+    close() {
+        this.db.close();
+    }
+}
+
+// Usage example
+async function example() {
+    const db = new WorldDatabase();
+    
+    try {
+        // Get countries
+        const countries = await db.getCountries(5);
+        console.log('Countries:', countries);
+        
+        // Get US cities
+        const usCities = await db.getCitiesByCountry('United States', 5);
+        console.log('US Cities:', usCities);
+        
+        // Search for cities
+        const londonCities = await db.searchCities('London');
+        console.log('Cities named London:', londonCities);
+        
+    } catch (error) {
+        console.error('Database error:', error);
+    } finally {
+        db.close();
+    }
+}
+
+example();
+```
+</Tab>
+
+<Tab title="C#">
+```csharp
+using Microsoft.Data.Sqlite;
+using System;
+using System.Collections.Generic;
+using System.Data;
+
+public class WorldDatabase : IDisposable
+{
+    private readonly SqliteConnection _connection;
+    
+    public WorldDatabase(string dbPath = "world.db")
+    {
+        string connectionString = $"Data Source={dbPath}";
+        _connection = new SqliteConnection(connectionString);
+        _connection.Open();
+    }
+    
+    public List<Country> GetCountries(int? limit = null)
+    {
+        var countries = new List<Country>();
+        string query = "SELECT id, name, iso2, iso3, region FROM countries";
+        if (limit.HasValue) query += $" LIMIT {limit}";
+        
+        using var command = new SqliteCommand(query, _connection);
+        using var reader = command.ExecuteReader();
+        
+        while (reader.Read())
+        {
+            countries.Add(new Country
+            {
+                Id = reader.GetInt32("id"),
+                Name = reader.GetString("name"),
+                Iso2 = reader.GetString("iso2"),
+                Iso3 = reader.GetString("iso3"),
+                Region = reader.IsDBNull("region") ? null : reader.GetString("region")
+            });
+        }
+        
+        return countries;
+    }
+    
+    public List<City> GetCitiesByCountry(string countryName, int? limit = null)
+    {
+        var cities = new List<City>();
+        string query = @"
+            SELECT name, latitude, longitude, state_name 
+            FROM cities 
+            WHERE country_name = @countryName";
+        if (limit.HasValue) query += $" LIMIT {limit}";
+        
+        using var command = new SqliteCommand(query, _connection);
+        command.Parameters.AddWithValue("@countryName", countryName);
+        using var reader = command.ExecuteReader();
+        
+        while (reader.Read())
+        {
+            cities.Add(new City
+            {
+                Name = reader.GetString("name"),
+                Latitude = reader.IsDBNull("latitude") ? null : reader.GetDouble("latitude"),
+                Longitude = reader.IsDBNull("longitude") ? null : reader.GetDouble("longitude"),
+                StateName = reader.IsDBNull("state_name") ? null : reader.GetString("state_name")
+            });
+        }
+        
+        return cities;
+    }
+    
+    public void Dispose()
+    {
+        _connection?.Dispose();
+    }
+}
+
+public class Country
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Iso2 { get; set; }
+    public string Iso3 { get; set; }
+    public string Region { get; set; }
+}
+
+public class City
+{
+    public string Name { get; set; }
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
+    public string StateName { get; set; }
+}
+
+// Usage example
+using var db = new WorldDatabase();
+
+var countries = db.GetCountries(5);
+foreach (var country in countries)
+{
+    Console.WriteLine($"{country.Name} ({country.Iso2})");
+}
+
+var usCities = db.GetCitiesByCountry("United States", 5);
+foreach (var city in usCities)
+{
+    Console.WriteLine($"{city.Name}, {city.StateName}");
+}
+```
+</Tab>
+</Tabs>
+
+## Advanced Features
+
+### Full-Text Search
+
+<CodeGroup>
+```sql FTS Setup
+-- Create FTS virtual table for cities
+CREATE VIRTUAL TABLE cities_fts USING fts5(
+    name, 
+    country_name, 
+    state_name, 
+    content='cities'
+);
+
+-- Populate FTS table
+INSERT INTO cities_fts SELECT name, country_name, state_name FROM cities;
+```
+
+```sql FTS Queries
+-- Search cities with full-text search
+SELECT c.name, c.country_name, c.state_name, c.latitude, c.longitude
+FROM cities_fts f
+JOIN cities c ON c.name = f.name AND c.country_name = f.country_name
+WHERE cities_fts MATCH 'paris OR london'
+ORDER BY rank;
+
+-- Phrase search
+SELECT * FROM cities_fts WHERE cities_fts MATCH '"new york"';
+```
+</CodeGroup>
+
+### JSON Support
+
+```sql
+-- SQLite 3.38+ supports JSON functions
+SELECT 
+    name,
+    json_object(
+        'country', country_name,
+        'coordinates', json_array(latitude, longitude),
+        'timezone', timezone
+    ) as city_json
+FROM cities 
+WHERE country_name = 'Japan'
+LIMIT 5;
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Database Lock Error">
+**Problem**: `database is locked` error
+
+**Solutions**:
+1. Close all connections to the database
+2. Check for zombie processes: `fuser world.db`
+3. Remove WAL files: `rm world.db-wal world.db-shm`
+4. Use connection timeout: `sqlite3 -timeout 10000 world.db`
+</Accordion>
+
+<Accordion title="Corrupted Database">
+**Problem**: `database disk image is malformed`
+
+**Solutions**:
+1. Run integrity check: `.integrity_check`
+2. Try to repair: `.recover world_recovered.db`
+3. Restore from backup if available
+4. Re-import from original SQL file
+</Accordion>
+
+<Accordion title="Performance Issues">
+**Problem**: Queries are slow
+
+**Solutions**:
+1. Create appropriate indexes (see Performance Optimization)
+2. Enable WAL mode: `PRAGMA journal_mode = WAL;`
+3. Increase cache size: `PRAGMA cache_size = 10000;`
+4. Use prepared statements
+5. Consider using FTS for text searches
+</Accordion>
+
+<Accordion title="Memory Usage">
+**Problem**: High memory consumption
+
+**Solutions**:
+1. Reduce cache size: `PRAGMA cache_size = 2000;`
+2. Disable memory mapping: `PRAGMA mmap_size = 0;`
+3. Use disk-based temp storage: `PRAGMA temp_store = file;`
+4. Close connections promptly
+</Accordion>
+</AccordionGroup>
+
+## Backup and Maintenance
+
+### Backup Strategies
+
+<CodeGroup>
+```bash Simple Copy
+# SQLite databases can be backed up by copying the file
+cp world.db world_backup_$(date +%Y%m%d).db
+
+# Compress backup
+gzip world_backup_$(date +%Y%m%d).db
+```
+
+```bash Online Backup
+# Backup while database is in use
+sqlite3 world.db ".backup world_backup_$(date +%Y%m%d).db"
+
+# Or using Python
+python -c "
+import sqlite3
+import shutil
+from datetime import datetime
+
+src = sqlite3.connect('world.db')
+dst = sqlite3.connect(f'world_backup_{datetime.now().strftime(\"%Y%m%d\")}.db')
+src.backup(dst)
+dst.close()
+src.close()
+"
+```
+</CodeGroup>
+
+### Maintenance Commands
+
+```sql
+-- Analyze for better query plans
+ANALYZE;
+
+-- Vacuum to reclaim space (offline operation)
+VACUUM;
+
+-- Check database integrity
+PRAGMA integrity_check;
+
+-- Get database info
+PRAGMA database_list;
+PRAGMA table_list;
+```
+
+<Tip>
+SQLite databases are highly reliable but benefit from regular ANALYZE commands to keep query performance optimal.
+</Tip>
+
+## Next Steps
+
+After successful installation:
+
+1. **Create indexes** for your specific use cases
+2. **Implement connection pooling** for web applications
+3. **Set up backup strategy** using the provided scripts
+4. **Consider FTS** for text search functionality
+5. **Monitor database size** and performance
+
+<Card title="Need Help?" icon="support">
+  Join our [community discussions](https://github.com/dr5hn/countries-states-cities-database/discussions) for SQLite-specific questions and mobile development tips.
+</Card>

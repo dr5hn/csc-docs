@@ -1,0 +1,258 @@
+---
+title: "Installation Overview"
+description: "Choose your preferred database platform and follow the step-by-step installation guide"
+icon: "download"
+---
+
+The Countries States Cities database is available in multiple formats to support different technology stacks and use cases. Choose your preferred database platform and follow the corresponding installation guide.
+
+<Card title="Download Database Files" icon="download" href="https://github.com/dr5hn/countries-states-cities-database/releases">
+  Get the latest database files from our GitHub releases page.
+</Card>
+
+## Available Database Formats
+
+<CardGroup cols={2}>
+  <Card title="MySQL" icon="database" href="/database/installation/mysql">
+    Most popular open-source relational database
+    
+    **Best for**: Web applications, high-traffic sites
+  </Card>
+  
+  <Card title="PostgreSQL" icon="database" href="/database/installation/postgresql">
+    Advanced open-source relational database
+    
+    **Best for**: Complex queries, analytics, spatial data
+  </Card>
+  
+  <Card title="SQLite" icon="database" href="/database/installation/sqlite">
+    Lightweight file-based database
+    
+    **Best for**: Mobile apps, prototypes, embedded systems
+  </Card>
+  
+  <Card title="MongoDB" icon="leaf" href="/database/installation/mongodb">
+    Document-oriented NoSQL database
+    
+    **Best for**: Flexible schemas, JSON-based applications
+  </Card>
+  
+  <Card title="SQL Server" icon="database" href="/database/installation/sql-server">
+    Microsoft SQL Server compatible format
+    
+    **Best for**: Enterprise applications, Windows environments
+  </Card>
+  
+  <Card title="DuckDB" icon="database" href="/database/installation/duckdb">
+    Analytical database for data science
+    
+    **Best for**: Analytics, data science, in-process OLAP
+  </Card>
+</CardGroup>
+
+## Quick Comparison
+
+| Database | File Size | Installation Time | Best Use Case |
+|:---------|:----------|:------------------|:-------------|
+| SQLite | ~50MB | < 1 minute | Development, mobile apps |
+| MySQL | ~200MB | 2-5 minutes | Web applications |
+| PostgreSQL | ~220MB | 3-6 minutes | Complex applications |
+| MongoDB | ~180MB | 2-4 minutes | Document-based apps |
+| SQL Server | ~250MB | 5-10 minutes | Enterprise environments |
+| DuckDB | ~60MB | 1-2 minutes | Analytics workloads |
+
+## Prerequisites
+
+Before installing any database format:
+
+<Steps>
+<Step title="Download Database Files">
+  Download the appropriate database files from our [GitHub repository](https://github.com/dr5hn/countries-states-cities-database).
+  
+  <CodeGroup>
+  ```bash Git Clone
+  git clone https://github.com/dr5hn/countries-states-cities-database.git
+  cd countries-states-cities-database
+  ```
+  
+  ```bash Direct Download
+  # Download specific format files
+  wget https://github.com/dr5hn/countries-states-cities-database/raw/master/mysql/world.sql
+  ```
+  </CodeGroup>
+</Step>
+
+<Step title="Verify Database Software">
+  Ensure your target database system is installed and running.
+  
+  <Tip>
+  Each installation guide includes specific version requirements and compatibility information.
+  </Tip>
+</Step>
+</Steps>
+
+## What You'll Get
+
+After installation, your database will contain:
+
+- **250 Countries** with ISO codes, regions, and metadata
+- **5,038 States/Provinces** with administrative codes
+- **151,024 Cities** with coordinates and timezone data
+
+<Info>
+All data is regularly updated and includes comprehensive geographical information for worldwide coverage.
+</Info>
+
+## Need Help?
+
+<CardGroup cols={2}>
+<Card title="System Requirements" icon="server" href="#system-requirements">
+  Check minimum hardware and software requirements
+</Card>
+
+<Card title="Troubleshooting" icon="bug" href="#troubleshooting">
+  Common installation issues and solutions
+</Card>
+
+<Card title="Performance Tips" icon="gauge" href="#performance-optimization">
+  Optimize your database for better performance
+</Card>
+
+<Card title="Backup Guide" icon="shield" href="#backup-configuration">
+  Set up automated backups and disaster recovery
+</Card>
+</CardGroup>
+
+---
+
+## System Requirements
+
+### Minimum Hardware Requirements
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+  <div className="border rounded-lg p-4">
+    <h4 className="font-semibold mb-2">Development Environment</h4>
+    <ul className="space-y-1 text-sm">
+      <li>• RAM: 2GB minimum, 4GB recommended</li>
+      <li>• Disk: 500MB free space</li>
+      <li>• CPU: Any modern processor</li>
+    </ul>
+  </div>
+  
+  <div className="border rounded-lg p-4">
+    <h4 className="font-semibold mb-2">Production Environment</h4>
+    <ul className="space-y-1 text-sm">
+      <li>• RAM: 8GB minimum, 16GB+ recommended</li>
+      <li>• Disk: 2GB free space + growth capacity</li>
+      <li>• CPU: Multi-core processor recommended</li>
+    </ul>
+  </div>
+</div>
+
+### Software Version Compatibility
+
+<Tabs>
+<Tab title="SQL Databases">
+- **MySQL**: 5.7+ (8.0+ recommended)
+- **PostgreSQL**: 10+ (13+ recommended)  
+- **SQLite**: 3.25+ (3.35+ recommended)
+- **SQL Server**: 2016+ (2019+ recommended)
+</Tab>
+
+<Tab title="NoSQL & Analytics">
+- **MongoDB**: 4.0+ (5.0+ recommended)
+- **DuckDB**: 0.8+ (latest recommended)
+</Tab>
+
+<Tab title="Programming Languages">
+- **Python**: 3.7+ for DuckDB conversion
+- **Node.js**: 14+ for JavaScript examples
+- **PHP**: 7.4+ for web applications
+</Tab>
+</Tabs>
+
+## Performance Optimization
+
+### Recommended Indexes
+
+```sql
+-- Performance indexes for common queries
+CREATE INDEX idx_cities_coordinates ON cities(latitude, longitude);
+CREATE INDEX idx_countries_region ON countries(region);
+CREATE INDEX idx_states_name ON states(name);
+CREATE INDEX idx_cities_name ON cities(name);
+```
+
+### Query Optimization Tips
+
+- Enable query cache if available
+- Configure appropriate connection pooling
+- Set up read replicas for high-traffic applications
+- Consider partitioning large tables by region/country
+
+## Backup Configuration
+
+<Warning>
+Always implement a backup strategy before using the database in production.
+</Warning>
+
+<CodeGroup>
+```bash MySQL Backup
+mysqldump -u root -p world > world_backup_$(date +%Y%m%d).sql
+```
+
+```bash PostgreSQL Backup
+pg_dump -U postgres world > world_backup_$(date +%Y%m%d).sql
+```
+
+```bash SQLite Backup
+# SQLite files can be backed up by copying the database file
+cp world.db world_backup_$(date +%Y%m%d).db
+```
+
+```bash MongoDB Backup
+mongodump --db world --out world_backup_$(date +%Y%m%d)
+```
+</CodeGroup>
+
+## Troubleshooting
+
+### Common Issues
+
+<AccordionGroup>
+<Accordion title="Character Encoding Problems">
+**Problem**: Special characters or emojis display incorrectly
+
+**Solution**: Ensure proper UTF-8 encoding
+```sql
+-- MySQL
+ALTER DATABASE world CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- PostgreSQL  
+CREATE DATABASE world WITH ENCODING 'UTF8';
+```
+</Accordion>
+
+<Accordion title="Import Timeout">
+**Problem**: Import process times out or fails
+
+**Solution**: Increase timeout limits and disable checks temporarily
+```sql
+-- MySQL
+SET session sql_mode = '';
+SET foreign_key_checks = 0;
+SET autocommit = 0;
+-- Run import --
+COMMIT;
+```
+</Accordion>
+
+<Accordion title="Memory Issues">
+**Problem**: Out of memory errors during import
+
+**Solution**: 
+- Increase database memory limits
+- Import tables individually
+- Use smaller batch sizes
+</Accordion>
+</AccordionGroup>

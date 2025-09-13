@@ -1,0 +1,195 @@
+---
+title: "Contributions"
+description: "How to contribute improvements, corrections, and new data to the Countries States Cities database"
+icon: "users"
+---
+
+## Contributing Overview
+
+The Countries States Cities database thrives through community contributions. Whether you're fixing a small typo or proposing major data additions, your contributions help millions of developers access accurate geographical data.
+
+<Card title="CSC Update Tool" icon="arrow-up-right-from-square" href="https://manager.countrystatecity.in/">
+  Our official web-based tool makes contributing easy - no technical setup required!
+</Card>
+
+## Contribution Methods
+
+### 1. CSC Update Tool (Recommended)
+
+The easiest way to contribute is through our dedicated web application:
+
+<CardGroup cols={2}>
+  <Card title="Browse & Search" icon="magnifying-glass">
+    Easily explore regions, countries, states, and cities with powerful search capabilities.
+  </Card>
+  <Card title="Submit Changes" icon="pen">
+    Simple forms to request corrections, additions, or updates with proper source validation.
+  </Card>
+  <Card title="Track Progress" icon="chart-line">
+    Monitor your submissions through our streamlined review process with real-time status updates.
+  </Card>
+  <Card title="Community Recognition" icon="star">
+    Contributors are recognized for their valuable additions to the database.
+  </Card>
+</CardGroup>
+
+<Steps>
+<Step title="Access the Tool">
+  Visit [manager.countrystatecity.in](https://manager.countrystatecity.in/) and sign in with GitHub or use the Magic Link option.
+  
+  <Info>
+  No account required - we automatically create one when you first contribute.
+  </Info>
+</Step>
+
+<Step title="Find Data to Improve">
+  Use the search functionality to locate geographical entities that need updates:
+  
+  - Browse by region → country → state → city
+  - Search for specific locations
+  - Filter by data quality indicators
+  - Review community-flagged issues
+</Step>
+
+<Step title="Submit Your Changes">
+  Fill out the contribution form with:
+  
+  - **What needs to change**: Current incorrect data
+  - **Correct information**: Your proposed updates
+  - **Source documentation**: Links to authoritative sources
+  - **Additional context**: Any relevant background information
+  
+  <Tip>
+  Always include authoritative sources for your changes. Government websites and official statistical offices are preferred.
+  </Tip>
+</Step>
+
+<Step title="Track Your Submission">
+  Monitor your contribution through the review process:
+  
+  - **Pending**: Under initial review
+  - **In Review**: Being evaluated by our team
+  - **Approved**: Accepted and queued for integration
+  - **Rejected**: Not accepted (with feedback)
+  - **Integrated**: Live in the database
+</Step>
+</Steps>
+
+### 2. GitHub Contributions (Advanced)
+
+For developers comfortable with Git workflows:
+
+<Warning>
+Direct GitHub contributions require technical knowledge of SQL and database management. We recommend using the Update Tool for most contributions.
+</Warning>
+
+<Steps>
+<Step title="Fork the Repository">
+  ```bash
+  git clone https://github.com/dr5hn/countries-states-cities-database.git
+  cd countries-states-cities-database
+  git checkout -b feature/your-improvement-name
+  ```
+</Step>
+
+<Step title="Make Your Changes">
+  Edit the `sql/world.sql` file directly:
+  
+  ```sql
+  -- Example: Adding a new city
+  INSERT INTO cities (name, state_id, state_code, state_name, country_id, country_code, country_name, latitude, longitude) 
+  VALUES ('New City', 1234, 'CA', 'California', 231, 'US', 'United States', 34.0522, -118.2437);
+  
+  -- Example: Correcting city coordinates  
+  UPDATE cities 
+  SET latitude = 40.7128, longitude = -74.0060
+  WHERE name = 'New York' AND state_code = 'NY' AND country_code = 'US';
+  ```
+</Step>
+
+<Step title="Create Pull Request">
+  ```bash
+  git add sql/world.sql
+  git commit -m "feat: add New City to California, US"
+  git push origin feature/your-improvement-name
+  ```
+  
+  Then create a pull request on GitHub with:
+  - Clear description of changes
+  - Source documentation
+  - Justification for the changes
+</Step>
+</Steps>
+
+
+## Contribution Guidelines
+
+### Quality Standards
+
+<AccordionGroup>
+<Accordion title="Source Requirements">
+**Tier 1 Sources (Preferred)**:
+- Government websites and official portals
+- National statistical offices
+- International organizations (UN, ISO, etc.)
+- Official geographical surveys
+
+**Tier 2 Sources (Acceptable)**:
+- Reputable geographical databases (GeoNames, etc.)
+- Academic institutions and research papers
+- Established reference works
+- Well-documented Wikipedia articles with citations
+
+**Unacceptable Sources**:
+- Personal blogs or opinions
+- Commercial directories without verification
+- Uncited crowd-sourced content
+- Outdated or deprecated sources
+</Accordion>
+
+<Accordion title="Data Accuracy Standards">
+**Coordinates**:
+- Must be in WGS84 decimal degrees format
+- Precision appropriate to entity type (cities: 6+ decimals)
+- Should represent actual administrative center when possible
+
+**Names**:
+- Use internationally recognized English names
+- Maintain consistency with established conventions
+- Include alternative names only when widely used
+
+**Administrative Data**:
+- Must reflect current official administrative structure
+- Include effective dates for recent changes
+- Maintain proper hierarchical relationships
+</Accordion>
+
+<Accordion title="Documentation Requirements">
+Every contribution must include:
+
+```
+Source: [Official source name and URL]
+Date Verified: [When you verified this information]
+Justification: [Why this change is needed]
+Impact: [What this change affects]
+Additional Context: [Any relevant background]
+```
+
+**Example**:
+```
+Source: Statistics Canada - https://www.statcan.gc.ca/
+Date Verified: September 13, 2025
+Justification: Nunavut coordinates incorrect by 2km
+Impact: Affects coordinate-based queries for Canadian territories
+Additional Context: Verified against official territorial government website
+```
+</Accordion>
+</AccordionGroup>
+
+<CardGroup>
+<Card title="Join Our Community" icon="heart" href="mailto:gadadarshan@gmail.com">
+  Have questions? Want to become a regional coordinator? Reach out to our team!
+</Card>
+</CardGroup>
+
+Thank you for helping make geographical data more accurate and accessible for developers worldwide! 🌍

@@ -9,15 +9,6 @@
   },
   "favicon": "/favicon.svg",
   "navigation": {
-    "groups": [
-      {
-        "group": "Getting Started",
-        "pages": [
-          "introduction",
-          "quickstart"
-        ]
-      }
-    ],
     "tabs": [
       {
         "tab": "API",
@@ -38,7 +29,7 @@
             ]
           },
           {
-            "group": "States Endpoints", 
+            "group": "States Endpoints",
             "pages": [
               "api/endpoints/get-all-states",
               "api/endpoints/get-states-by-country",
@@ -48,7 +39,7 @@
           {
             "group": "Cities Endpoints",
             "pages": [
-              "api/endpoints/get-cities-by-country", 
+              "api/endpoints/get-cities-by-country",
               "api/endpoints/get-cities-by-state"
             ]
           },
@@ -73,18 +64,22 @@
           {
             "group": "Update Tool",
             "pages": [
-              "tools/update-tool/introduction",
-              "tools/update-tool/installation",
-              "tools/update-tool/configuration",
-              "tools/update-tool/monitoring"
+              "tools/update-tool/index",
+              "tools/update-tool/getting-started",
+              "tools/update-tool/submitting-changes",
+              "tools/update-tool/workflow",
+              "tools/update-tool/review-process",
+              "tools/update-tool/faq"
             ]
           },
           {
             "group": "Export Tool",
             "pages": [
-              "tools/export-tool/introduction",
+              "tools/export-tool/index",
+              "tools/export-tool/getting-started",
+              "tools/export-tool/use-cases",
               "tools/export-tool/formats",
-              "tools/export-tool/usage"
+              "tools/export-tool/faq"
             ]
           },
           {
@@ -102,16 +97,26 @@
             "group": "Database Documentation",
             "pages": [
               "database/overview",
-              "database/schema",
-              "database/installation"
+              "database/schema"
             ]
           },
           {
-            "group": "Data Management",
+            "group": "Installation Guides", 
             "pages": [
-              "database/data-sources",
-              "database/updates",
-              "database/contributing"
+              "database/installation/index",
+              "database/installation/mysql",
+              "database/installation/postgresql", 
+              "database/installation/sqlite",
+              "database/installation/mongodb",
+              "database/installation/sql-server",
+              "database/installation/duckdb"
+            ]
+          },
+          {
+            "group": "Support",
+            "pages": [
+              "database/contributing",
+              "donate"
             ]
           }
         ]
@@ -119,33 +124,37 @@
     ]
   },
   "global": {
-      "anchors": [
-        {
-          "anchor": "API Portal",
-          "href": "https://countrystatecity.in",
-          "icon": "globe"
-        },
-        {
-          "anchor": "GitHub",
-          "href": "https://github.com/dr5hn/countries-states-cities-database",
-          "icon": "github"
-        },
-        {
-          "anchor": "Support",
-          "href": "mailto:api@countrystatecity.in",
-          "icon": "envelope"
-        }
-      ]
-    },
+    "anchors": [
+      {
+        "anchor": "API Portal",
+        "href": "https://countrystatecity.in",
+        "icon": "globe"
+      },
+      {
+        "anchor": "GitHub",
+        "href": "https://github.com/dr5hn/countries-states-cities-database",
+        "icon": "github"
+      },
+      {
+        "anchor": "Support",
+        "href": "mailto:api@countrystatecity.in",
+        "icon": "envelope"
+      }
+    ]
+  },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/world.svg",
+    "dark": "/logo/world.svg"
   },
   "navbar": {
     "links": [
       {
-        "label": "API Portal",
-        "href": "https://countrystatecity.in"
+        "label": "Donate",
+        "href": "http://localhost:3000/donate"
+      },
+      {
+        "label": "Changelog",
+        "href": "http://localhost:3000/changelog"
       }
     ],
     "primary": {
@@ -156,19 +165,21 @@
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {
-      "github": "https://github.com/dr5hn/countries-states-cities-database"
+      "github": "https://github.com/dr5hn/countries-states-cities-database",
+      "linkedin": "https://www.linkedin.com/in/dr5hn/",
+      "x": "https://x.com/dr5hn"
     }
   },
   "seo": {
@@ -176,10 +187,10 @@
   },
   "analytics": {
     "gtag": {
-      "measurementId": "G-XXXXXXXXXX"
+      "measurementId": "G-XPF0QLDXVS"
     }
   },
   "search": {
-    "prompt": "Search the Country State City ecosystem documentation..."
+    "prompt": "Search the documentation..."
   }
 }

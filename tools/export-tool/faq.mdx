@@ -1,0 +1,751 @@
+---
+title: "FAQ"
+description: "Common questions and answers about the CSC Export Tool including credits, data freshness, formats, billing, and troubleshooting."
+icon: "circle-question"
+---
+
+Find answers to common questions about the CSC Export Tool. Can't find what you're looking for? Contact us at export@countrystatecity.in.
+
+## Getting Started
+
+<AccordionGroup>
+<Accordion title="How do I get started with the CSC Export Tool?">
+Getting started is simple:
+
+1. **Sign up** at [export.countrystatecity.in](https://export.countrystatecity.in)
+2. **Choose your method**: GitHub (one-click) or Email (magic link)
+3. **Get 3 free credits** automatically added to your account
+4. **Create your first export** following our [getting started guide](/tools/export-tool/getting-started)
+
+<Tip>
+**Free Trial**: Every new user gets 3 credits to test the system before purchasing additional credits.
+</Tip>
+</Accordion>
+
+<Accordion title="What can I do with the 3 free trial credits?">
+Your 3 free credits give you several options:
+
+**Option 1: Basic Testing**
+- Countries export in JSON format (1 credit)
+- States export in JSON format (2 credits)
+- **Total: 3 credits**
+
+**Option 2: Analysis Ready**
+- Countries export in CSV format (1 + 1 = 2 credits)
+- 1 credit remaining for another small export
+
+**Option 3: Complete Dataset**
+- Cities export in JSON format (3 credits)
+- Perfect for testing location-based features
+
+**Option 4: Database Ready**
+- Countries export in SQL format (1 + 3 = 4 credits)
+- *Note: This would require purchasing 1 additional credit*
+</Accordion>
+
+<Accordion title="How long does it take to create an export?">
+Export processing times depend on the dataset size and format:
+
+**Typical Processing Times:**
+- **Countries only**: 10-30 seconds
+- **Countries + States**: 30-60 seconds  
+- **All datasets**: 1-3 minutes
+- **SQL format**: Additional 30-60 seconds for relationship processing
+
+**Factors affecting speed:**
+- Dataset size (Countries < States < Cities)
+- Export format (JSON fastest, SQL slowest)
+- Number of selected fields
+- Current system load
+
+<Info>
+You'll receive a notification when your export is ready for download.
+</Info>
+</Accordion>
+</AccordionGroup>
+
+## Credits & Billing
+
+<AccordionGroup>
+<Accordion title="How does the credit system work?">
+Credits are used to generate exports based on datasets and formats:
+
+**Dataset Costs:**
+- **Countries**: 1 credit (~247 countries)
+- **States**: 2 credits (~4,000+ states/provinces)  
+- **Cities**: 3 credits (~150,000+ cities)
+
+**Format Costs (added to dataset cost):**
+- **JSON**: Free (0 additional credits)
+- **CSV**: +1 credit
+- **XML**: +2 credits
+- **YAML**: +2 credits  
+- **SQL**: +3 credits
+
+**Example Calculations:**
+```
+Countries + States in JSON = 1 + 2 + 0 = 3 credits
+Countries in CSV = 1 + 1 = 2 credits
+Cities in SQL = 3 + 3 = 6 credits
+All datasets in JSON = 1 + 2 + 3 = 6 credits
+```
+</Accordion>
+
+<Accordion title="Do credits expire?">
+**No, credits never expire!** You can use them whenever you need to create new exports.
+
+**Credit Features:**
+- ✅ No expiration date
+- ✅ Use at your own pace
+- ✅ Accumulate credits across purchases
+- ✅ Transparent usage tracking
+- ✅ No hidden fees or recurring charges
+
+**Export Access:**
+- Exports are available for **30 days** after creation
+- After 30 days, you can renew expired exports for the same credit cost
+- This ensures you always get the most up-to-date geographical data
+</Accordion>
+
+<Accordion title="What payment methods do you accept?">
+We use **Dodo Payments** for secure, encrypted transactions:
+
+**Accepted Payment Methods:**
+- Visa, Mastercard, American Express
+- Discover, JCB, Diners Club
+- Apple Pay, Google Pay
+
+**Payment Features:**
+- 🔒 Secure SSL encryption
+- 💳 No stored payment information
+- 📧 Instant email receipts  
+- 🚀 Credits added immediately
+- 🌍 International payments supported
+
+**Billing Process:**
+1. Enter billing information
+2. Select credit package
+3. Complete secure payment
+4. Credits added instantly to your account
+5. Email confirmation sent
+</Accordion>
+
+<Accordion title="Can I get a refund?">
+**Our refund policy:**
+
+**Preview Before Purchase:** Use our free preview feature to see exactly what your export will contain before spending credits.
+
+**Refund Scenarios:**
+- ✅ **Technical issues**: Full refund if export fails due to our system errors
+- ✅ **Billing errors**: Immediate refund for incorrect charges
+- ❌ **Preview mismatch**: Refunds not available if export matches preview
+- ❌ **Changed requirements**: Credits spent on completed exports are non-refundable
+
+**Prevention Tips:**
+- Always use the **preview feature** (free) before creating exports
+- Review field selections and format choices carefully
+- Start with small test exports using trial credits
+- Contact support if you're unsure about an export
+
+<Warning>
+**Important**: Preview your exports before confirming to ensure they meet your needs. This prevents unnecessary credit usage.
+</Warning>
+</Accordion>
+
+<Accordion title="Is there a bulk discount for large purchases?">
+**Smart Purchasing Strategy:**
+- Calculate your project needs first
+- Consider purchasing larger packages for better value
+- Credits never expire, so buying ahead saves money
+- Share credits across team members
+
+Contact us at export@countrystatecity.in for custom pricing.
+</Accordion>
+</AccordionGroup>
+
+## Data & Export Management
+
+<AccordionGroup>
+<Accordion title="How fresh is the geographical data?">
+Our data is **updated daily** to ensure accuracy:
+
+**Update Schedule:**
+- **Daily sync**: Database updated every 24 hours
+- **Source monitoring**: Continuous tracking of official sources
+- **Change detection**: Automatic identification of updates
+- **Quality assurance**: Validation before publishing
+
+**Data Sources:**
+- Official government databases
+- ISO country code registries  
+- United Nations statistical databases
+- World Bank economic indicators
+- Geographic coordinate systems
+
+**What gets updated:**
+- New countries, states, or cities
+- Population changes
+- Economic indicators (GDP, currency changes)
+- Administrative boundary changes
+- Political changes (country names, capitals)
+
+<Check>
+**Always Current**: When you export data, you get the latest available information as of that day.
+</Check>
+</Accordion>
+
+<Accordion title="How long can I download my exports?">
+**Export Download Period: 30 days**
+
+**What happens after 30 days:**
+- Export links expire (to ensure data freshness)
+- You can **renew** expired exports for the same credit cost
+- Renewal gives you updated data with any changes
+
+**Best Practices:**
+- Download exports immediately after creation
+- Save exports locally for your project needs
+- Set reminders for important exports before they expire
+- Consider renewal if you need updated data
+
+**Renewal Benefits:**
+- Same credit cost as original export
+- Updated with any data changes since original export
+- Fresh 30-day download window
+- Maintains your original field selection and format
+
+<Tip>
+**Pro Tip**: For ongoing projects, plan exports around your development schedule to maximize the 30-day access window.
+</Tip>
+</Accordion>
+
+<Accordion title="What if I need data for just one country?">
+**Use our country filtering feature!**
+
+**Available Filters:**
+- **Country selection**: Choose specific countries (US, CA, GB, etc.)
+- **Region filtering**: Select by region (Americas, Europe, Asia, etc.)
+- **Subregion filtering**: Narrow down to subregions (Northern America, Western Europe)
+
+**Benefits:**
+- Reduced file sizes
+- Faster processing
+- Cleaner datasets
+- Same credit costs
+
+**Example Use Cases:**
+```json US-only States Export
+{
+  "filters": {
+    "countries": ["US"]
+  },
+  "datasets": ["states"],
+  "fields": ["name", "state_code", "latitude", "longitude"]
+}
+// Result: Only US states (50 records instead of 4,000+)
+// Cost: Still 2 credits for states dataset
+```
+
+**Available in All Formats:**
+- JSON, CSV, XML, YAML, and SQL all support filtering
+- Same credit costs regardless of filtered data size
+- Filtering applied during export generation
+</Accordion>
+
+<Accordion title="Can I get historical data or different versions?">
+**Current Limitation:** We provide current data only, not historical versions.
+
+**What We Provide:**
+- ✅ Most current geographical data
+- ✅ Daily updates with latest changes
+- ✅ Real-time accuracy
+- ❌ Historical snapshots not available
+- ❌ Previous versions not stored
+
+**For Historical Analysis:**
+- Export and save data regularly for your own historical tracking
+- Use version control to track changes over time
+- Document important data snapshots for your projects
+
+**Future Plans:**
+We're considering historical data features for enterprise customers. Contact us if this is important for your use case.
+
+**Workaround:**
+Create regular exports (monthly/quarterly) and save them locally to build your own historical dataset.
+</Accordion>
+</AccordionGroup>
+
+## Technical Questions
+
+<AccordionGroup>
+<Accordion title="What's the difference between the export formats?">
+Each format serves different use cases and has different credit costs:
+
+<Tabs>
+<Tab title="JSON (Free)">
+**Best for:** Web applications, APIs, mobile apps
+
+**Advantages:**
+- Native JavaScript support
+- Nested structure preserves relationships
+- Lightweight and fast parsing
+- Perfect for REST APIs
+
+**Sample Structure:**
+```json
+{
+  "countries": [...],
+  "states": [...], 
+  "metadata": {...}
+}
+```
+</Tab>
+
+<Tab title="CSV (+1 Credit)">
+**Best for:** Spreadsheets, data analysis, BI tools
+
+**Advantages:**
+- Excel/Google Sheets ready
+- Great for data science (Pandas, R)
+- Easy pivot table creation
+- Universal format support
+
+**Sample Structure:**
+```csv
+name,iso2,currency,population
+United States,US,USD,331002651
+Canada,CA,CAD,37742154
+```
+</Tab>
+
+<Tab title="XML (+2 Credits)">
+**Best for:** Enterprise systems, SOAP APIs, legacy systems
+
+**Advantages:**
+- Schema validation support
+- Hierarchical structure
+- Industry standard for enterprise
+- SOAP web service compatibility
+
+**Sample Structure:**
+```xml
+<csc:export>
+  <csc:countries>
+    <csc:country>
+      <csc:name>United States</csc:name>
+    </csc:country>
+  </csc:countries>
+</csc:export>
+```
+</Tab>
+
+<Tab title="YAML (+2 Credits)">
+**Best for:** Configuration files, documentation, DevOps
+
+**Advantages:**
+- Human-readable format
+- Great for config files
+- Kubernetes/Docker integration
+- Documentation-friendly
+
+**Sample Structure:**
+```yaml
+countries:
+  - name: United States
+    iso2: US
+    currency: USD
+```
+</Tab>
+
+<Tab title="SQL (+3 Credits)">
+**Best for:** Database seeding, data migration, production setup
+
+**Advantages:**
+- Ready-to-execute statements
+- Proper table relationships
+- Indexes and constraints included
+- Production database ready
+
+**Sample Structure:**
+```sql
+CREATE TABLE countries (...);
+INSERT INTO countries VALUES (...);
+CREATE INDEX idx_countries_iso2 ON countries (iso2);
+```
+</Tab>
+</Tabs>
+</Accordion>
+
+<Accordion title="Can I combine multiple datasets in one export?">
+**Yes!** You can combine Countries, States, and Cities in a single export:
+
+**Benefits of Combined Exports:**
+- ✅ Data consistency across datasets
+- ✅ Proper relationships maintained
+- ✅ Single download and processing
+- ✅ Unified timestamp and version
+
+**Cost Calculation:**
+Combined exports sum the individual dataset costs plus format cost:
+```
+Countries (1) + States (2) + Cities (3) + CSV (1) = 7 credits total
+```
+
+**Output Structure Examples:**
+
+```json JSON Combined Export
+{
+  "countries": [
+    {
+      "name": "United States",
+      "iso2": "US",
+      "states_count": 50,
+      "cities_count": 19495
+    }
+  ],
+  "states": [
+    {
+      "name": "California", 
+      "country_code": "US",
+      "cities_count": 1538
+    }
+  ],
+  "cities": [
+    {
+      "name": "Los Angeles",
+      "state_name": "California",
+      "country_name": "United States"
+    }
+  ]
+}
+```
+
+```csv CSV Combined Export
+# countries.csv
+name,iso2,states_count,cities_count
+United States,US,50,19495
+
+# states.csv  
+name,country_code,country_name,cities_count
+California,US,United States,1538
+
+# cities.csv
+name,state_name,country_name,population
+Los Angeles,California,United States,3971883
+```
+</Accordion>
+
+<Accordion title="How do I integrate exports with my application?">
+Integration depends on your chosen format and technology stack:
+
+**Web Applications (JSON):**
+```javascript Frontend Integration
+// Load and cache data
+const geoData = await fetch('/data/export.json').then(r => r.json());
+
+// Create lookup maps for performance
+const countryMap = new Map(geoData.countries.map(c => [c.iso2, c]));
+const stateMap = new Map(geoData.states.map(s => [s.state_code, s]));
+
+// Use in components
+function CountryDropdown() {
+  return (
+    <select>
+      {geoData.countries.map(country => (
+        <option key={country.iso2} value={country.iso2}>
+          {country.emoji} {country.name}
+        </option>
+      ))}
+    </select>
+  );
+}
+```
+
+**Database Integration (SQL):**
+```bash Database Import
+# PostgreSQL
+psql -d mydb -f csc_export.sql
+
+# MySQL
+mysql -u user -p mydb < csc_export.sql
+
+# SQLite
+sqlite3 mydb.db < csc_export.sql
+```
+
+**Data Analysis (CSV):**
+```python Python/Pandas
+import pandas as pd
+
+# Load data
+countries = pd.read_csv('countries.csv')
+states = pd.read_csv('states.csv')
+
+# Analysis
+regional_stats = countries.groupby('region').agg({
+    'population': 'sum',
+    'gdp': 'mean'
+})
+```
+
+**Configuration (YAML):**
+```yaml Kubernetes Config
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: geo-config
+data:
+  countries.yaml: |
+    # CSC Export Data
+    countries:
+      - name: "United States"
+        currency: "USD"
+```
+</Accordion>
+
+<Accordion title="What file sizes should I expect?">
+File sizes vary by dataset, fields selected, and format:
+
+**Approximate Sizes (All Fields):**
+
+<Tabs>
+<Tab title="JSON Format">
+**Countries Only:**
+- ~247 countries: 200-300 KB
+- With all fields: 500 KB - 1 MB
+
+**Countries + States:**
+- ~4,000 states: 2-4 MB
+- Compressed: 500 KB - 1 MB
+
+**All Datasets:**
+- ~150,000 cities: 50-100 MB
+- Compressed: 10-20 MB
+</Tab>
+
+<Tab title="CSV Format">
+**Countries Only:**
+- ~247 countries: 100-200 KB
+- More compact than JSON
+
+**Countries + States:**
+- Multiple CSV files: 1-3 MB total
+- Efficient for spreadsheet use
+
+**All Datasets:**
+- Large CSV files: 30-80 MB
+- Good for data analysis tools
+</Tab>
+
+<Tab title="SQL Format">
+**Countries Only:**
+- With indexes: 300-500 KB
+- Includes CREATE statements
+
+**Countries + States:**
+- With relationships: 3-6 MB
+- Production-ready structure
+
+**All Datasets:**
+- Complete database: 80-150 MB
+- Includes all optimizations
+</Tab>
+</Tabs>
+
+**Optimization Tips:**
+- Select only needed fields to reduce size
+- Use country filters for regional data
+- JSON format is generally most compact
+- ZIP compression reduces download size by 60-80%
+</Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="My export is taking longer than expected">
+**Normal Processing Times:**
+- Countries: 10-30 seconds
+- States: 30-60 seconds  
+- Cities: 1-3 minutes
+- SQL format: +30-60 seconds
+
+**If your export is taking longer:**
+
+**Check System Status:**
+1. Visit our status page for any known issues
+2. Peak usage times may cause delays (typically 9 AM - 5 PM EST)
+
+**Common Causes:**
+- Large dataset (Cities with all fields)
+- Complex SQL format processing
+- High system load during peak hours
+- Network connectivity issues
+
+**What To Do:**
+1. **Wait patiently**: Large exports genuinely take time
+2. **Check your network**: Ensure stable internet connection
+3. **Contact support**: If over 10 minutes for any export
+
+**Optimization for Future:**
+- Use field filtering to reduce processing time
+- Consider JSON format for faster processing
+- Schedule large exports during off-peak hours
+
+<Info>
+**Status Updates**: You'll receive browser notifications when your export is ready, even if you close the tab.
+</Info>
+</Accordion>
+
+<Accordion title="I can't download my export file">
+**Common Download Issues:**
+
+**Browser Issues:**
+- Try a different browser (Chrome, Firefox, Safari)
+- Disable browser extensions temporarily
+- Clear browser cache and cookies
+- Check if popup blockers are interfering
+
+**Network Issues:**
+- Check your internet connection
+- Try downloading on a different network
+- Use a VPN if experiencing regional restrictions
+- Restart your router/modem
+
+**File Size Issues:**
+- Large files may timeout on slow connections
+- Try using a download manager for large files
+- Consider splitting large exports into smaller ones
+
+**Account Issues:**
+- Ensure you're logged into the correct account
+- Check if the export has expired (30-day limit)
+- Verify you have permission to download
+
+**Quick Fixes:**
+1. **Refresh the page** and try again
+2. **Right-click and "Save Link As"** instead of direct click
+3. **Try incognito/private browsing mode**
+4. **Contact support** with your export ID
+
+<Warning>
+**Export Expiration**: Downloads are only available for 30 days. After that, you'll need to renew the export.
+</Warning>
+</Accordion>
+
+<Accordion title="The exported data doesn't match my preview">
+**This should not happen** - exports should exactly match previews. If you experience this:
+
+**Immediate Steps:**
+1. **Don't panic** - we'll resolve this quickly
+2. **Take screenshots** of both preview and actual export
+3. **Note the export ID** (found in your export history)
+4. **Contact support immediately** at export@countrystatecity.in
+
+**Information to Include:**
+- Export ID and timestamp
+- Screenshots of preview vs actual data
+- Browser and operating system details
+- Specific fields or records that don't match
+
+**Our Response:**
+- **Investigation**: We'll investigate the discrepancy immediately
+- **Resolution**: Bug fixes are prioritized and deployed quickly  
+- **Compensation**: Credit refund if the issue was on our end
+- **Prevention**: System improvements to prevent recurrence
+
+**Temporary Workaround:**
+If you need the correct data urgently, create a new export and we'll refund the credits for the incorrect one.
+
+<Check>
+**Quality Guarantee**: Preview accuracy is fundamental to our service. We take these issues very seriously.
+</Check>
+</Accordion>
+
+<Accordion title="I'm getting an error during export creation">
+**Common Error Types:**
+
+**"Insufficient Credits" Error:**
+- **Cause**: Not enough credits for the selected configuration
+- **Solution**: Purchase additional credits or reduce export scope
+- **Prevention**: Check credit requirements before confirming
+
+**"Field Selection Required" Error:**
+- **Cause**: No fields selected for export
+- **Solution**: Select at least one field from each chosen dataset
+- **Prevention**: Review field selections before proceeding
+
+**"Export Processing Failed" Error:**
+- **Cause**: Server-side processing issue
+- **Solution**: Try again in a few minutes, contact support if persistent
+- **Prevention**: Avoid very large exports during peak hours
+
+**"Invalid Format Combination" Error:**
+- **Cause**: Certain formats may not support specific field combinations
+- **Solution**: Try a different format or adjust field selection
+- **Prevention**: Use preview to validate before creating
+
+**Browser/Network Errors:**
+- Clear browser cache and cookies
+- Disable browser extensions temporarily
+- Try a different network or browser
+- Check if JavaScript is enabled
+
+**Steps to Resolve:**
+1. **Try again**: Many errors are temporary
+2. **Simplify**: Reduce fields or datasets to isolate the issue
+3. **Switch browsers**: Rule out browser-specific issues
+4. **Contact support**: Include error message and export configuration
+</Accordion>
+
+<Accordion title="How do I report bugs or request features?">
+**Bug Reports:**
+Send bug reports to: **export@countrystatecity.in**
+
+**Include the Following:**
+- Detailed description of the issue
+- Steps to reproduce the problem
+- Browser and operating system details
+- Screenshots or error messages
+- Export ID if applicable
+
+**Feature Requests:**
+Send feature requests to: **export@countrystatecity.in**
+
+**Popular Feature Requests:**
+- Historical data snapshots
+- API access for automated exports
+- Bulk export operations
+- Custom field calculations
+- Advanced filtering options
+- Team collaboration features
+
+**Our Response Time:**
+- **Bug reports**: Within 24 hours
+- **Feature requests**: Reviewed monthly
+- **Critical issues**: Same day response
+- **Enhancement updates**: Quarterly releases
+
+**Community Feedback:**
+- Join our community forum for discussions
+- Vote on feature requests
+- Share use cases and success stories
+- Connect with other users
+</Accordion>
+</AccordionGroup>
+
+---
+
+## Still Need Help?
+
+<CardGroup>
+<Card title="Email Support" icon="envelope">
+**export@countrystatecity.in**
+
+General questions, technical issues, and billing inquiries
+</Card>
+</CardGroup>
+
+<Note>
+**Response Time**: We typically respond to all inquiries within 24 hours. Enterprise customers receive priority support with faster response times.
+</Note>
