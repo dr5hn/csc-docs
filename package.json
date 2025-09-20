@@ -1,0 +1,14 @@
+{
+  "name": "country-state-city-docs",
+  "version": "1.0.0",
+  "description": "Country State City ecosystem documentation",
+  "private": true,
+  "scripts": {
+    "sync-changelog": "node scripts/sync-changelog.js",
+    "dev": "mintlify dev",
+    "build": "mintlify build"
+  },
+  "keywords": ["documentation", "geography", "api", "countries", "states", "cities"],
+  "author": "Country State City Team",
+  "license": "MIT"
+}

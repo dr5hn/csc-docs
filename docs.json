@@ -11,6 +11,18 @@
   "navigation": {
     "tabs": [
       {
+        "tab": "Home",
+        "groups": [
+          {
+            "group": "Getting Started", 
+            "pages": [
+              "index",
+              "changelog"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "API",
         "groups": [
           {
