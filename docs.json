@@ -162,11 +162,11 @@
     "links": [
       {
         "label": "Donate",
-        "href": "http://localhost:3000/donate"
+        "href": "http://docs.countrystatecity.in/donate"
       },
       {
         "label": "Changelog",
-        "href": "http://localhost:3000/changelog"
+        "href": "http://docs.countrystatecity.in/changelog"
       }
     ],
     "primary": {
