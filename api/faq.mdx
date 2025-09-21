@@ -1,0 +1,688 @@
+---
+title: "Frequently Asked Questions"
+description: "Common questions and solutions for using the Country State City API effectively"
+icon: "circle-question"
+---
+
+## Getting Started
+
+<AccordionGroup>
+<Accordion title="How do I get an API key?">
+  Register for free at [our portal](https://countrystatecity.in) to obtain your API key instantly. The process is simple:
+
+  1. Visit [countrystatecity.in](https://countrystatecity.in)
+  2. Create an account with your email
+  3. Verify your email address
+  4. Your API key will be generated immediately
+
+  <Info>
+  Free tier includes 3,000 requests per month (100 requests per day) - perfect for development and small applications.
+  </Info>
+</Accordion>
+
+<Accordion title="Is there a free plan available?">
+  Yes! Our **Community (Free)** plan includes:
+  - 3,000 requests per month
+  - 100 requests per day
+  - 2 requests per second rate limit
+  - Access to all endpoints
+  - No credit card required
+
+  This is perfect for development, testing, and small-scale applications.
+</Accordion>
+
+<Accordion title="How quickly can I start using the API?">
+  You can make your first API call within minutes:
+
+  ```bash
+  curl -X GET 'https://api.countrystatecity.in/v1/countries' \
+    -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+  ```
+
+  <Check>
+  Your API key is ready to use immediately after registration - no waiting period required.
+  </Check>
+</Accordion>
+
+<Accordion title="Do you provide SDKs for different programming languages?">
+  While we don't maintain official SDKs, our RESTful API works with any programming language that can make HTTP requests. We provide comprehensive [integration examples](/api/examples) for:
+
+  - JavaScript/Node.js
+  - Python
+  - PHP
+  - Java
+  - C#
+  - Go
+  - Ruby
+
+  Community members have also created unofficial libraries for various platforms.
+</Accordion>
+</AccordionGroup>
+
+## Authentication & Security
+
+<AccordionGroup>
+<Accordion title="How do I authenticate API requests?">
+  Authentication is done using API key headers. Include your API key in every request:
+
+  ```
+  X-CSCAPI-KEY: YOUR_API_KEY
+  ```
+
+  <CodeGroup>
+  ```javascript JavaScript
+  const response = await fetch('https://api.countrystatecity.in/v1/countries', {
+    headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' }
+  });
+  ```
+
+  ```python Python
+  import requests
+  response = requests.get(
+    'https://api.countrystatecity.in/v1/countries',
+    headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+  )
+  ```
+
+  ```bash cURL
+  curl -H 'X-CSCAPI-KEY: YOUR_API_KEY' \
+    'https://api.countrystatecity.in/v1/countries'
+  ```
+  </CodeGroup>
+</Accordion>
+
+<Accordion title="Is it safe to use my API key in client-side applications?">
+  <Warning>
+  **Never expose your API key in client-side code** such as browser JavaScript, mobile apps, or public repositories.
+  </Warning>
+
+  **Safe practices:**
+  - Use server-side applications or serverless functions
+  - Store API keys in environment variables
+  - Implement your own backend API that securely calls our API
+  - Use build-time environment variables for static sites
+
+  **Why this matters:**
+  - API keys in client-side code are visible to anyone
+  - Malicious users could extract and abuse your API key
+  - This could lead to unexpected usage and charges
+</Accordion>
+
+<Accordion title="Can I rotate or regenerate my API key?">
+  Yes! You can manage your API keys through the [developer portal](https://countrystatecity.in):
+
+  1. Log into your account
+  2. Navigate to API key management
+  3. Generate a new key
+  4. Update your applications with the new key
+  5. Revoke the old key once migration is complete
+
+  <Tip>
+  Keep both keys active during migration to avoid service interruption.
+  </Tip>
+</Accordion>
+
+<Accordion title="What should I do if I get a 401 Unauthorized error?">
+  A 401 error typically indicates an authentication issue:
+
+  **Common causes and solutions:**
+  - **Invalid API key**: Double-check your API key for typos
+  - **Wrong header name**: Ensure you're using `X-CSCAPI-KEY` exactly
+  - **Missing header**: Verify the header is being sent with every request
+  - **Expired/revoked key**: Generate a new API key if needed
+
+  **Test your authentication:**
+  ```bash
+  curl -X GET 'https://api.countrystatecity.in/v1/countries' \
+    -H 'X-CSCAPI-KEY: YOUR_API_KEY' \
+    -w "HTTP Status: %{http_code}\n"
+  ```
+
+  A successful test returns HTTP 200 with country data.
+</Accordion>
+</AccordionGroup>
+
+## Rate Limits & Usage
+
+<AccordionGroup>
+<Accordion title="What are the current rate limits?">
+  Rate limits vary by plan:
+
+  | Plan | Monthly Requests | Daily Requests | Rate Limit |
+  |:-----|:-----------------|:---------------|:-----------|
+  | **Community (Free)** | 3,000 | 100 | 2 req/second |
+  | **Supporter** | 30,000 | 1,000 | 10 req/second |
+  | **Professional** | 150,000 | 5,000 | 25 req/second |
+
+  <Card 
+    title="View Full Pricing Details" 
+    icon="credit-card" 
+    href="https://countrystatecity.in/pricing"
+  >
+    Compare plans, features, and pricing options
+  </Card>
+</Accordion>
+
+<Accordion title="How can I monitor my API usage?">
+  Every API response includes rate limit headers:
+
+  ```
+  X-RateLimit-Limit: 1000
+  X-RateLimit-Remaining: 999
+  X-RateLimit-Reset: 1640995200
+  X-RateLimit-Window: 3600
+  ```
+
+  **Monitor usage in code:**
+  ```javascript
+  const response = await fetch(apiUrl, { headers });
+  
+  const remaining = response.headers.get('X-RateLimit-Remaining');
+  const limit = response.headers.get('X-RateLimit-Limit');
+  
+  console.log(`Rate Limit: ${remaining}/${limit}`);
+  
+  if (remaining < limit * 0.1) {
+    console.warn('⚠️ Approaching rate limit!');
+  }
+  ```
+
+  You can also monitor usage through your account dashboard.
+</Accordion>
+
+<Accordion title="What happens when I exceed my rate limit?">
+  When you exceed your rate limit, you'll receive a `429 Too Many Requests` response:
+
+  ```json
+  {
+    "error": "Rate limit exceeded",
+    "message": "Too many requests. Please try again later.",
+    "retry_after": 3600
+  }
+  ```
+
+  **Best practices for handling rate limits:**
+  - Implement exponential backoff retry logic
+  - Cache responses to reduce API calls
+  - Monitor usage proactively
+  - Consider upgrading your plan if limits are consistently hit
+
+  <Tip>
+  The `Retry-After` header indicates how long to wait before making another request.
+  </Tip>
+</Accordion>
+
+<Accordion title="How can I optimize my API usage to stay within limits?">
+  **Effective caching strategies:**
+  - Cache country/state data for 24+ hours (rarely changes)
+  - Cache city data for 12+ hours
+  - Implement local fallbacks for critical data
+
+  **Efficient request patterns:**
+  - Fetch broader datasets when possible (all countries vs individual requests)
+  - Use hierarchical endpoints strategically
+  - Batch related requests together
+
+  **Example caching implementation:**
+  ```javascript
+  class APICache {
+    constructor(ttl = 24 * 60 * 60 * 1000) {
+      this.cache = new Map();
+      this.ttl = ttl;
+    }
+    
+    get(key) {
+      const item = this.cache.get(key);
+      if (!item || Date.now() - item.timestamp > this.ttl) {
+        return null;
+      }
+      return item.data;
+    }
+    
+    set(key, data) {
+      this.cache.set(key, { data, timestamp: Date.now() });
+    }
+  }
+  ```
+</Accordion>
+</AccordionGroup>
+
+## Data & Endpoints
+
+<AccordionGroup>
+<Accordion title="What data is included for countries, states, and cities?">
+  **Countries include:**
+  - ISO2 and ISO3 codes
+  - Country name and native name
+  - Phone code and currency information
+  - Flag emoji and region information
+  - Latitude and longitude coordinates
+
+  **States include:**
+  - State name and ISO2 code
+  - Country association
+  - State type (state, province, region, etc.)
+  - Latitude and longitude coordinates
+
+  **Cities include:**
+  - City name and unique ID
+  - Country and state association
+  - Latitude and longitude coordinates
+  - Timezone information (when available)
+
+  <Tip>
+  Use the detailed endpoints (`/countries/{iso2}`) to get complete information including additional metadata.
+  </Tip>
+</Accordion>
+
+<Accordion title="How often is the geographical data updated?">
+  Our data is continuously maintained and updated:
+
+  - **Country data**: Updated as needed for political changes, currency updates, etc.
+  - **State/Province data**: Updated for administrative boundary changes
+  - **City data**: Regular additions and corrections based on authoritative sources
+
+  We implement automated validation and quality checks to ensure data accuracy. Major updates are announced through our changelog.
+
+  <Info>
+  The dataset includes 247+ countries, 5,000+ states/provinces, and 151,000+ cities worldwide.
+  </Info>
+</Accordion>
+
+<Accordion title="Can I get all countries, states, and cities in one request?">
+  No, for performance and efficiency reasons, our API is designed with hierarchical endpoints:
+
+  - `/countries` - All countries
+  - `/countries/{countryCode}/states` - States within a country  
+  - `/countries/{countryCode}/cities` - Cities within a country
+  - `/countries/{countryCode}/states/{stateCode}/cities` - Cities within a state
+
+  **Why this design:**
+  - Faster response times for specific data
+  - Reduced bandwidth usage
+  - Better caching opportunities
+  - More manageable response sizes
+
+  <Warning>
+  Requesting all cities globally would result in 151,000+ records, which would be slow and consume significant bandwidth.
+  </Warning>
+</Accordion>
+
+<Accordion title="Do you provide latitude and longitude coordinates?">
+  Yes! Latitude and longitude coordinates are included for:
+
+  - ✅ **Countries**: Approximate center coordinates
+  - ✅ **States/Provinces**: Administrative center coordinates
+  - ✅ **Cities**: City center coordinates
+
+  **Example city response:**
+  ```json
+  {
+    "id": 12345,
+    "name": "Los Angeles",
+    "latitude": "34.05223",
+    "longitude": "-118.24368",
+    "country_code": "US",
+    "state_code": "CA"
+  }
+  ```
+
+  Coordinates are provided as strings for precision and can be easily converted to numbers for calculations.
+</Accordion>
+
+<Accordion title="Are country and currency codes standardized?">
+  Yes, we follow international standards:
+
+  **Country Codes:**
+  - ISO 3166-1 alpha-2 (2-letter codes like "US", "GB")
+  - ISO 3166-1 alpha-3 (3-letter codes like "USA", "GBR")
+
+  **Currency Codes:**
+  - ISO 4217 standard (3-letter codes like "USD", "EUR")
+
+  **Phone Codes:**
+  - ITU-T E.164 standard international calling codes
+
+  This ensures compatibility with other international systems and databases.
+</Accordion>
+</AccordionGroup>
+
+## Integration & Development
+
+<AccordionGroup>
+<Accordion title="Can I use this API with CORS from a browser application?">
+  <Warning>
+  We strongly recommend against making direct API calls from browser applications due to security concerns with exposing API keys.
+  </Warning>
+
+  **Recommended approaches:**
+  1. **Server-side proxy**: Create your own API endpoint that calls our API
+  2. **Serverless functions**: Use services like Vercel Functions, Netlify Functions, or AWS Lambda
+  3. **Static site generation**: Fetch data at build time for static sites
+
+  **Why avoid direct browser calls:**
+  - API keys are visible in browser developer tools
+  - Risk of key theft and unauthorized usage
+  - Potential CORS restrictions
+</Accordion>
+
+<Accordion title="How do I handle cascading dropdowns (Country → State → City)?">
+  Implement cascading dropdowns by chaining API calls based on user selections:
+
+  **React example pattern:**
+  ```javascript
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+
+  // Load states when country changes
+  useEffect(() => {
+    if (selectedCountry) {
+      loadStates(selectedCountry);
+      setCities([]); // Clear cities when country changes
+    }
+  }, [selectedCountry]);
+
+  const loadStates = async (countryCode) => {
+    const statesData = await api.getStates(countryCode);
+    setStates(statesData);
+  };
+  ```
+
+  <Card title="Complete Example" icon="code" href="/api/examples#complete-registration-form-with-cascading-dropdowns">
+    See our comprehensive cascading dropdown implementation guide
+  </Card>
+</Accordion>
+
+<Accordion title="What's the best way to handle errors in my integration?">
+  Implement comprehensive error handling for different scenarios:
+
+  **Error types and handling:**
+  ```javascript
+  async function makeAPIRequest(endpoint) {
+    try {
+      const response = await fetch(endpoint, { headers });
+      
+      if (response.status === 401) {
+        throw new Error('INVALID_API_KEY');
+      } else if (response.status === 429) {
+        throw new Error('RATE_LIMITED');
+      } else if (response.status === 404) {
+        throw new Error('NOT_FOUND');
+      } else if (!response.ok) {
+        throw new Error('API_ERROR');
+      }
+      
+      return await response.json();
+      
+    } catch (error) {
+      if (error.message === 'RATE_LIMITED') {
+        // Implement exponential backoff
+        await delay(5000);
+        return makeAPIRequest(endpoint);
+      } else if (error.message === 'INVALID_API_KEY') {
+        // Notify user to check API configuration
+        console.error('Invalid API key configuration');
+      }
+      throw error;
+    }
+  }
+  ```
+
+  **Best practices:**
+  - Always check response status codes
+  - Implement retry logic for temporary failures
+  - Provide meaningful error messages to users
+  - Log errors for debugging purposes
+</Accordion>
+
+<Accordion title="Can I cache API responses locally?">
+  Yes, caching is highly recommended and beneficial:
+
+  **Recommended cache durations:**
+  - **Countries**: 24-48 hours (very stable data)
+  - **States**: 12-24 hours (occasionally updated)
+  - **Cities**: 6-12 hours (more frequently updated)
+
+  **Implementation strategies:**
+  ```javascript
+  // Browser localStorage
+  const cacheKey = 'countries_data';
+  const cachedData = localStorage.getItem(cacheKey);
+  const isExpired = Date.now() - cachedData?.timestamp > 24 * 60 * 60 * 1000;
+
+  if (cachedData && !isExpired) {
+    return JSON.parse(cachedData).data;
+  }
+
+  // Server-side caching (Redis, Memcached, etc.)
+  const redis = require('redis');
+  const client = redis.createClient();
+  
+  const cached = await client.get('countries');
+  if (cached) return JSON.parse(cached);
+  
+  const data = await fetchFromAPI();
+  await client.setex('countries', 86400, JSON.stringify(data)); // 24h TTL
+  ```
+
+  Caching reduces API usage, improves performance, and provides offline fallbacks.
+</Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Why am I getting empty results for certain countries/states?">
+  This can happen for several reasons:
+
+  **Common causes:**
+  1. **Incorrect country/state codes**: Verify you're using the correct ISO codes
+  2. **Case sensitivity**: Country codes should be uppercase ("US", not "us")
+  3. **State code format**: Use 2-letter state codes when available
+  4. **Data availability**: Some territories may have limited subdivision data
+
+  **Debugging steps:**
+  ```javascript
+  // First, verify the country exists
+  const countries = await api.getCountries();
+  const country = countries.find(c => c.iso2 === 'US');
+  console.log('Country found:', country);
+
+  // Then check states
+  const states = await api.getStates('US');
+  console.log('States count:', states.length);
+  ```
+
+  <Tip>
+  Use our detailed country endpoint to verify exact country and state codes available.
+  </Tip>
+</Accordion>
+
+<Accordion title="The API response seems slow. How can I improve performance?">
+  **Performance optimization strategies:**
+
+  1. **Implement caching** (most important)
+  2. **Use specific endpoints** instead of filtering large datasets
+  3. **Parallel requests** for independent data
+  4. **CDN/Edge caching** for static geographical data
+
+  **Example parallel requests:**
+  ```javascript
+  // Instead of sequential requests
+  const countries = await api.getCountries();
+  const states = await api.getStates('US');
+
+  // Use parallel requests
+  const [countries, states] = await Promise.all([
+    api.getCountries(),
+    api.getStates('US')
+  ]);
+  ```
+
+  **Server-side optimizations:**
+  - Use HTTP/2 for multiplexed requests
+  - Implement connection pooling
+  - Add response compression
+</Accordion>
+
+<Accordion title="I'm seeing inconsistent data between requests. What's wrong?">
+  This is typically due to caching issues or incorrect API usage:
+
+  **Check these common issues:**
+  
+  1. **Browser caching**: Different cache states in development
+  2. **API versioning**: Ensure you're using the same API version
+  3. **Mixed endpoints**: Don't mix different API base URLs
+  4. **Concurrent updates**: Our data is occasionally updated
+
+  **Troubleshooting steps:**
+  ```javascript
+  // Add request debugging
+  console.log('Request URL:', fullUrl);
+  console.log('Request headers:', headers);
+  console.log('Response status:', response.status);
+  console.log('Response headers:', [...response.headers.entries()]);
+  ```
+
+  **Force fresh data:**
+  ```javascript
+  // Add cache-busting parameter for testing
+  const url = `${baseUrl}?_t=${Date.now()}`;
+  ```
+
+  If issues persist, contact support with specific request/response examples.
+</Accordion>
+
+<Accordion title="How do I test my API integration?">
+  **Testing strategy:**
+
+  1. **Start with cURL** to verify basic connectivity
+  2. **Test each endpoint** individually
+  3. **Verify error handling** with invalid inputs
+  4. **Load test** within your rate limits
+
+  **Basic connectivity test:**
+  ```bash
+  curl -X GET 'https://api.countrystatecity.in/v1/countries' \
+    -H 'X-CSCAPI-KEY: YOUR_API_KEY' \
+    -w "HTTP Status: %{http_code}\n"
+  ```
+
+  **Automated testing example:**
+  ```javascript
+  describe('Country State City API', () => {
+    test('should fetch countries successfully', async () => {
+      const countries = await api.getCountries();
+      expect(countries).toBeInstanceOf(Array);
+      expect(countries.length).toBeGreaterThan(0);
+      expect(countries[0]).toHaveProperty('iso2');
+    });
+
+    test('should handle invalid country code', async () => {
+      await expect(api.getStates('INVALID')).rejects.toThrow();
+    });
+  });
+  ```
+
+  <Check>
+  A successful countries request should return 247+ countries with proper ISO codes.
+  </Check>
+</Accordion>
+</AccordionGroup>
+
+## Billing & Account
+
+<AccordionGroup>
+<Accordion title="How does billing work for paid plans?">
+  **Billing details:**
+  - Monthly billing cycle
+  - Usage resets on your billing date
+  - Overage protection available
+  - Multiple payment methods accepted
+
+  **Plan upgrades:**
+  - Instant activation
+  - Prorated billing for upgrades
+  - Change or cancel anytime
+
+  **Usage tracking:**
+  - Real-time usage monitoring in your dashboard
+  - Email alerts for approaching limits
+  - Detailed usage analytics and reporting
+
+  <Card
+    title="View Pricing & Plans"
+    icon="credit-card"
+    href="https://countrystatecity.in/pricing"
+  >
+    Compare features and choose the right plan for your needs
+  </Card>
+</Accordion>
+
+<Accordion title="Can I upgrade or downgrade my plan?">
+  Yes! You can change plans anytime:
+
+  **Upgrades:**
+  - Immediate activation
+  - Higher rate limits available instantly
+  - Prorated billing for remainder of cycle
+
+  **Downgrades:**
+  - Applied at next billing cycle
+  - Usage limits adjust accordingly
+  - Data access remains unchanged
+
+  **How to change plans:**
+  1. Log into your [account dashboard](https://countrystatecity.in)
+  2. Navigate to billing/subscription settings
+  3. Select your new plan
+  4. Confirm changes
+
+  <Info>
+  Contact support if you need help choosing the right plan for your usage patterns.
+  </Info>
+</Accordion>
+
+<Accordion title="What happens if I exceed my plan limits?">
+  **For monthly limits:**
+  - API requests are blocked until next billing cycle
+  - Account dashboard shows exceeded status
+  - Email notification sent when approaching and exceeding limits
+
+  **For rate limits:**
+  - Requests return 429 status code
+  - Retry after specified time period
+  - No additional charges for rate limit hits
+
+  **Overage protection:**
+  - Available on paid plans
+  - Automatic temporary limit increases
+  - Additional usage billed at standard rates
+
+  <Warning>
+  Free tier users cannot exceed monthly limits. Consider upgrading if you consistently hit limits.
+  </Warning>
+</Accordion>
+</AccordionGroup>
+
+## Still Need Help?
+
+<CardGroup cols={2}>
+  <Card title="View Examples" icon="lightbulb" href="/api/examples">
+    Comprehensive integration examples and real-world use cases
+  </Card>
+  <Card title="API Reference" icon="book" href="/api/introduction">
+    Complete API documentation with all endpoints and parameters
+  </Card>
+  <Card title="Rate Limits Guide" icon="gauge" href="/api/rate-limits">
+    Understanding rate limits and optimization strategies
+  </Card>
+  <Card title="Contact Support" icon="envelope" href="mailto:api@countrystatecity.in">
+    Get help from our support team
+  </Card>
+</CardGroup>
+
+<Note>
+Can't find what you're looking for? [Contact our support team](mailto:api@countrystatecity.in) with specific questions about your integration or use case.
+</Note>

@@ -30,7 +30,8 @@
             "pages": [
               "api/introduction",
               "api/authentication",
-              "api/rate-limits"
+              "api/rate-limits",
+              "api/faq"
             ]
           },
           {
