@@ -14,7 +14,7 @@
         "tab": "Home",
         "groups": [
           {
-            "group": "Getting Started", 
+            "group": "Getting Started",
             "pages": [
               "index",
               "changelog"
@@ -93,12 +93,6 @@
               "tools/export-tool/formats",
               "tools/export-tool/faq"
             ]
-          },
-          {
-            "group": "Integrations",
-            "pages": [
-              "tools/integrations"
-            ]
           }
         ]
       },
@@ -113,11 +107,11 @@
             ]
           },
           {
-            "group": "Installation Guides", 
+            "group": "Installation Guides",
             "pages": [
               "database/installation/index",
               "database/installation/mysql",
-              "database/installation/postgresql", 
+              "database/installation/postgresql",
               "database/installation/sqlite",
               "database/installation/mongodb",
               "database/installation/sql-server",
@@ -155,8 +149,8 @@
     ]
   },
   "logo": {
-    "light": "/logo/world.svg",
-    "dark": "/logo/world.svg"
+    "light": "/logo/csc-docs-logo-dark.svg",
+    "dark": "/logo/csc-docs-logo-light.svg"
   },
   "navbar": {
     "links": [

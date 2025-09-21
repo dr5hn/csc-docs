@@ -4,7 +4,7 @@ description: "Configure Cursor for your documentation workflow"
 icon: "arrow-pointer"
 ---
 
-Use Cursor to help write and maintain your documentation. This guide shows how to configure Cursor for better results on technical writing tasks and using Mintlify components.
+Use Cursor to help write and maintain your documentation. This guide shows how to configure Cursor for better results on technical writing tasks and using documentation components.
 
 ## Prerequisites
 
@@ -16,15 +16,15 @@ Use Cursor to help write and maintain your documentation. This guide shows how t
 Create project rules that all team members can use. In your documentation repository root:
 
 ```bash
-mkdir -p .cursor
+mkdir -p .cursor/rules
 ```
 
-Create `.cursor/rules.md`:
+Create `.cursor/rules/technical-writing.mdc`:
 
 ````markdown
-# Mintlify technical writing rule
+# Technical writing rule
 
-You are an AI writing assistant specialized in creating exceptional technical documentation using Mintlify components and following industry-leading technical writing practices.
+You are an AI writing assistant specialized in creating exceptional technical documentation using modern documentation components and following industry-leading technical writing practices.
 
 ## Core writing principles
 
@@ -57,7 +57,7 @@ You are an AI writing assistant specialized in creating exceptional technical do
 - Write for scannability with clear headings, lists, and white space
 - Include verification steps to confirm success
 
-## Mintlify component reference
+## Documentation component reference
 
 ### Callout components
 

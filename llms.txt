@@ -1,33 +1,44 @@
 # Country State City Ecosystem Documentation
 
-This documentation covers the comprehensive Country State City (CSC) ecosystem for accessing geographical data including countries, states/provinces, and cities worldwide.
+This comprehensive Mintlify documentation site covers the complete Country State City (CSC) ecosystem for accessing geographical data including countries, states/provinces, and cities worldwide.
 
 ## Core Products & Services
 
 ### Country State City API
-- REST API with 247+ countries, 5000+ states/provinces, 150,000+ cities
+- REST API with 247+ countries, 5000+ states/provinces, 151,000+ cities
 - Real-time data access with authentication via X-CSCAPI-KEY headers
-- Rate limiting and performance optimizations
-- Multiple response formats (JSON)
+- Multiple pricing tiers with different rate limits
+- High-performance JSON responses with sub-100ms response times globally
 - Base URL: https://api.countrystatecity.in/v1
+- Complete endpoint coverage for countries, states, and cities
 
 ### CSC Database
 - Complete geographical database with regular updates
-- SQL and NoSQL export formats
-- Schema documentation and installation guides
+- Multiple database platform support: MySQL, PostgreSQL, SQLite, MongoDB, SQL Server, DuckDB
+- Comprehensive installation guides and optimization recommendations
+- Schema documentation with relationship mappings
 - Data freshness tracking and version management
+- Performance tuning guides for each platform
 
 ### Update Tool
-- Automated system for geographical data updates
-- Real-time monitoring and alerting
-- Configuration management and deployment
+- Community-driven geographical data updates
+- Submission workflow with review process
+- Real-time monitoring and change tracking
 - Integration with primary data sources
+- FAQ and troubleshooting documentation
 
 ### Export Tool  
 - Multiple export formats (SQL, JSON, CSV, XML)
-- Custom data filtering and selection
-- Bulk export capabilities
+- Custom data filtering and selection capabilities
+- Bulk export functionality with format-specific optimizations
+- Use case documentation for different scenarios
 - Integration APIs for automated exports
+
+### AI Tools Integration
+- Claude Code integration examples
+- Cursor IDE configuration and workflows
+- Windsurf editor setup and usage
+- Developer productivity optimization guides
 
 ## Key Data Examples
 When referencing data in this ecosystem, use these consistent examples:
@@ -49,19 +60,41 @@ Cities:
 
 ## Authentication & Access
 - API Key required for all endpoints (X-CSCAPI-KEY header)
-- Rate limits: 1000 requests/hour for free tier
-- Premium tiers available with higher limits
+- Multiple pricing tiers with different limits:
+  - Community (Free): 3,000 requests/month, 100/day, 2 req/second
+  - Supporter: 30,000 requests/month, 1,000/day, 10 req/second  
+  - Professional: 150,000 requests/month, 5,000/day, 25 req/second
+- Secure authentication with environment variable best practices
 
 ## Technical Architecture
-- RESTful API design principles
-- HTTP status codes for error handling
-- Pagination for large result sets
-- Caching recommendations for performance
+- RESTful API design principles with consistent JSON responses
+- Comprehensive HTTP status codes for error handling (200, 401, 404, 429, 500)
+- High-performance caching with sub-100ms global response times
+- Robust error handling with retry logic recommendations
+- Contextual options for copy, view, ChatGPT, Claude, Perplexity, MCP, Cursor, VSCode
+- SEO optimization and comprehensive analytics integration
 
 ## Integration Patterns
-- Direct API consumption
-- Database integration via exports
-- Automated updates via Update Tool
-- Custom exports via Export Tool
+- Direct API consumption with official SDKs (JavaScript, Python, PHP, etc.)
+- Self-hosted database integration with multiple platform support
+- Community-driven data updates via Update Tool workflow
+- Flexible data exports in multiple formats (JSON, CSV, SQL, XML)
+- AI-powered development workflows with Claude, Cursor, and Windsurf integration
+- Real-world code examples and implementation patterns
 
-This ecosystem serves developers building applications requiring geographical data, from simple dropdown lists to complex mapping and analytics applications.
+## Documentation Features
+- Mintlify-powered documentation with advanced search capabilities
+- Interactive code examples with multiple programming languages
+- Comprehensive component library (Steps, Tabs, Cards, Accordions)
+- Developer-friendly navigation with contextual help
+- Mobile-responsive design with dark/light theme support
+- Analytics tracking and search optimization
+
+## Use Cases
+- E-commerce & shipping applications with address validation
+- Analytics & business intelligence with geographical insights
+- Mobile & web applications with location pickers and store locators
+- Government & research applications with standardized geographical data
+- Travel and hospitality applications with comprehensive city data
+
+This ecosystem serves developers building applications requiring geographical data, from simple dropdown lists to complex mapping and analytics applications, with comprehensive tooling and AI-enhanced development workflows.

@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "sync-changelog": "node scripts/sync-changelog.js",
+    "update-database-stats": "node scripts/update-database-stats.js",
     "dev": "mintlify dev",
     "build": "mintlify build"
   },
