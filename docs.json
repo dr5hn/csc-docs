@@ -192,9 +192,9 @@
   "seo": {
     "indexHiddenPages": true
   },
-  "analytics": {
-    "gtag": {
-      "measurementId": "G-7LDSKYGZJB"
+  "integrations": {
+    "ga4": {
+        "measurementId": "G-7LDSKYGZJB"
     }
   },
   "search": {
