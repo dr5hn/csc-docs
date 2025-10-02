@@ -162,6 +162,10 @@
   "navbar": {
     "links": [
       {
+        "label": "Home",
+        "href": "https://countrystatecity.in"
+      },
+      {
         "label": "Donate",
         "href": "http://docs.countrystatecity.in/donate"
       },
