@@ -62,6 +62,12 @@
               "api/sdks",
               "api/examples"
             ]
+          },
+          {
+            "group": "No-Code Integrations",
+            "pages": [
+              "api/no-code-integrations"
+            ]
           }
         ]
       },
