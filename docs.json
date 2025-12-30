@@ -144,6 +144,11 @@
         "icon": "globe"
       },
       {
+        "anchor": "Encyclopedia",
+        "href": "https://countrystatecity.org",
+        "icon": "book"
+      },
+      {
         "anchor": "GitHub",
         "href": "https://github.com/dr5hn/countries-states-cities-database",
         "icon": "github"
@@ -164,6 +169,10 @@
       {
         "label": "Home",
         "href": "https://countrystatecity.in"
+      },
+      {
+        "label": "Encyclopedia",
+        "href": "https://countrystatecity.org"
       },
       {
         "label": "Donate",
