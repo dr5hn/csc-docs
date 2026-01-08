@@ -30,7 +30,6 @@
             "pages": [
               "api/introduction",
               "api/authentication",
-              "api/rate-limits",
               "api/faq"
             ]
           },
@@ -169,6 +168,10 @@
       {
         "label": "Home",
         "href": "https://countrystatecity.in"
+      },
+      {
+        "label": "Pricing",
+        "href": "https://countrystatecity.in/pricing"
       },
       {
         "label": "Encyclopedia",

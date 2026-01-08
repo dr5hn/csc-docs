@@ -7,7 +7,6 @@ This comprehensive Mintlify documentation site covers the complete Country State
 ### Country State City API
 - REST API with 247+ countries, 5000+ states/provinces, 151,000+ cities
 - Real-time data access with authentication via X-CSCAPI-KEY headers
-- Multiple pricing tiers with different rate limits
 - High-performance JSON responses with sub-100ms response times globally
 - Base URL: https://api.countrystatecity.in/v1
 - Complete endpoint coverage for countries, states, and cities
@@ -60,10 +59,6 @@ Cities:
 
 ## Authentication & Access
 - API Key required for all endpoints (X-CSCAPI-KEY header)
-- Multiple pricing tiers with different limits:
-  - Community (Free): 3,000 requests/month, 100/day, 2 req/second
-  - Supporter: 30,000 requests/month, 1,000/day, 10 req/second  
-  - Professional: 150,000 requests/month, 5,000/day, 25 req/second
 - Secure authentication with environment variable best practices
 
 ## Technical Architecture

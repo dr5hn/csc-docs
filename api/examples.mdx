@@ -8,7 +8,7 @@ icon: "lightbulb"
 
 ### Basic API Client Setup
 
-Set up a robust API client with proper authentication, error handling, and rate limiting:
+Set up a robust API client with proper authentication and error handling:
 
 <CodeGroup>
 ```javascript JavaScript/Node.js
@@ -31,7 +31,7 @@ class CountryStateCityAPI {
         if (response.status === 401) {
           throw new Error('Invalid API key. Please check your credentials.');
         } else if (response.status === 429) {
-          throw new Error('Rate limit exceeded. Please try again later.');
+          throw new Error('Too many requests. Please try again later.');
         } else {
           throw new Error(`API error: ${response.status}`);
         }
@@ -93,7 +93,7 @@ class CountryStateCityAPI:
             if response.status_code == 401:
                 raise ValueError('Invalid API key. Please check your credentials.')
             elif response.status_code == 429:
-                raise ValueError('Rate limit exceeded. Please try again later.')
+                raise ValueError('Too many requests. Please try again later.')
             elif not response.ok:
                 raise ValueError(f'API error: {response.status_code}')
                 
@@ -162,7 +162,7 @@ class CountryStateCityAPI {
         if ($httpCode === 401) {
             throw new Exception('Invalid API key. Please check your credentials.');
         } elseif ($httpCode === 429) {
-            throw new Exception('Rate limit exceeded. Please try again later.');
+            throw new Exception('Too many requests. Please try again later.');
         } elseif ($httpCode !== 200) {
             throw new Exception('API error: ' . $httpCode);
         }
@@ -226,7 +226,7 @@ public class CountryStateCityAPI {
         if (response.statusCode() == 401) {
             throw new RuntimeException("Invalid API key. Please check your credentials.");
         } else if (response.statusCode() == 429) {
-            throw new RuntimeException("Rate limit exceeded. Please try again later.");
+            throw new RuntimeException("Too many requests. Please try again later.");
         } else if (response.statusCode() != 200) {
             throw new RuntimeException("API error: " + response.statusCode());
         }
@@ -278,7 +278,7 @@ public class CountryStateCityAPI
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
             {
-                throw new InvalidOperationException("Rate limit exceeded. Please try again later.");
+                throw new InvalidOperationException("Too many requests. Please try again later.");
             }
             
             response.EnsureSuccessStatusCode();
@@ -355,7 +355,7 @@ func (api *CountryStateCityAPI) request(endpoint string) ([]byte, error) {
     if resp.StatusCode == 401 {
         return nil, fmt.Errorf("invalid API key")
     } else if resp.StatusCode == 429 {
-        return nil, fmt.Errorf("rate limit exceeded")
+        return nil, fmt.Errorf("too many requests")
     } else if resp.StatusCode != 200 {
         return nil, fmt.Errorf("API error: %d", resp.StatusCode)
     }
@@ -411,7 +411,7 @@ class CountryStateCityAPI
     when 401
       raise 'Invalid API key. Please check your credentials.'
     when 429
-      raise 'Rate limit exceeded. Please try again later.'
+      raise 'Too many requests. Please try again later.'
     when 200
       JSON.parse(response.body)
     else
@@ -854,83 +854,6 @@ class OptimizedCountryStateCityAPI extends CountryStateCityAPI {
 }
 ```
 
-### Rate Limiting and Error Handling
-
-Implement robust error handling and rate limiting strategies:
-
-```javascript
-class ResilientCountryStateCityAPI extends CountryStateCityAPI {
-  constructor(apiKey, options = {}) {
-    super(apiKey);
-    this.maxRetries = options.maxRetries || 3;
-    this.baseDelay = options.baseDelay || 1000;
-    this.requestsPerSecond = options.requestsPerSecond || 2;
-    this.requestQueue = [];
-    this.processing = false;
-    
-    this.startRequestProcessor();
-  }
-
-  async request(endpoint) {
-    return new Promise((resolve, reject) => {
-      this.requestQueue.push({ endpoint, resolve, reject, retries: 0 });
-      this.processQueue();
-    });
-  }
-
-  async processQueue() {
-    if (this.processing || this.requestQueue.length === 0) return;
-    
-    this.processing = true;
-    
-    while (this.requestQueue.length > 0) {
-      const { endpoint, resolve, reject, retries } = this.requestQueue.shift();
-      
-      try {
-        const data = await this.makeRequestWithRetry(endpoint, retries);
-        resolve(data);
-      } catch (error) {
-        reject(error);
-      }
-      
-      // Rate limiting: wait between requests
-      await this.sleep(1000 / this.requestsPerSecond);
-    }
-    
-    this.processing = false;
-  }
-
-  async makeRequestWithRetry(endpoint, retries) {
-    try {
-      return await super.request(endpoint);
-    } catch (error) {
-      if (retries >= this.maxRetries) {
-        throw error;
-      }
-
-      if (error.message.includes('Rate limit exceeded') || 
-          error.message.includes('500') || 
-          error.message.includes('503')) {
-        
-        const delay = this.baseDelay * Math.pow(2, retries);
-        await this.sleep(delay);
-        return this.makeRequestWithRetry(endpoint, retries + 1);
-      }
-      
-      throw error;
-    }
-  }
-
-  sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  startRequestProcessor() {
-    setInterval(() => this.processQueue(), 100);
-  }
-}
-```
-
 ## Need More Help?
 
 <CardGroup cols={2}>
@@ -940,14 +863,11 @@ class ResilientCountryStateCityAPI extends CountryStateCityAPI {
   <Card title="SDKs & Libraries" icon="code" href="/api/sdks">
     Official SDKs and community libraries for popular programming languages.
   </Card>
-  <Card title="Rate Limits" icon="gauge" href="/api/rate-limits">
-    Understanding rate limits and best practices for high-volume usage.
-  </Card>
   <Card title="Support" icon="headset" href="/api/faq">
     Get help from our community and support team.
   </Card>
 </CardGroup>
 
 <Note>
-All code examples are production-ready and include proper error handling, caching, and rate limiting. Remember to replace `YOUR_API_KEY` with your actual API key from the [Country State City portal](https://app.countrystatecity.in).
+All code examples are production-ready and include proper error handling and caching. Remember to replace `YOUR_API_KEY` with your actual API key from the [Country State City portal](https://app.countrystatecity.in).
 </Note>

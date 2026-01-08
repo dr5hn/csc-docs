@@ -14,7 +14,7 @@ The Country State City API provides developers with comprehensive access to geog
   href="https://app.countrystatecity.in"
   horizontal
 >
-  Register for free and start accessing geographical data immediately with 3,000 requests/month.
+  Register and start accessing geographical data immediately.
 </Card>
 
 ## Key Features
@@ -39,10 +39,6 @@ The Country State City API provides developers with comprehensive access to geog
 <Steps>
 <Step title="Get Your API Key">
   Register at [our portal](https://app.countrystatecity.in) to obtain your free API key.
-  
-  <Info>
-  Free tier includes 3,000 requests per month (100/day) - perfect for development and small applications.
-  </Info>
 </Step>
 
 <Step title="Make Your First Request">
@@ -100,22 +96,6 @@ X-CSCAPI-KEY: YOUR_API_KEY
 Never expose your API key in client-side code or public repositories. Use environment variables or server-side configurations to keep your key secure.
 </Warning>
 
-## Rate Limits
-
-| Plan | Monthly Requests | Daily Requests | Rate Limit |
-|:-----|:-----------------|:---------------|:-----------|
-| **Community (Free)** | 3,000 | 100 | 2 req/second |
-| **Supporter** | 30,000 | 1,000 | 10 req/second |
-| **Professional** | 150,000 | 5,000 | 25 req/second |
-
-<Card 
-  title="View Full Rate Limit Details" 
-  icon="gauge" 
-  href="/api/rate-limits"
->
-  Learn about monitoring, best practices, and handling rate limits
-</Card>
-
 ## Available Endpoints
 
 <CardGroup cols={3}>
@@ -172,7 +152,6 @@ All API endpoints return JSON responses with consistent structure:
 | 200  | Success - Request completed successfully |
 | 401  | Unauthorized - Invalid or missing API key |
 | 404  | Not Found - Resource doesn't exist |
-| 429  | Too Many Requests - Rate limit exceeded |
 | 500  | Internal Server Error - Something went wrong on our end |
 
 <Info>

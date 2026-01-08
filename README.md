@@ -20,7 +20,7 @@ The Country State City ecosystem is a complete geographical data solution that p
 This documentation covers four main areas:
 
 ### 🌐 API Documentation
-- Authentication and rate limiting
+- Authentication and security
 - Countries, states, and cities endpoints
 - SDKs and integration examples
 - Request/response specifications

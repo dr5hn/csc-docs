@@ -13,21 +13,6 @@ icon: "circle-question"
   1. Visit [app.countrystatecity.in](https://app.countrystatecity.in)
   2. Sign up or log in to your account
   3. Create your API key instantly
-
-  <Info>
-  Free tier includes 3,000 requests per month (100 requests per day) - perfect for development and small applications.
-  </Info>
-</Accordion>
-
-<Accordion title="Is there a free plan available?">
-  Yes! Our **Community (Free)** plan includes:
-  - 3,000 requests per month
-  - 100 requests per day
-  - 2 requests per second rate limit
-  - Access to all endpoints
-  - No credit card required
-
-  This is perfect for development, testing, and small-scale applications.
 </Accordion>
 
 <Accordion title="How quickly can I start using the API?">
@@ -139,55 +124,7 @@ icon: "circle-question"
 
   A successful test returns HTTP 200 with country data.
 </Accordion>
-</AccordionGroup>
 
-## Rate Limits & Usage
-
-<AccordionGroup>
-<Accordion title="What are the current rate limits?">
-  Rate limits vary by plan:
-
-  | Plan | Monthly Requests | Daily Requests | Rate Limit |
-  |:-----|:-----------------|:---------------|:-----------|
-  | **Community (Free)** | 3,000 | 100 | 2 req/second |
-  | **Supporter** | 30,000 | 1,000 | 10 req/second |
-  | **Professional** | 150,000 | 5,000 | 25 req/second |
-
-  <Card 
-    title="View Full Pricing Details" 
-    icon="credit-card" 
-    href="https://countrystatecity.in/pricing"
-  >
-    Compare plans, features, and pricing options
-  </Card>
-</Accordion>
-
-<Accordion title="How can I monitor my API usage?">
-  Every API response includes rate limit headers:
-
-  ```
-  X-RateLimit-Limit: 1000
-  X-RateLimit-Remaining: 999
-  X-RateLimit-Reset: 1640995200
-  X-RateLimit-Window: 3600
-  ```
-
-  **Monitor usage in code:**
-  ```javascript
-  const response = await fetch(apiUrl, { headers });
-  
-  const remaining = response.headers.get('X-RateLimit-Remaining');
-  const limit = response.headers.get('X-RateLimit-Limit');
-  
-  console.log(`Rate Limit: ${remaining}/${limit}`);
-  
-  if (remaining < limit * 0.1) {
-    console.warn('⚠️ Approaching rate limit!');
-  }
-  ```
-
-  You can also monitor usage through your account dashboard.
-</Accordion>
 
 <Accordion title="What happens when I exceed my rate limit?">
   When you exceed your rate limit, you'll receive a `429 Too Many Requests` response:
@@ -229,7 +166,7 @@ icon: "circle-question"
       this.cache = new Map();
       this.ttl = ttl;
     }
-    
+
     get(key) {
       const item = this.cache.get(key);
       if (!item || Date.now() - item.timestamp > this.ttl) {
@@ -237,7 +174,7 @@ icon: "circle-question"
       }
       return item.data;
     }
-    
+
     set(key, data) {
       this.cache.set(key, { data, timestamp: Date.now() });
     }
@@ -292,7 +229,7 @@ icon: "circle-question"
   No, for performance and efficiency reasons, our API is designed with hierarchical endpoints:
 
   - `/countries` - All countries
-  - `/countries/{countryCode}/states` - States within a country  
+  - `/countries/{countryCode}/states` - States within a country
   - `/countries/{countryCode}/cities` - Cities within a country
   - `/countries/{countryCode}/states/{stateCode}/cities` - Cities within a state
 
@@ -401,25 +338,19 @@ icon: "circle-question"
   async function makeAPIRequest(endpoint) {
     try {
       const response = await fetch(endpoint, { headers });
-      
+
       if (response.status === 401) {
         throw new Error('INVALID_API_KEY');
-      } else if (response.status === 429) {
-        throw new Error('RATE_LIMITED');
       } else if (response.status === 404) {
         throw new Error('NOT_FOUND');
       } else if (!response.ok) {
         throw new Error('API_ERROR');
       }
-      
+
       return await response.json();
-      
+
     } catch (error) {
-      if (error.message === 'RATE_LIMITED') {
-        // Implement exponential backoff
-        await delay(5000);
-        return makeAPIRequest(endpoint);
-      } else if (error.message === 'INVALID_API_KEY') {
+      if (error.message === 'INVALID_API_KEY') {
         // Notify user to check API configuration
         console.error('Invalid API key configuration');
       }
@@ -457,10 +388,10 @@ icon: "circle-question"
   // Server-side caching (Redis, Memcached, etc.)
   const redis = require('redis');
   const client = redis.createClient();
-  
+
   const cached = await client.get('countries');
   if (cached) return JSON.parse(cached);
-  
+
   const data = await fetchFromAPI();
   await client.setex('countries', 86400, JSON.stringify(data)); // 24h TTL
   ```
@@ -479,7 +410,7 @@ icon: "circle-question"
   1. **Incorrect country/state codes**: Verify you're using the correct ISO codes
   2. **Case sensitivity**: Country codes should be uppercase ("US", not "us")
   3. **State code format**: Use 2-letter state codes when available
-  4. **Data availability**: Some territories may have limited subdivision data
+  4. **Data availability**: Some territories may have incomplete subdivision data
 
   **Debugging steps:**
   ```javascript
@@ -529,7 +460,7 @@ icon: "circle-question"
   This is typically due to caching issues or incorrect API usage:
 
   **Check these common issues:**
-  
+
   1. **Browser caching**: Different cache states in development
   2. **API versioning**: Ensure you're using the same API version
   3. **Mixed endpoints**: Don't mix different API base URLs
@@ -559,7 +490,6 @@ icon: "circle-question"
   1. **Start with cURL** to verify basic connectivity
   2. **Test each endpoint** individually
   3. **Verify error handling** with invalid inputs
-  4. **Load test** within your rate limits
 
   **Basic connectivity test:**
   ```bash
@@ -590,81 +520,6 @@ icon: "circle-question"
 </Accordion>
 </AccordionGroup>
 
-## Billing & Account
-
-<AccordionGroup>
-<Accordion title="How does billing work for paid plans?">
-  **Billing details:**
-  - Monthly billing cycle
-  - Usage resets on your billing date
-  - Overage protection available
-  - Multiple payment methods accepted
-
-  **Plan upgrades:**
-  - Instant activation
-  - Prorated billing for upgrades
-  - Change or cancel anytime
-
-  **Usage tracking:**
-  - Real-time usage monitoring in your dashboard
-  - Email alerts for approaching limits
-  - Detailed usage analytics and reporting
-
-  <Card
-    title="View Pricing & Plans"
-    icon="credit-card"
-    href="https://countrystatecity.in/pricing"
-  >
-    Compare features and choose the right plan for your needs
-  </Card>
-</Accordion>
-
-<Accordion title="Can I upgrade or downgrade my plan?">
-  Yes! You can change plans anytime:
-
-  **Upgrades:**
-  - Immediate activation
-  - Higher rate limits available instantly
-  - Prorated billing for remainder of cycle
-
-  **Downgrades:**
-  - Applied at next billing cycle
-  - Usage limits adjust accordingly
-  - Data access remains unchanged
-
-  **How to change plans:**
-  1. Log into your [account dashboard](https://app.countrystatecity.in)
-  2. Navigate to billing/subscription settings
-  3. Select your new plan
-  4. Confirm changes
-
-  <Info>
-  Contact support if you need help choosing the right plan for your usage patterns.
-  </Info>
-</Accordion>
-
-<Accordion title="What happens if I exceed my plan limits?">
-  **For monthly limits:**
-  - API requests are blocked until next billing cycle
-  - Account dashboard shows exceeded status
-  - Email notification sent when approaching and exceeding limits
-
-  **For rate limits:**
-  - Requests return 429 status code
-  - Retry after specified time period
-  - No additional charges for rate limit hits
-
-  **Overage protection:**
-  - Available on paid plans
-  - Automatic temporary limit increases
-  - Additional usage billed at standard rates
-
-  <Warning>
-  Free tier users cannot exceed monthly limits. Consider upgrading if you consistently hit limits.
-  </Warning>
-</Accordion>
-</AccordionGroup>
-
 ## Still Need Help?
 
 <CardGroup cols={2}>
@@ -673,9 +528,6 @@ icon: "circle-question"
   </Card>
   <Card title="API Reference" icon="book" href="/api/introduction">
     Complete API documentation with all endpoints and parameters
-  </Card>
-  <Card title="Rate Limits Guide" icon="gauge" href="/api/rate-limits">
-    Understanding rate limits and optimization strategies
   </Card>
   <Card title="Contact Support" icon="envelope" href="mailto:api@countrystatecity.in">
     Get help from our support team
