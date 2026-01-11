@@ -14,41 +14,29 @@ Getting started is simple:
 
 1. **Sign up** at [export.countrystatecity.in](https://export.countrystatecity.in)
 2. **Choose your method**: GitHub (one-click) or Email (magic link)
-3. **Get 5 free credits** automatically added to your account
+3. **Get free trial credits** automatically added to your account
 4. **Create your first export** following our [getting started guide](/tools/export-tool/getting-started)
 
 <Tip>
-**Free Trial**: Every new user gets 5 credits to test the system before purchasing additional credits.
+**Free Trial**: Every new user gets trial credits to test the system before purchasing additional credits.
 </Tip>
 </Accordion>
 
-<Accordion title="What can I do with the 5 free trial credits?">
-Your 5 free credits give you several options to test the system:
+<Accordion title="What can I do with my free trial credits?">
+Your free trial credits allow you to test the system with various export options.
 
-**Option 1: Basic Testing**
-- Countries export in JSON format (1 credit)
-- States export in JSON format (2 credits)
-- 2 credits remaining for format upgrades or additional exports
+**Example Uses:**
+- Countries export in JSON format
+- States export in JSON format
+- Format testing with different output types
 
-**Option 2: Complete Dataset Test**
-- Cities export in JSON format (3 credits)
-- Perfect for testing location-based features
-- 2 credits remaining for additional experiments
-
-**Option 3: Format Testing**
-- Countries export in CSV format (1 + 1 = 2 credits)
-- Countries export in XML format (1 + 2 = 3 credits)
-- **Total: 5 credits** - Perfect fit for format comparison
-
-**Option 4: Database Ready**
-- Countries export in SQL format (1 + 3 = 4 credits)
-- 1 credit remaining for testing
-
-**Need More Credits?**
-The **Starter Pack** (6 credits for $2.99) gives you extra credit to fully explore all features, including:
-- All three datasets (Countries + States + Cities = 6 credits in JSON)
-- Advanced format testing
-- Multiple export combinations
+<Card
+  title="View Pricing & Trial Credits"
+  icon="credit-card"
+  href="https://countrystatecity.in/pricing"
+>
+  See how many trial credits you get and explore credit packages
+</Card>
 
 <Tip>
 **Pro Tip**: Use your free credits to test different combinations, then purchase the package that matches your project needs!
@@ -84,22 +72,22 @@ Credits are used to generate exports based on datasets and formats:
 
 **Dataset Costs:**
 - **Countries**: 1 credit (~247 countries)
-- **States**: 2 credits (~4,000+ states/provinces)  
+- **States**: 2 credits (~4,000+ states/provinces)
 - **Cities**: 3 credits (~150,000+ cities)
 
 **Format Costs (added to dataset cost):**
-- **JSON**: Free (0 additional credits)
+- **JSON**: +1 credit
 - **CSV**: +1 credit
 - **XML**: +2 credits
-- **YAML**: +2 credits  
-- **SQL**: +3 credits
+- **YAML**: +2 credits
+- **SQL/PostgreSQL/SQLite/SQL Server**: +3 credits
 
 **Example Calculations:**
 ```
-Countries + States in JSON = 1 + 2 + 0 = 3 credits
+Countries + States in JSON = 1 + 2 + 1 = 4 credits
 Countries in CSV = 1 + 1 = 2 credits
 Cities in SQL = 3 + 3 = 6 credits
-All datasets in JSON = 1 + 2 + 3 = 6 credits
+All datasets in JSON = 1 + 2 + 3 + 1 = 7 credits
 ```
 </Accordion>
 
@@ -165,21 +153,11 @@ We use **Dodo Payments** for secure, encrypted transactions:
 </Accordion>
 
 <Accordion title="What credit packages are available?">
-**We offer flexible credit packages to suit different needs:**
-
-**Individual Credits:**
-- **Custom Credits**: $1.00 per credit
-- Perfect for one-time exports or testing
-
-**Value Packages:**
-- **Starter Pack**: $2.99 for 6 credits ($0.50/credit) - 50% savings
-- **Basic Pack**: $4.99 for 10 credits ($0.50/credit) - Most Popular
-- **Standard Pack**: $9.99 for 25 credits ($0.40/credit) - 60% savings  
-- **Premium Pack**: $19.99 for 60 credits ($0.33/credit) - Best Value, 67% savings
+We offer flexible credit packages to suit different needs, from individual credits to value packs with significant savings.
 
 **Smart Purchasing Strategy:**
 - Credits never expire, so larger packages offer better value
-- Premium Pack provides maximum savings for frequent users
+- Larger packs provide maximum savings for frequent users
 - Share credits across team members
 - Calculate your project needs to choose the right package
 
@@ -314,7 +292,7 @@ Create regular exports (monthly/quarterly) and save them locally to build your o
 Each format serves different use cases and has different credit costs:
 
 <Tabs>
-<Tab title="JSON (Free)">
+<Tab title="JSON (+1 Credit)">
 **Best for:** Web applications, APIs, mobile apps
 
 **Advantages:**
@@ -327,7 +305,7 @@ Each format serves different use cases and has different credit costs:
 ```json
 {
   "countries": [...],
-  "states": [...], 
+  "states": [...],
   "metadata": {...}
 }
 ```

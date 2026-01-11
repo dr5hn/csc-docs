@@ -10,9 +10,9 @@ Choose the perfect format for your project. Each format is optimized for specifi
 
 <CardGroup cols={3}>
 <Card title="JSON" icon="brackets-curly">
-**Free Format**
+**+1 Credit**
 - Web applications
-- APIs and microservices  
+- APIs and microservices
 - JavaScript/Node.js projects
 - Mobile app backends
 </Card>
@@ -42,7 +42,7 @@ Choose the perfect format for your project. Each format is optimized for specifi
 </Card>
 
 <Card title="SQL" icon="database">
-**+3 Credits**  
+**+3 Credits**
 - Database seeding
 - Data migration
 - Direct imports
@@ -50,7 +50,11 @@ Choose the perfect format for your project. Each format is optimized for specifi
 </Card>
 </CardGroup>
 
-## JSON Format (Free)
+<Info>
+SQL format includes PostgreSQL, SQLite, and SQL Server variants - all at +3 credits.
+</Info>
+
+## JSON Format (+1 Credit)
 
 The most popular format for modern web development. Perfect for APIs, web applications, and mobile backends.
 
@@ -1361,7 +1365,7 @@ Choosing the right format can save you credits and development time. Use this de
 
 <AccordionGroup>
 <Accordion title="Web Applications & APIs">
-**Recommendation: JSON (Free)**
+**Recommendation: JSON (+1 credit)**
 - Native JavaScript support
 - Easy API integration
 - No additional parsing needed
@@ -1408,8 +1412,8 @@ Choosing the right format can save you credits and development time. Use this de
 Total Credits = Dataset Cost + Format Cost
 
 Examples:
-- Countries (1) + JSON (0) = 1 credit
-- Countries (1) + States (2) + CSV (1) = 4 credits  
+- Countries (1) + JSON (1) = 2 credits
+- Countries (1) + States (2) + CSV (1) = 4 credits
 - Cities (3) + SQL (3) = 6 credits
 ```
 </Step>
@@ -1570,8 +1574,16 @@ WHERE LENGTH(iso2) != 2 OR iso2 !~ '^[A-Z]{2}$';
 
 <Note>
 **Need help choosing a format?** Consider your primary use case:
-- **Quick prototyping**: Start with JSON (free)
-- **Data analysis**: Use CSV for spreadsheet compatibility  
+- **Quick prototyping**: Start with JSON for web apps
+- **Data analysis**: Use CSV for spreadsheet compatibility
 - **Production database**: Invest in SQL for proper setup
 - **Configuration management**: YAML for readability
+
+<Card
+  title="View Pricing"
+  icon="credit-card"
+  href="https://countrystatecity.in/pricing"
+>
+  See detailed pricing for all formats and credit packages
+</Card>
 </Note>
