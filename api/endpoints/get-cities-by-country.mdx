@@ -17,6 +17,12 @@ Retrieve all cities within a specific country using the country's ISO2 code. Thi
   Your API key for authentication
 </ParamField>
 
+## Query Parameters
+
+<ParamField query="q" type="string">
+  Search filter on name. Case-insensitive match on `name` and `native` fields. Minimum 2 characters. **Requires Supporter+ plan.** Without this parameter, all results are returned (no plan restriction for search).
+</ParamField>
+
 ## Response
 
 <ResponseField name="id" type="integer">
@@ -30,6 +36,11 @@ Retrieve all cities within a specific country using the country's ISO2 code. Thi
 <RequestExample>
 ```bash cURL
 curl -X GET 'https://api.countrystatecity.in/v1/countries/IN/cities' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (with search)
+curl -X GET 'https://api.countrystatecity.in/v1/countries/IN/cities?q=mumbai' \
   -H 'X-CSCAPI-KEY: YOUR_API_KEY'
 ```
 
