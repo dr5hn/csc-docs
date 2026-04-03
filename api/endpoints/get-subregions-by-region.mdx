@@ -1,0 +1,68 @@
+---
+title: "Get Subregions by Region"
+description: "Retrieve subregions within a geographic region"
+---
+
+Retrieve all subregions belonging to a specific region. For example, region "Asia" contains subregions like "Southern Asia", "Eastern Asia", etc.
+
+<Note>**Availability:** Supporter plan and above.</Note>
+
+## Authentication
+
+<ParamField header="X-CSCAPI-KEY" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="id" type="integer" required>
+  Numeric region ID (e.g., `3` for Asia)
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="q" type="string">
+  Search filter on subregion name. Min 2 characters. Requires Supporter+ plan.
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="integer">
+  Unique identifier for the subregion
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Subregion name
+</ResponseField>
+
+<ResponseField name="region_id" type="integer">
+  Parent region ID
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X GET 'https://api.countrystatecity.in/v1/regions/3/subregions' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.countrystatecity.in/v1/regions/3/subregions', {
+  headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' }
+});
+
+const subregions = await response.json();
+console.log(subregions);
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 - Success
+[
+  { "id": 14, "name": "Southern Asia", "region_id": 3 },
+  { "id": 15, "name": "Eastern Asia", "region_id": 3 },
+  { "id": 16, "name": "South-Eastern Asia", "region_id": 3 },
+  { "id": 17, "name": "Western Asia", "region_id": 3 },
+  { "id": 18, "name": "Central Asia", "region_id": 3 }
+]
+```
+</ResponseExample>

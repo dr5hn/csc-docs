@@ -56,6 +56,14 @@
             ]
           },
           {
+            "group": "Regions Endpoints",
+            "pages": [
+              "api/endpoints/get-all-regions",
+              "api/endpoints/get-subregions-by-region",
+              "api/endpoints/get-countries-by-subregion"
+            ]
+          },
+          {
             "group": "SDKs & Examples",
             "pages": [
               "api/sdks",

@@ -1,0 +1,56 @@
+---
+title: "Get Countries by Subregion"
+description: "Retrieve countries belonging to a specific subregion"
+---
+
+Retrieve all countries within a subregion. For example, subregion "Southern Asia" contains India, Pakistan, Bangladesh, etc.
+
+<Note>**Availability:** Supporter plan and above.</Note>
+
+## Authentication
+
+<ParamField header="X-CSCAPI-KEY" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="id" type="integer" required>
+  Numeric subregion ID (e.g., `14` for Southern Asia)
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="q" type="string">
+  Search filter on country name. Min 2 characters. Requires Supporter+ plan.
+</ParamField>
+
+## Response
+
+Returns the same country object as [Get All Countries](/api/endpoints/get-all-countries), filtered to the subregion.
+
+<RequestExample>
+```bash cURL
+curl -X GET 'https://api.countrystatecity.in/v1/subregions/14/countries' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.countrystatecity.in/v1/subregions/14/countries', {
+  headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' }
+});
+
+const countries = await response.json();
+console.log(countries);
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 - Success
+[
+  { "id": 101, "name": "India", "iso2": "IN", "iso3": "IND" },
+  { "id": 167, "name": "Pakistan", "iso2": "PK", "iso3": "PAK" },
+  { "id": 19, "name": "Bangladesh", "iso2": "BD", "iso3": "BGD" }
+]
+```
+</ResponseExample>
