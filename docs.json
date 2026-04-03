@@ -219,6 +219,18 @@
       "x": "https://x.com/dr5hn"
     }
   },
+  "api": {
+    "mdx": {
+      "server": "https://api.countrystatecity.in/v1",
+      "auth": {
+        "method": "key",
+        "name": "X-CSCAPI-KEY"
+      }
+    },
+    "playground": {
+      "display": "interactive"
+    }
+  },
   "seo": {
     "indexHiddenPages": true
   },
