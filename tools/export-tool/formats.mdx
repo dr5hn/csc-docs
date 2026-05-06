@@ -10,7 +10,7 @@ Choose the perfect format for your project. Each format is optimized for specifi
 
 <CardGroup cols={3}>
 <Card title="JSON" icon="brackets-curly">
-**+1 Credit**
+**+2 Credits**
 - Web applications
 - APIs and microservices
 - JavaScript/Node.js projects
@@ -18,11 +18,19 @@ Choose the perfect format for your project. Each format is optimized for specifi
 </Card>
 
 <Card title="CSV" icon="table">
-**+1 Credit**
+**+3 Credits**
 - Spreadsheet analysis
 - Data science workflows
 - Excel/Google Sheets
 - BI tools and dashboards
+</Card>
+
+<Card title="Excel (.xlsx)" icon="file-spreadsheet">
+**+4 Credits**
+- Native Excel workbook
+- Business reporting
+- No CSV import step
+- Multi-sheet output
 </Card>
 
 <Card title="XML" icon="code">
@@ -42,19 +50,35 @@ Choose the perfect format for your project. Each format is optimized for specifi
 </Card>
 
 <Card title="SQL" icon="database">
-**+3 Credits**
+**+4 Credits**
 - Database seeding
-- Data migration
+- Generic INSERT statements
 - Direct imports
 - Production deployments
+</Card>
+
+<Card title="PostgreSQL / SQL Server / SQLite3" icon="database">
+**+5 Credits**
+- Dialect-specific schema
+- Type inference and indexes
+- Constraints and check rules
+- Ready-to-import DDL
+</Card>
+
+<Card title="GeoJSON" icon="map">
+**+4 Credits**
+- Mapping and GIS
+- Spatial queries
+- Map libraries (Mapbox, Leaflet)
+- Compatible with PostGIS
 </Card>
 </CardGroup>
 
 <Info>
-SQL format includes PostgreSQL, SQLite, and SQL Server variants - all at +3 credits.
+PostgreSQL, SQL Server, and SQLite3 all produce dialect-specific DDL with type inference, indexes, and constraints — they're priced higher than generic SQL because the schema is ready-to-deploy.
 </Info>
 
-## JSON Format (+1 Credit)
+## JSON Format (+2 Credits)
 
 The most popular format for modern web development. Perfect for APIs, web applications, and mobile backends.
 
@@ -286,7 +310,7 @@ function validateStateForCountry(stateCode, countryCode) {
 </Tab>
 </Tabs>
 
-## CSV Format (+1 Credit)
+## CSV Format (+3 Credits)
 
 Perfect for spreadsheet analysis, data science workflows, and business intelligence tools.
 
@@ -922,7 +946,7 @@ app.get('/api/stats/regions', (req, res) => {
 </Tab>
 </Tabs>
 
-## SQL Format (+3 Credits)
+## SQL Format (+4 Credits, dialects +5)
 
 Ready-to-execute SQL statements for direct database imports, perfect for production deployments and data migrations.
 
@@ -1365,7 +1389,7 @@ Choosing the right format can save you credits and development time. Use this de
 
 <AccordionGroup>
 <Accordion title="Web Applications & APIs">
-**Recommendation: JSON (+1 credit)**
+**Recommendation: JSON (+2 credits)**
 - Native JavaScript support
 - Easy API integration
 - No additional parsing needed
@@ -1373,7 +1397,7 @@ Choosing the right format can save you credits and development time. Use this de
 </Accordion>
 
 <Accordion title="Data Analysis & BI">
-**Recommendation: CSV (+1 credit)**
+**Recommendation: CSV (+3 credits)**
 - Excel/Google Sheets ready
 - Pandas compatibility
 - Tableau/PowerBI import
@@ -1397,7 +1421,7 @@ Choosing the right format can save you credits and development time. Use this de
 </Accordion>
 
 <Accordion title="Database Population">
-**Recommendation: SQL (+3 credits)**
+**Recommendation: SQL (+4 credits) or PostgreSQL/SQL Server/SQLite3 (+5 credits)**
 - Direct database import
 - Proper relationships
 - Production-ready

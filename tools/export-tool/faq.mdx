@@ -71,23 +71,27 @@ You'll receive a notification when your export is ready for download.
 Credits are used to generate exports based on datasets and formats:
 
 **Dataset Costs:**
-- **Countries**: 1 credit (~247 countries)
-- **States**: 2 credits (~4,000+ states/provinces)
-- **Cities**: 3 credits (~150,000+ cities)
+- **Countries**: 1 credit (~250 countries)
+- **States**: 3 credits (~5,000 states/provinces)
+- **Cities**: 4 credits (~150,000 cities)
 
 **Format Costs (added to dataset cost):**
-- **JSON**: +1 credit
-- **CSV**: +1 credit
-- **XML**: +2 credits
-- **YAML**: +2 credits
-- **SQL/PostgreSQL/SQLite/SQL Server**: +3 credits
+- **JSON / NDJSON / XML / YAML**: +2 credits
+- **CSV / Markdown**: +3 credits
+- **SQL**: +4 credits
+- **Excel (.xlsx) / GeoJSON**: +4 credits
+- **PostgreSQL / SQL Server / SQLite3**: +5 credits
+- **MongoDB Extended JSON**: +3 credits
+
+Filters and add-ons (single or multi-region, multi-country, translation locales, sort, flag bundle) can add more. The preview always shows the exact cost before you confirm.
 
 **Example Calculations:**
 ```
-Countries + States in JSON = 1 + 2 + 1 = 4 credits
-Countries in CSV = 1 + 1 = 2 credits
-Cities in SQL = 3 + 3 = 6 credits
-All datasets in JSON = 1 + 2 + 3 + 1 = 7 credits
+Countries + States in JSON         = 1 + 3 + 2 = 6 credits
+Countries in CSV                   = 1 + 3     = 4 credits
+Cities in SQL                      = 4 + 4     = 8 credits
+Cities in PostgreSQL               = 4 + 5     = 9 credits
+All datasets in JSON               = 1 + 3 + 4 + 2 = 10 credits
 ```
 </Accordion>
 
@@ -292,7 +296,7 @@ Create regular exports (monthly/quarterly) and save them locally to build your o
 Each format serves different use cases and has different credit costs:
 
 <Tabs>
-<Tab title="JSON (+1 Credit)">
+<Tab title="JSON (+2 Credits)">
 **Best for:** Web applications, APIs, mobile apps
 
 **Advantages:**
@@ -311,7 +315,7 @@ Each format serves different use cases and has different credit costs:
 ```
 </Tab>
 
-<Tab title="CSV (+1 Credit)">
+<Tab title="CSV (+3 Credits)">
 **Best for:** Spreadsheets, data analysis, BI tools
 
 **Advantages:**
