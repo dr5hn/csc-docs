@@ -59,8 +59,17 @@
             "group": "Regions Endpoints",
             "pages": [
               "api/endpoints/get-all-regions",
+              "api/endpoints/get-region-details",
               "api/endpoints/get-subregions-by-region",
+              "api/endpoints/get-subregion-details",
               "api/endpoints/get-countries-by-subregion"
+            ]
+          },
+          {
+            "group": "Currency Endpoints",
+            "pages": [
+              "api/endpoints/list-all-currencies",
+              "api/endpoints/get-currency-by-country"
             ]
           },
           {

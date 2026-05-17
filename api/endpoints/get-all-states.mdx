@@ -41,10 +41,6 @@ Retrieve a complete list of all states, provinces, regions, and territories from
   ISO2 code for the state/province
 </ResponseField>
 
-<ResponseField name="type" type="string">
-  Administrative division type (e.g., "state", "province", "region")
-</ResponseField>
-
 <ResponseField name="latitude" type="string">
   Approximate latitude coordinate of the state/province center
 </ResponseField>
@@ -52,6 +48,16 @@ Retrieve a complete list of all states, provinces, regions, and territories from
 <ResponseField name="longitude" type="string">
   Approximate longitude coordinate of the state/province center
 </ResponseField>
+
+<ResponseField name="timezone" type="string">
+  IANA timezone identifier (e.g., `"Asia/Kolkata"`)
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  Administrative division type (e.g., `"state"`, `"province"`, `"region"`). **Coordinates tier and above.**
+</ResponseField>
+
+<Info>Additional fields like `fips_code`, `iso3166_2`, `level`, `parent_id`, `native`, `population`, `translations`, and `wikiDataId` are returned on higher tiers. See **Tier-Based Field Availability** below.</Info>
 
 <RequestExample>
 ```bash cURL
@@ -184,7 +190,7 @@ puts "Found #{states.length} states"
 </RequestExample>
 
 <ResponseExample>
-```json 200 - Success
+```json 200 - Basic tier (Community, Starter, Legacy)
 [
   {
     "id": 4008,
@@ -192,19 +198,31 @@ puts "Found #{states.length} states"
     "country_id": 101,
     "country_code": "IN",
     "iso2": "MH",
-    "type": "state",
     "latitude": "19.75147980",
-    "longitude": "75.71388840"
-  },
+    "longitude": "75.71388840",
+    "timezone": "Asia/Kolkata"
+  }
+]
+```
+
+```json 200 - Coordinates tier (Supporter) — basic plus
+[
   {
-    "id": 1456,
-    "name": "California",
-    "country_id": 233,
-    "country_code": "US",
-    "iso2": "CA",
+    "id": 4008,
+    "name": "Maharashtra",
+    "country_id": 101,
+    "country_code": "IN",
+    "iso2": "MH",
+    "latitude": "19.75147980",
+    "longitude": "75.71388840",
+    "timezone": "Asia/Kolkata",
+    "fips_code": "16",
+    "iso3166_2": "IN-MH",
     "type": "state",
-    "latitude": "36.17497340",
-    "longitude": "-119.76762120"
+    "level": 1,
+    "parent_id": null,
+    "native": "महाराष्ट्र",
+    "population": 112374333
   }
 ]
 ```
@@ -257,3 +275,15 @@ puts "Found #{states.length} states"
 <Warning>
 This endpoint returns a large dataset (5000+ states). Consider using the filtered endpoints for better performance in most applications.
 </Warning>
+
+## Tier-Based Field Availability
+
+| Tier | Plans | Fields |
+|------|-------|--------|
+| **Basic** | Community, Starter, Legacy | `id`, `name`, `iso2`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone` |
+| **Coordinates** | Supporter | All Basic **+** `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population` |
+| **Full** | Professional, Business | All Coordinates **+** `translations`, `wikiDataId` |
+
+<Note>The `bulkStates` feature (calling `/states` without filtering by country) requires **Supporter+**. Community/Starter users must call `/countries/{iso2}/states` instead.</Note>
+
+See [Pricing](https://app.countrystatecity.in/pricing) for plan details.

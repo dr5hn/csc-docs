@@ -1,0 +1,131 @@
+---
+title: "List All Currencies"
+api: "GET https://api.countrystatecity.in/v1/currency"
+authMethod: "key"
+description: "Retrieve the currency used by every country, with optional reverse lookup by ISO 4217 code"
+---
+
+Retrieve the currency mapping for every country in the database. Each item links a country (by ISO2) to its currency `code`, `name`, and `symbol`. Use the optional `?code=` query parameter to perform a reverse lookup and find every country that uses a given ISO 4217 currency code (e.g., all Eurozone countries).
+
+<Note>**Availability:** Supporter plan and above. Returns `403` on lower tiers.</Note>
+
+<Info>The list is alphabetically ordered by country ISO2 and excludes countries without currency data (~0.1% of records). Results are cached server-side for 24 hours.</Info>
+
+## Authentication
+
+<ParamField header="X-CSCAPI-KEY" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="code" type="string">
+  Optional ISO 4217 currency code (3 letters, case-insensitive). When set, returns only countries that use that currency. Invalid codes return `400`.
+</ParamField>
+
+## Response
+
+Returns an array of objects with this shape:
+
+<ResponseField name="country" type="string">
+  ISO2 code of the country (e.g., `"US"`, `"IN"`, `"FR"`)
+</ResponseField>
+
+<ResponseField name="currency" type="object">
+  Currency information
+  <Expandable title="properties">
+    <ResponseField name="code" type="string">
+      ISO 4217 currency code (e.g., `"USD"`, `"EUR"`). Always present.
+    </ResponseField>
+    <ResponseField name="name" type="string | null">
+      Full currency name (e.g., `"United States dollar"`). May be `null` for edge-case territories.
+    </ResponseField>
+    <ResponseField name="symbol" type="string | null">
+      Unicode currency symbol (e.g., `"$"`, `"€"`, `"₹"`). May be `null` — clients should fall back to `code` when rendering.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+```bash cURL (all currencies)
+curl -X GET 'https://api.countrystatecity.in/v1/currency' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (Eurozone lookup)
+curl -X GET 'https://api.countrystatecity.in/v1/currency?code=EUR' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.countrystatecity.in/v1/currency?code=EUR', {
+  headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' }
+});
+
+const eurozone = await response.json();
+console.log(`${eurozone.length} countries use EUR`);
+```
+
+```python Python
+import requests
+
+response = requests.get(
+  'https://api.countrystatecity.in/v1/currency',
+  params={'code': 'EUR'},
+  headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+)
+
+eurozone = response.json()
+print(f"{len(eurozone)} countries use EUR")
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 - Full List (truncated)
+[
+  {
+    "country": "AD",
+    "currency": { "code": "EUR", "name": "Euro", "symbol": "€" }
+  },
+  {
+    "country": "AE",
+    "currency": { "code": "AED", "name": "United Arab Emirates dirham", "symbol": "د.إ" }
+  },
+  {
+    "country": "AF",
+    "currency": { "code": "AFN", "name": "Afghan afghani", "symbol": "؋" }
+  }
+]
+```
+
+```json 200 - Filtered (?code=EUR)
+[
+  { "country": "AD", "currency": { "code": "EUR", "name": "Euro", "symbol": "€" } },
+  { "country": "AT", "currency": { "code": "EUR", "name": "Euro", "symbol": "€" } },
+  { "country": "BE", "currency": { "code": "EUR", "name": "Euro", "symbol": "€" } },
+  { "country": "DE", "currency": { "code": "EUR", "name": "Euro", "symbol": "€" } },
+  { "country": "FR", "currency": { "code": "EUR", "name": "Euro", "symbol": "€" } }
+]
+```
+
+```json 400 - Bad Request
+{
+  "status": 400,
+  "message": "Invalid currency code. Must be a 3-letter ISO 4217 code (e.g., USD, EUR).",
+  "details": null
+}
+```
+
+```json 403 - Feature Restricted
+{
+  "error": "This feature is not available on your current plan.",
+  "feature": "currencyApi",
+  "upgradeUrl": "https://app.countrystatecity.in/pricing"
+}
+```
+</ResponseExample>
+
+## Related Endpoints
+
+- [Get Currency by Country](/api/endpoints/get-currency-by-country) — fetch the currency for a single country
+- [Get Country Details](/api/endpoints/get-country-details) — full country record (includes currency fields inline)

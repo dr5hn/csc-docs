@@ -57,6 +57,36 @@ Retrieve a complete list of all countries with basic information including ISO c
   Flag emoji representation
 </ResponseField>
 
+<ResponseField name="latitude" type="string">
+  Country's approximate latitude
+</ResponseField>
+
+<ResponseField name="longitude" type="string">
+  Country's approximate longitude
+</ResponseField>
+
+<ResponseField name="region" type="string">
+  Geographic region name (e.g., Asia, Europe)
+</ResponseField>
+
+<ResponseField name="region_id" type="integer">
+  Geographic region ID (foreign key into `/regions`)
+</ResponseField>
+
+<ResponseField name="subregion" type="string">
+  Geographic subregion name (e.g., Southern Asia)
+</ResponseField>
+
+<ResponseField name="subregion_id" type="integer">
+  Geographic subregion ID (foreign key into `/subregions`)
+</ResponseField>
+
+<ResponseField name="timezones" type="string">
+  JSON string of timezones (array of `{zoneName, gmtOffset, gmtOffsetName, abbreviation, tzName}`)
+</ResponseField>
+
+<Info>Additional fields like `numeric_code`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex`, `emojiU`, `translations`, and `wikiDataId` are returned on higher tiers. See the **Tier-Based Field Availability** section below.</Info>
+
 <RequestExample>
 ```bash cURL
 curl -X GET 'https://api.countrystatecity.in/v1/countries' \
@@ -172,7 +202,7 @@ puts JSON.pretty_generate(countries)
 </RequestExample>
 
 <ResponseExample>
-```json 200 - Success
+```json 200 - Basic tier (Community, Starter, Legacy)
 [
   {
     "id": 101,
@@ -183,18 +213,47 @@ puts JSON.pretty_generate(countries)
     "capital": "New Delhi",
     "currency": "INR",
     "native": "भारत",
-    "emoji": "🇮🇳"
-  },
+    "emoji": "🇮🇳",
+    "latitude": "20.00000000",
+    "longitude": "77.00000000",
+    "region": "Asia",
+    "region_id": 3,
+    "subregion": "Southern Asia",
+    "subregion_id": 14,
+    "timezones": "[{\"zoneName\":\"Asia/Kolkata\",\"gmtOffset\":19800,\"gmtOffsetName\":\"UTC+05:30\",\"abbreviation\":\"IST\",\"tzName\":\"Indian Standard Time\"}]"
+  }
+]
+```
+
+```json 200 - Coordinates tier (Supporter) — basic plus
+[
   {
-    "id": 233,
-    "name": "United States",
-    "iso2": "US",
-    "iso3": "USA",
-    "phonecode": "1",
-    "capital": "Washington",
-    "currency": "USD",
-    "native": "United States",
-    "emoji": "🇺🇸"
+    "id": 101,
+    "name": "India",
+    "...": "...all basic fields above...",
+    "numeric_code": "356",
+    "currency_name": "Indian rupee",
+    "currency_symbol": "₹",
+    "tld": ".in",
+    "nationality": "Indian",
+    "population": 1380004385,
+    "gdp": 2870504000000,
+    "area_sq_km": 3287263,
+    "postal_code_format": "######",
+    "postal_code_regex": "^(\\d{6})$",
+    "emojiU": "U+1F1EE U+1F1F3"
+  }
+]
+```
+
+```json 200 - Full tier (Professional, Business) — coordinates plus
+[
+  {
+    "id": 101,
+    "name": "India",
+    "...": "...all coordinates fields above...",
+    "translations": "{\"kr\":\"인도\",\"de\":\"Indien\",\"es\":\"India\",\"fr\":\"Inde\",\"ja\":\"インド\"}",
+    "wikiDataId": "Q668"
   }
 ]
 ```
@@ -205,6 +264,18 @@ puts JSON.pretty_generate(countries)
 }
 ```
 </ResponseExample>
+
+## Tier-Based Field Availability
+
+The fields returned depend on your plan's data access level.
+
+| Tier | Plans | Fields |
+|------|-------|--------|
+| **Basic** | Community, Starter, Legacy | `id`, `name`, `iso2`, `iso3`, `phonecode`, `capital`, `currency`, `native`, `emoji`, `latitude`, `longitude`, `region`, `region_id`, `subregion`, `subregion_id`, `timezones` |
+| **Coordinates** | Supporter | All Basic **+** `numeric_code`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex`, `emojiU` |
+| **Full** | Professional, Business | All Coordinates **+** `translations`, `wikiDataId` |
+
+See [Pricing](https://app.countrystatecity.in/pricing) for plan details.
 
 ## Common Use Cases
 

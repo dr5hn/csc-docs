@@ -102,7 +102,39 @@ Retrieve detailed information for a specific country using its ISO2 code, includ
 </ResponseField>
 
 <ResponseField name="emojiU" type="string">
-  Unicode representation of the flag emoji
+  Unicode representation of the flag emoji. **Coordinates tier and above.**
+</ResponseField>
+
+<ResponseField name="region_id" type="integer">
+  Geographic region ID (foreign key into `/regions`). **Basic tier.**
+</ResponseField>
+
+<ResponseField name="subregion_id" type="integer">
+  Geographic subregion ID (foreign key into `/subregions`). **Basic tier.**
+</ResponseField>
+
+<ResponseField name="population" type="integer">
+  Population estimate. **Coordinates tier and above.**
+</ResponseField>
+
+<ResponseField name="gdp" type="integer">
+  Nominal GDP in USD. **Coordinates tier and above.**
+</ResponseField>
+
+<ResponseField name="area_sq_km" type="integer">
+  Surface area in square kilometres. **Coordinates tier and above.**
+</ResponseField>
+
+<ResponseField name="postal_code_format" type="string">
+  Display template for postal codes (`#` = digit, `@` = letter). **Coordinates tier and above.**
+</ResponseField>
+
+<ResponseField name="postal_code_regex" type="string">
+  Regex for postal-code validation. **Coordinates tier and above.**
+</ResponseField>
+
+<ResponseField name="wikiDataId" type="string">
+  Wikidata item identifier. **Full tier only.**
 </ResponseField>
 
 <RequestExample>
@@ -261,7 +293,7 @@ get_country_details('IN')
 </RequestExample>
 
 <ResponseExample>
-```json 200 - Success
+```json 200 - Full tier (Professional, Business)
 {
   "id": 101,
   "name": "India",
@@ -285,7 +317,34 @@ get_country_details('IN')
   "latitude": "20.00000000",
   "longitude": "77.00000000",
   "emoji": "🇮🇳",
-  "emojiU": "U+1F1EE U+1F1F3"
+  "emojiU": "U+1F1EE U+1F1F3",
+  "population": 1380004385,
+  "gdp": 2870504000000,
+  "area_sq_km": 3287263,
+  "postal_code_format": "######",
+  "postal_code_regex": "^(\\d{6})$",
+  "wikiDataId": "Q668"
+}
+```
+
+```json 200 - Basic tier (Community, Starter, Legacy)
+{
+  "id": 101,
+  "name": "India",
+  "iso2": "IN",
+  "iso3": "IND",
+  "phonecode": "91",
+  "capital": "New Delhi",
+  "currency": "INR",
+  "native": "भारत",
+  "emoji": "🇮🇳",
+  "latitude": "20.00000000",
+  "longitude": "77.00000000",
+  "region": "Asia",
+  "region_id": 3,
+  "subregion": "Southern Asia",
+  "subregion_id": 14,
+  "timezones": "[{\"zoneName\":\"Asia/Kolkata\",\"gmtOffset\":19800,\"gmtOffsetName\":\"UTC+05:30\",\"abbreviation\":\"IST\",\"tzName\":\"Indian Standard Time\"}]"
 }
 ```
 
@@ -337,3 +396,13 @@ get_country_details('IN')
 <Tip>
 Use this endpoint when you need detailed country information for user profiles, shipping calculations, or localization features.
 </Tip>
+
+## Tier-Based Field Availability
+
+| Tier | Plans | Fields |
+|------|-------|--------|
+| **Basic** | Community, Starter, Legacy | `id`, `name`, `iso2`, `iso3`, `phonecode`, `capital`, `currency`, `native`, `emoji`, `latitude`, `longitude`, `region`, `region_id`, `subregion`, `subregion_id`, `timezones` |
+| **Coordinates** | Supporter | All Basic **+** `numeric_code`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex`, `emojiU` |
+| **Full** | Professional, Business | All Coordinates **+** `translations`, `wikiDataId` |
+
+See [Pricing](https://app.countrystatecity.in/pricing) for plan details.
