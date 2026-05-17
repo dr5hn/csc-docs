@@ -39,6 +39,8 @@ Retrieve all cities within a specific state or province using both the country's
   Official name of the city
 </ResponseField>
 
+<Info>City responses on the **Basic** tier only return `id` and `name`. Upgrading to **Supporter+** unlocks `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, and `native`. **Professional+** adds `translations` and `wikiDataId`. See **Tier-Based Field Availability** below.</Info>
+
 <RequestExample>
 ```bash cURL
 curl -X GET 'https://api.countrystatecity.in/v1/countries/IN/states/MH/cities' \
@@ -231,19 +233,43 @@ cities = get_cities_by_state('IN', 'MH')
 </RequestExample>
 
 <ResponseExample>
-```json 200 - Success
+```json 200 - Basic tier (Community, Starter, Legacy)
+[
+  { "id": 133024, "name": "Mumbai" },
+  { "id": 132332, "name": "Pune" },
+  { "id": 133351, "name": "Nashik" }
+]
+```
+
+```json 200 - Supporter tier (Coordinates)
 [
   {
     "id": 133024,
-    "name": "Mumbai"
-  },
+    "name": "Mumbai",
+    "state_id": 4008,
+    "state_code": "MH",
+    "country_id": 101,
+    "country_code": "IN",
+    "latitude": "19.07283000",
+    "longitude": "72.88261000",
+    "timezone": "Asia/Kolkata",
+    "population": 12442373,
+    "type": null,
+    "level": null,
+    "parent_id": null,
+    "native": "मुंबई"
+  }
+]
+```
+
+```json 200 - Professional / Business (Full) — coordinates plus
+[
   {
-    "id": 132332,
-    "name": "Pune"
-  },
-  {
-    "id": 133351,
-    "name": "Nashik"
+    "id": 133024,
+    "name": "Mumbai",
+    "...": "...all coordinates fields above...",
+    "translations": "{\"de\":\"Mumbai\",\"fr\":\"Bombay\",\"ja\":\"ムンバイ\",\"cn\":\"孟买\"}",
+    "wikiDataId": "Q1156"
   }
 ]
 ```
@@ -351,3 +377,13 @@ This is the most efficient endpoint for building cascading location selectors as
 <Info>
 This endpoint provides the optimal balance between data size and specificity, making it ideal for form controls and location-based filtering.
 </Info>
+
+## Tier-Based Field Availability
+
+| Tier | Plans | Fields |
+|------|-------|--------|
+| **Basic** | Community, Starter, Legacy | `id`, `name` |
+| **Coordinates** | Supporter | All Basic **+** `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, `native` |
+| **Full** | Professional, Business | All Coordinates **+** `translations`, `wikiDataId` |
+
+See [Pricing](https://app.countrystatecity.in/pricing) for plan details.

@@ -45,10 +45,6 @@ Retrieve detailed information for a specific state or province using the country
   ISO2 code for the state/province
 </ResponseField>
 
-<ResponseField name="type" type="string">
-  Administrative division type (e.g., "state", "province", "region")
-</ResponseField>
-
 <ResponseField name="latitude" type="string">
   Approximate latitude coordinate of the state/province center
 </ResponseField>
@@ -56,6 +52,16 @@ Retrieve detailed information for a specific state or province using the country
 <ResponseField name="longitude" type="string">
   Approximate longitude coordinate of the state/province center
 </ResponseField>
+
+<ResponseField name="timezone" type="string">
+  IANA timezone identifier (e.g., `"Asia/Kolkata"`)
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  Administrative division type (e.g., `"state"`, `"province"`, `"region"`). **Coordinates tier and above.**
+</ResponseField>
+
+<Info>Additional fields like `fips_code`, `iso3166_2`, `level`, `parent_id`, `native`, `population`, `translations`, and `wikiDataId` are returned on higher tiers. See **Tier-Based Field Availability** below.</Info>
 
 <RequestExample>
 ```bash cURL
@@ -241,16 +247,36 @@ state = get_state_details('IN', 'MH')
 </RequestExample>
 
 <ResponseExample>
-```json 200 - Success
+```json 200 - Basic tier (Community, Starter, Legacy)
 {
   "id": 4008,
   "name": "Maharashtra",
   "country_id": 101,
   "country_code": "IN",
   "iso2": "MH",
-  "type": "state",
   "latitude": "19.75147980",
-  "longitude": "75.71388840"
+  "longitude": "75.71388840",
+  "timezone": "Asia/Kolkata"
+}
+```
+
+```json 200 - Coordinates tier (Supporter) — basic plus
+{
+  "id": 4008,
+  "name": "Maharashtra",
+  "country_id": 101,
+  "country_code": "IN",
+  "iso2": "MH",
+  "latitude": "19.75147980",
+  "longitude": "75.71388840",
+  "timezone": "Asia/Kolkata",
+  "fips_code": "16",
+  "iso3166_2": "IN-MH",
+  "type": "state",
+  "level": 1,
+  "parent_id": null,
+  "native": "महाराष्ट्र",
+  "population": 112374333
 }
 ```
 
@@ -313,3 +339,13 @@ state = get_state_details('IN', 'MH')
 <Tip>
 Use this endpoint when you need precise geographical coordinates or want to validate specific state/country combinations.
 </Tip>
+
+## Tier-Based Field Availability
+
+| Tier | Plans | Fields |
+|------|-------|--------|
+| **Basic** | Community, Starter, Legacy | `id`, `name`, `iso2`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone` |
+| **Coordinates** | Supporter | All Basic **+** `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population` |
+| **Full** | Professional, Business | All Coordinates **+** `translations`, `wikiDataId` |
+
+See [Pricing](https://app.countrystatecity.in/pricing) for plan details.

@@ -48,11 +48,56 @@ console.log(countries);
 </RequestExample>
 
 <ResponseExample>
-```json 200 - Success
+```json 200 - Supporter tier (Coordinates) — abridged
 [
-  { "id": 101, "name": "India", "iso2": "IN", "iso3": "IND" },
-  { "id": 167, "name": "Pakistan", "iso2": "PK", "iso3": "PAK" },
-  { "id": 19, "name": "Bangladesh", "iso2": "BD", "iso3": "BGD" }
+  {
+    "id": 101,
+    "name": "India",
+    "iso2": "IN",
+    "iso3": "IND",
+    "phonecode": "91",
+    "capital": "New Delhi",
+    "currency": "INR",
+    "currency_name": "Indian rupee",
+    "currency_symbol": "₹",
+    "tld": ".in",
+    "nationality": "Indian",
+    "native": "भारत",
+    "emoji": "🇮🇳",
+    "emojiU": "U+1F1EE U+1F1F3",
+    "latitude": "20.00000000",
+    "longitude": "77.00000000",
+    "region": "Asia",
+    "region_id": 3,
+    "subregion": "Southern Asia",
+    "subregion_id": 14,
+    "timezones": "[{\"zoneName\":\"Asia/Kolkata\",\"gmtOffset\":19800,\"gmtOffsetName\":\"UTC+05:30\",\"abbreviation\":\"IST\",\"tzName\":\"Indian Standard Time\"}]",
+    "population": 1380004385,
+    "gdp": 2870504000000,
+    "area_sq_km": 3287263,
+    "postal_code_format": "######",
+    "postal_code_regex": "^(\\d{6})$",
+    "numeric_code": "356"
+  }
 ]
 ```
+
+```json 403 - Feature Restricted
+{
+  "error": "This feature is not available on your current plan.",
+  "feature": "regionsApi",
+  "upgradeUrl": "https://app.countrystatecity.in/pricing"
+}
+```
 </ResponseExample>
+
+## Tier-Based Field Availability
+
+This endpoint requires **Supporter+**, so the **Basic** tier never applies. Returned country fields match [Get Country Details](/api/endpoints/get-country-details):
+
+| Tier | Plans | Fields |
+|------|-------|--------|
+| **Coordinates** | Supporter | `id`, `name`, `iso2`, `iso3`, `phonecode`, `capital`, `currency`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `native`, `emoji`, `emojiU`, `latitude`, `longitude`, `region`, `region_id`, `subregion`, `subregion_id`, `timezones`, `numeric_code`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex` |
+| **Full** | Professional, Business | All Coordinates **+** `translations`, `wikiDataId` |
+
+See [Pricing](https://app.countrystatecity.in/pricing) for plan details.

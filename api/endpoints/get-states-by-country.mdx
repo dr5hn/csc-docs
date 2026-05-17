@@ -39,6 +39,28 @@ Retrieve all states, provinces, regions, and territories for a specific country 
   ISO2 code for the state/province
 </ResponseField>
 
+<ResponseField name="country_id" type="integer">
+  Unique identifier of the parent country
+</ResponseField>
+
+<ResponseField name="country_code" type="string">
+  ISO2 code of the parent country
+</ResponseField>
+
+<ResponseField name="latitude" type="string">
+  Approximate latitude of the state/province
+</ResponseField>
+
+<ResponseField name="longitude" type="string">
+  Approximate longitude of the state/province
+</ResponseField>
+
+<ResponseField name="timezone" type="string">
+  IANA timezone identifier (e.g., `"Asia/Kolkata"`)
+</ResponseField>
+
+<Info>Additional fields like `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population`, `translations`, and `wikiDataId` are returned on higher tiers. See **Tier-Based Field Availability** below.</Info>
+
 <RequestExample>
 ```bash cURL
 curl -X GET 'https://api.countrystatecity.in/v1/countries/IN/states' \
@@ -224,22 +246,39 @@ states = get_states_by_country('IN')
 </RequestExample>
 
 <ResponseExample>
-```json 200 - Success
+```json 200 - Basic tier (Community, Starter, Legacy)
 [
   {
     "id": 4008,
     "name": "Maharashtra",
-    "iso2": "MH"
-  },
+    "iso2": "MH",
+    "country_id": 101,
+    "country_code": "IN",
+    "latitude": "19.75147980",
+    "longitude": "75.71388840",
+    "timezone": "Asia/Kolkata"
+  }
+]
+```
+
+```json 200 - Coordinates tier (Supporter) — basic plus
+[
   {
-    "id": 4017,
-    "name": "Karnataka",
-    "iso2": "KA"
-  },
-  {
-    "id": 4030,
-    "name": "Tamil Nadu",
-    "iso2": "TN"
+    "id": 4008,
+    "name": "Maharashtra",
+    "iso2": "MH",
+    "country_id": 101,
+    "country_code": "IN",
+    "latitude": "19.75147980",
+    "longitude": "75.71388840",
+    "timezone": "Asia/Kolkata",
+    "fips_code": "16",
+    "iso3166_2": "IN-MH",
+    "type": "state",
+    "level": 1,
+    "parent_id": null,
+    "native": "महाराष्ट्र",
+    "population": 112374333
   }
 ]
 ```
@@ -301,3 +340,13 @@ states = get_states_by_country('IN')
 <Tip>
 Cache states by country as they rarely change. Use this endpoint instead of filtering all states for better performance.
 </Tip>
+
+## Tier-Based Field Availability
+
+| Tier | Plans | Fields |
+|------|-------|--------|
+| **Basic** | Community, Starter, Legacy | `id`, `name`, `iso2`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone` |
+| **Coordinates** | Supporter | All Basic **+** `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population` |
+| **Full** | Professional, Business | All Coordinates **+** `translations`, `wikiDataId` |
+
+See [Pricing](https://app.countrystatecity.in/pricing) for plan details.
