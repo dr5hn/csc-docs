@@ -7,6 +7,8 @@ description: "Retrieve a complete list of all states, provinces, and regions wor
 
 Retrieve a complete list of all states, provinces, regions, and territories from around the world with basic geographical information.
 
+<Note>**Availability:** Supporter plan and above. Calling `/states` without filtering by country (`bulkStates`) is gated to Supporter+. Community/Starter users must call `/countries/{iso2}/states` instead. The fields returned also vary by tier — see **Tier-Based Field Availability** below.</Note>
+
 ## Authentication
 
 <ParamField header="X-CSCAPI-KEY" type="string" required>
@@ -283,7 +285,5 @@ This endpoint returns a large dataset (5000+ states). Consider using the filtere
 | **Basic** | Community, Starter, Legacy | `id`, `name`, `iso2`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone` |
 | **Coordinates** | Supporter | All Basic **+** `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population` |
 | **Full** | Professional, Business | All Coordinates **+** `translations`, `wikiDataId` |
-
-<Note>The `bulkStates` feature (calling `/states` without filtering by country) requires **Supporter+**. Community/Starter users must call `/countries/{iso2}/states` instead.</Note>
 
 See [Pricing](https://app.countrystatecity.in/pricing) for plan details.
