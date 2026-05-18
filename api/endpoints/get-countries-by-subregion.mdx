@@ -95,9 +95,12 @@ console.log(countries);
 
 This endpoint requires **Supporter+**, so the **Basic** tier never applies. Returned country fields match [Get Country Details](/api/endpoints/get-country-details):
 
+<!-- AUTOGEN:tier-matrix:countries START -->
 | Tier | Plans | Fields |
 |------|-------|--------|
-| **Coordinates** | Supporter | `id`, `name`, `iso2`, `iso3`, `phonecode`, `capital`, `currency`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `native`, `emoji`, `emojiU`, `latitude`, `longitude`, `region`, `region_id`, `subregion`, `subregion_id`, `timezones`, `numeric_code`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex` |
+| **Basic** | Community, Starter, Legacy | `id`, `name`, `iso2`, `iso3`, `phonecode`, `capital`, `currency`, `native`, `emoji`, `latitude`, `longitude`, `region`, `region_id`, `subregion`, `subregion_id`, `timezones` |
+| **Coordinates** | Supporter | All Basic **+** `numeric_code`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex`, `emojiU` |
 | **Full** | Professional, Business | All Coordinates **+** `translations`, `wikiDataId` |
+<!-- AUTOGEN:tier-matrix:countries END -->
 
 See [Pricing](https://app.countrystatecity.in/pricing) for plan details.
