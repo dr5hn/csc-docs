@@ -1,0 +1,142 @@
+---
+title: "Lookup Country by ISO Code"
+api: "GET https://api.countrystatecity.in/v1/iso/country"
+authMethod: "key"
+description: "Find a country by ISO 3166-1 alpha-2, alpha-3, or numeric code"
+---
+
+Look up a single country by **any one** of the three ISO 3166-1 codes: 2-letter (alpha-2), 3-letter (alpha-3), or 3-digit numeric. Exactly one query parameter must be provided.
+
+This is the canonical lookup when you have an ISO code from an external system (payment gateway, geolocation service, address parser) and need to resolve it to the country record.
+
+<Note>**Availability:** Starter plan and above. Returns `403` on Community plan.</Note>
+
+<Info>Responses are cached server-side for 1 hour. The cache slot is shared with [`/v1/iso/country/convert`](/api/endpoints/convert-iso-code) — warming the cache via one endpoint serves the other for free. Numeric codes `4` and `004` resolve to the same cache slot.</Info>
+
+## Authentication
+
+<ParamField header="X-CSCAPI-KEY" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+## Query Parameters
+
+Provide **exactly one** of the three. Sending two or zero returns `400`.
+
+<ParamField query="iso2" type="string">
+  ISO 3166-1 alpha-2 code, e.g. `US`, `IN`, `DE`. Case-insensitive (auto-uppercased).
+</ParamField>
+
+<ParamField query="iso3" type="string">
+  ISO 3166-1 alpha-3 code, e.g. `USA`, `IND`, `DEU`. Case-insensitive.
+</ParamField>
+
+<ParamField query="numeric" type="string">
+  ISO 3166-1 numeric code, 1–3 digits. Accepts padded (`004`) and unpadded (`4`) forms. All-zero values are rejected.
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="integer">
+  Internal CSC country ID — same value used by `/v1/countries/:id` and other foreign-key references.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Official country name in English.
+</ResponseField>
+
+<ResponseField name="iso2" type="string">
+  ISO 3166-1 alpha-2 code (e.g. `"US"`).
+</ResponseField>
+
+<ResponseField name="iso3" type="string">
+  ISO 3166-1 alpha-3 code (e.g. `"USA"`).
+</ResponseField>
+
+<ResponseField name="numeric_code" type="string | null">
+  ISO 3166-1 numeric code, zero-padded to 3 digits (e.g. `"840"`). `null` for entries without an assigned numeric code.
+</ResponseField>
+
+<RequestExample>
+```bash cURL (alpha-2)
+curl -X GET 'https://api.countrystatecity.in/v1/iso/country?iso2=US' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (alpha-3)
+curl -X GET 'https://api.countrystatecity.in/v1/iso/country?iso3=IND' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (numeric)
+curl -X GET 'https://api.countrystatecity.in/v1/iso/country?numeric=840' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```javascript JavaScript
+const response = await fetch(
+  'https://api.countrystatecity.in/v1/iso/country?iso2=US',
+  { headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' } }
+);
+
+const country = await response.json();
+console.log(`${country.name} (id ${country.id})`);
+```
+
+```python Python
+import requests
+
+response = requests.get(
+  'https://api.countrystatecity.in/v1/iso/country',
+  params={'iso3': 'USA'},
+  headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+)
+
+country = response.json()
+print(f"{country['name']} → numeric {country['numeric_code']}")
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 - Success
+{
+  "id": 233,
+  "name": "United States",
+  "iso2": "US",
+  "iso3": "USA",
+  "numeric_code": "840"
+}
+```
+
+```json 400 - Wrong number of params
+{
+  "error": "Invalid query parameters: Provide exactly one of: iso2, iso3, numeric"
+}
+```
+
+```json 400 - Malformed code
+{
+  "error": "Invalid query parameters: iso2: must be a 2-letter code"
+}
+```
+
+```json 403 - Feature Restricted
+{
+  "error": "This feature is not available on your current plan.",
+  "feature": "isoLookup",
+  "upgradeUrl": "https://app.countrystatecity.in/pricing"
+}
+```
+
+```json 404 - No Match
+{
+  "error": "Country not found for the given code"
+}
+```
+</ResponseExample>
+
+## Related Endpoints
+
+- [Lookup State by ISO Code](/api/endpoints/lookup-state-by-iso) — same idea for ISO 3166-2 subdivision codes
+- [Convert ISO Code](/api/endpoints/convert-iso-code) — translate between alpha-2, alpha-3, and numeric in one call
+- [Get Country Details](/api/endpoints/get-country-details) — full country record (all fields, tier-gated)

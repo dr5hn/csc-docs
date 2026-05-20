@@ -1,0 +1,187 @@
+---
+title: "Parse Phone Number"
+api: "GET https://api.countrystatecity.in/v1/phone/parse"
+authMethod: "key"
+description: "Parse an E.164 phone number into its country and national parts"
+---
+
+Given a phone number in E.164 format (`+` followed by country code and national digits), identify the originating country and split out the national portion.
+
+The matcher walks 3-digit → 2-digit → 1-digit ITU prefixes, so longer-prefix countries (like `+972` Israel) win over shorter-prefix ones that share the leading digit. For NANP `+1` numbers, the area code is matched against known territory area codes — `+1-246-555-1234` resolves to Barbados (`BB`), not the US.
+
+<Note>**Availability:** Supporter plan and above. Returns `403` on lower tiers.</Note>
+
+<Warning>
+**The response echoes the phone number** (`e164` and `national_number`), so it's PII. The endpoint returns `Cache-Control: no-store` and emits no `ETag` — Cloudflare, browsers, and intermediate proxies will not retain the response. Do not change this if you're proxying through additional caching layers; the `Cache-Control` is intentional.
+
+The **internal phone-prefix index** is cached server-side for 24 hours. The `X-Parse-Index-Cache: HIT|MISS` header reports whether that internal lookup was a cache hit — it does **not** describe the response body.
+</Warning>
+
+## Authentication
+
+<ParamField header="X-CSCAPI-KEY" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="number" type="string" required>
+  E.164-formatted phone number starting with `+` followed by 5–15 digits.
+
+  Both `+14155552671` and the URL-decoded form ` 14155552671` (with a leading space, which is how some HTTP clients deliver an unencoded `+`) are accepted.
+</ParamField>
+
+## Response
+
+<ResponseField name="country" type="string">
+  ISO 3166-1 alpha-2 code of the matched country (e.g. `"BB"`). Convenience field equal to `iso2`.
+</ResponseField>
+
+<ResponseField name="dial_code" type="string">
+  Country dial code with leading `+` (e.g. `"+1"`).
+</ResponseField>
+
+<ResponseField name="area_code" type="string">
+  Present only for NANP matches with a fixed area-code prefix (e.g. `"246"` for Barbados). Omitted when not applicable.
+</ResponseField>
+
+<ResponseField name="iso2" type="string">
+  ISO 3166-1 alpha-2 code.
+</ResponseField>
+
+<ResponseField name="iso3" type="string">
+  ISO 3166-1 alpha-3 code.
+</ResponseField>
+
+<ResponseField name="national_number" type="string">
+  Digits remaining after stripping the country dial code (no `+`, no separators). For NANP numbers this **includes** the area code — the area code is part of the national format.
+</ResponseField>
+
+<ResponseField name="e164" type="string">
+  Echo of the normalized input (always starts with `+`).
+</ResponseField>
+
+<RequestExample>
+```bash cURL (US number)
+curl -X GET 'https://api.countrystatecity.in/v1/phone/parse?number=%2B14155552671' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (Indian number)
+curl -X GET 'https://api.countrystatecity.in/v1/phone/parse?number=%2B919876543210' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (NANP territory — Barbados)
+curl -X GET 'https://api.countrystatecity.in/v1/phone/parse?number=%2B12465551234' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```javascript JavaScript
+const number = '+14155552671';
+const response = await fetch(
+  `https://api.countrystatecity.in/v1/phone/parse?number=${encodeURIComponent(number)}`,
+  { headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' } }
+);
+
+const parsed = await response.json();
+// { country: "US", dial_code: "+1", iso2: "US", iso3: "USA",
+//   national_number: "4155552671", e164: "+14155552671" }
+```
+
+```python Python
+import requests
+
+response = requests.get(
+  'https://api.countrystatecity.in/v1/phone/parse',
+  params={'number': '+919876543210'},
+  headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+)
+
+parsed = response.json()
+print(f"{parsed['country']} | {parsed['dial_code']} | national {parsed['national_number']}")
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 - US number
+{
+  "country": "US",
+  "dial_code": "+1",
+  "iso2": "US",
+  "iso3": "USA",
+  "national_number": "4155552671",
+  "e164": "+14155552671"
+}
+```
+
+```json 200 - NANP territory (area-code disambiguation)
+{
+  "country": "BB",
+  "dial_code": "+1",
+  "area_code": "246",
+  "iso2": "BB",
+  "iso3": "BRB",
+  "national_number": "2465551234",
+  "e164": "+12465551234"
+}
+```
+
+```json 200 - 3-digit ITU prefix wins
+{
+  "country": "IL",
+  "dial_code": "+972",
+  "iso2": "IL",
+  "iso3": "ISR",
+  "national_number": "501234567",
+  "e164": "+972501234567"
+}
+```
+
+```json 400 - Missing param
+{
+  "error": "Missing required query parameter: number"
+}
+```
+
+```json 400 - No leading +
+{
+  "error": "Phone number must be in E.164 format starting with + (e.g., +14155552671)."
+}
+```
+
+```json 400 - Wrong digit count
+{
+  "error": "Invalid phone number. Must contain 5-15 digits after the +."
+}
+```
+
+```json 403 - Feature Restricted
+{
+  "error": "This feature is not available on your current plan.",
+  "feature": "phoneDialCode",
+  "upgradeUrl": "https://app.countrystatecity.in/pricing"
+}
+```
+
+```json 404 - No matching country
+{
+  "error": "Could not identify a country for the given phone number."
+}
+```
+</ResponseExample>
+
+## Notes on Matching
+
+The matcher tries 3-digit, then 2-digit, then 1-digit ITU prefixes:
+
+- `+972...` matches Israel (3-digit prefix), not Yemen (`+967`) or any 1-digit `+9` country (none exist, but the logic generalizes).
+- `+44...` matches the UK (2-digit prefix).
+- `+1...` is the NANP — the next 3 digits are checked against known area codes (Barbados `246`, Antigua `268`, etc.). If no area code matches, the request falls back to the US.
+
+When the data carries a `+1-XXX` area-code prefix for a country, the matcher prefers that more-specific entry over the bare `+1`.
+
+## Related Endpoints
+
+- [Get Dial Code by Country](/api/endpoints/get-dial-code-by-country) — when you already know the country
+- [List Dial Codes](/api/endpoints/list-dial-codes) — every country plus reverse lookup

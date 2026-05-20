@@ -9,7 +9,11 @@ This comprehensive Mintlify documentation site covers the complete Country State
 - Real-time data access with authentication via X-CSCAPI-KEY headers
 - High-performance JSON responses with sub-100ms response times globally
 - Base URL: https://api.countrystatecity.in/v1
-- Complete endpoint coverage for countries, states, and cities
+- Complete endpoint coverage for countries, states, cities, regions, currencies
+- ISO 3166-1 / 3166-2 lookup endpoints (alpha-2, alpha-3, numeric codes + state subdivisions)
+- Phone dial-code endpoints including reverse lookup and E.164 number parsing
+- Timezone endpoints by country, state, and city with DST awareness
+- Field filtering (?fields=) and custom sort (?sort=) on every geographic endpoint (Supporter+)
 
 ### CSC Database
 - Complete geographical database with regular updates

@@ -1,0 +1,132 @@
+---
+title: "Get Timezone by State"
+api: "GET https://api.countrystatecity.in/v1/timezone/{ciso}/{siso}"
+authMethod: "key"
+description: "Retrieve the timezone for a specific state or province"
+---
+
+Get the timezone for a state/province within a country. Useful for federations or countries that span multiple zones — US states, Canadian provinces, Russian federal subjects, Australian states, etc.
+
+<Note>**Availability:** All plans (Community and above). Only an API key is required.</Note>
+
+<Info>Responses are cached server-side for 24 hours. The cache key includes both the country and state codes, so cross-country state-code collisions never cause cache poisoning.</Info>
+
+## Authentication
+
+<ParamField header="X-CSCAPI-KEY" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="ciso" type="string" required>
+  Country code: ISO 3166-1 alpha-2 (`US`), alpha-3 (`USA`), or numeric CSC ID. Case-insensitive.
+</ParamField>
+
+<ParamField path="siso" type="string" required>
+  State/province code in the country's local subdivision system (e.g. `CA` for California within `US-CA`). Case-insensitive.
+</ParamField>
+
+## Response
+
+Identical shape to [`/v1/timezone/:ciso`](/api/endpoints/get-timezone-by-country):
+
+<ResponseField name="iana" type="string">
+  Canonical IANA timezone name (e.g. `"America/Los_Angeles"`).
+</ResponseField>
+
+<ResponseField name="abbreviation" type="string">
+  Locale-aware short name at request time (e.g. `"PST"` / `"PDT"`).
+</ResponseField>
+
+<ResponseField name="offset_utc" type="string">
+  Standard UTC offset in `±HH:MM` form (e.g. `"-08:00"`).
+</ResponseField>
+
+<ResponseField name="dst_offset_utc" type="string">
+  DST UTC offset in `±HH:MM` form (e.g. `"-07:00"`). Equal to `offset_utc` for zones that don't observe DST.
+</ResponseField>
+
+<ResponseField name="is_dst_now" type="boolean">
+  Whether DST is in effect at request time.
+</ResponseField>
+
+<RequestExample>
+```bash cURL (California)
+curl -X GET 'https://api.countrystatecity.in/v1/timezone/US/CA' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (Maharashtra, India)
+curl -X GET 'https://api.countrystatecity.in/v1/timezone/IN/MH' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (Bavaria, Germany — ISO3 country)
+curl -X GET 'https://api.countrystatecity.in/v1/timezone/DEU/BY' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```javascript JavaScript
+const response = await fetch(
+  'https://api.countrystatecity.in/v1/timezone/US/NY',
+  { headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' } }
+);
+
+const tz = await response.json();
+console.log(`${tz.iana} | DST in effect: ${tz.is_dst_now}`);
+```
+
+```python Python
+import requests
+
+response = requests.get(
+  'https://api.countrystatecity.in/v1/timezone/US/HI',  # Hawaii — no DST
+  headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+)
+
+print(response.json())
+# {"iana": "Pacific/Honolulu", "abbreviation": "HST", "offset_utc": "-10:00",
+#  "dst_offset_utc": "-10:00", "is_dst_now": false}
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 - California (DST in summer)
+{
+  "iana": "America/Los_Angeles",
+  "abbreviation": "PDT",
+  "offset_utc": "-08:00",
+  "dst_offset_utc": "-07:00",
+  "is_dst_now": true
+}
+```
+
+```json 200 - Hawaii (no DST)
+{
+  "iana": "Pacific/Honolulu",
+  "abbreviation": "HST",
+  "offset_utc": "-10:00",
+  "dst_offset_utc": "-10:00",
+  "is_dst_now": false
+}
+```
+
+```json 404 - State Not Found
+{
+  "error": "State not found."
+}
+```
+
+```json 404 - No Timezone Data
+{
+  "error": "No timezone data available for this state."
+}
+```
+</ResponseExample>
+
+## Related Endpoints
+
+- [Get Timezone by Country](/api/endpoints/get-timezone-by-country) — country-level resolution (uses the capital's timezone)
+- [Get Timezone by City](/api/endpoints/get-timezone-by-city) — per-city precision
+- [Get State Details](/api/endpoints/get-state-details) — full state record including the raw `timezone` field

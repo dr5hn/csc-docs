@@ -1,0 +1,144 @@
+---
+title: "Get Timezone by Country"
+api: "GET https://api.countrystatecity.in/v1/timezone/{ciso}"
+authMethod: "key"
+description: "Retrieve the canonical timezone for a country including current DST state"
+---
+
+Return the canonical IANA timezone for a country, plus its standard and DST UTC offsets and whether the country is observing DST at request time.
+
+Resolution order:
+
+1. The capital city's timezone — most countries with multiple zones use this as the canonical default.
+2. The first entry in the country's `timezones` JSON column — fallback when no capital-city match exists.
+
+<Note>**Availability:** All plans (Community and above). Only an API key is required.</Note>
+
+<Info>Responses are cached server-side for 24 hours.</Info>
+
+<Warning>
+**Known DST sampling limitation:** standard and DST offsets are determined by sampling Jan 1 and Jul 1 of the current year, which is correct for almost every populated IANA zone. A small number of zones with non-standard DST windows (most notably `Africa/Casablanca` with Ramadan-based transitions) can report incorrect `offset_utc` / `dst_offset_utc` / `is_dst_now` values during their actual DST window. Use a dedicated timezone library if you need exact DST behaviour for those edge cases.
+</Warning>
+
+## Authentication
+
+<ParamField header="X-CSCAPI-KEY" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="ciso" type="string" required>
+  ISO 3166-1 alpha-2 code (e.g. `US`), alpha-3 code (e.g. `USA`), or numeric CSC country ID (e.g. `233`). Case-insensitive for ISO codes.
+</ParamField>
+
+## Response
+
+<ResponseField name="iana" type="string">
+  Canonical IANA timezone name (e.g. `"America/New_York"`). Use this with any standards-compliant date/time library — JavaScript `Intl`, Python `zoneinfo`, Java `ZoneId`, etc.
+</ResponseField>
+
+<ResponseField name="abbreviation" type="string">
+  Locale-aware short name at request time (e.g. `"EST"` in winter, `"EDT"` in summer). Display-only — not stable enough to use as an identifier.
+</ResponseField>
+
+<ResponseField name="offset_utc" type="string">
+  Standard (non-DST) UTC offset in `±HH:MM` form (e.g. `"-05:00"` for US Eastern).
+</ResponseField>
+
+<ResponseField name="dst_offset_utc" type="string">
+  DST UTC offset in `±HH:MM` form (e.g. `"-04:00"` for US Eastern Daylight). Equal to `offset_utc` for zones that don't observe DST.
+</ResponseField>
+
+<ResponseField name="is_dst_now" type="boolean">
+  Whether DST is in effect for this zone at request time. `false` when the zone doesn't observe DST.
+</ResponseField>
+
+<RequestExample>
+```bash cURL (ISO2)
+curl -X GET 'https://api.countrystatecity.in/v1/timezone/US' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (ISO3)
+curl -X GET 'https://api.countrystatecity.in/v1/timezone/IND' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (numeric ID)
+curl -X GET 'https://api.countrystatecity.in/v1/timezone/233' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.countrystatecity.in/v1/timezone/US', {
+  headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' }
+});
+
+const tz = await response.json();
+// Format current time in that zone
+const local = new Date().toLocaleString('en-US', { timeZone: tz.iana });
+console.log(`${tz.iana} | ${local} | DST: ${tz.is_dst_now}`);
+```
+
+```python Python
+import requests
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+response = requests.get(
+  'https://api.countrystatecity.in/v1/timezone/IN',
+  headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+)
+
+tz = response.json()
+now_local = datetime.now(ZoneInfo(tz['iana']))
+print(f"{tz['iana']} ({tz['abbreviation']}) — {now_local}")
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 - DST-observing country (in summer)
+{
+  "iana": "America/New_York",
+  "abbreviation": "EDT",
+  "offset_utc": "-05:00",
+  "dst_offset_utc": "-04:00",
+  "is_dst_now": true
+}
+```
+
+```json 200 - Non-DST country
+{
+  "iana": "Asia/Kolkata",
+  "abbreviation": "GMT+5:30",
+  "offset_utc": "+05:30",
+  "dst_offset_utc": "+05:30",
+  "is_dst_now": false
+}
+```
+
+```json 401 - Unauthorized
+{
+  "error": "Unauthorized. You shouldn't be here."
+}
+```
+
+```json 404 - Country Not Found
+{
+  "error": "Country not found."
+}
+```
+
+```json 404 - No Timezone Data
+{
+  "error": "No timezone data available for this country."
+}
+```
+</ResponseExample>
+
+## Related Endpoints
+
+- [Get Timezone by State](/api/endpoints/get-timezone-by-state) — finer-grained timezone for federations / countries with multiple zones (US, Canada, Russia, Australia, etc.)
+- [Get Timezone by City](/api/endpoints/get-timezone-by-city) — per-city precision
+- [Get Country Details](/api/endpoints/get-country-details) — includes the raw `timezones` JSON column

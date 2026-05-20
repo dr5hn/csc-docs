@@ -30,6 +30,7 @@
             "pages": [
               "api/introduction",
               "api/authentication",
+              "api/field-filtering-and-sorting",
               "api/faq"
             ]
           },
@@ -70,6 +71,30 @@
             "pages": [
               "api/endpoints/list-all-currencies",
               "api/endpoints/get-currency-by-country"
+            ]
+          },
+          {
+            "group": "ISO Code Endpoints",
+            "pages": [
+              "api/endpoints/lookup-country-by-iso",
+              "api/endpoints/lookup-state-by-iso",
+              "api/endpoints/convert-iso-code"
+            ]
+          },
+          {
+            "group": "Phone Endpoints",
+            "pages": [
+              "api/endpoints/list-dial-codes",
+              "api/endpoints/get-dial-code-by-country",
+              "api/endpoints/parse-phone-number"
+            ]
+          },
+          {
+            "group": "Timezone Endpoints",
+            "pages": [
+              "api/endpoints/get-timezone-by-country",
+              "api/endpoints/get-timezone-by-state",
+              "api/endpoints/get-timezone-by-city"
             ]
           },
           {
