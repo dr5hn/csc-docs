@@ -1,6 +1,7 @@
 ---
-title: "Field Filtering & Sorting"
+title: "Field Filtering and Sorting"
 description: "Reduce payload size and order results with ?fields= and ?sort= on every geographic endpoint"
+icon: "filter"
 ---
 
 Every geographic endpoint accepts two query parameters that let you shape the response payload without changing the URL:
@@ -10,7 +11,7 @@ Every geographic endpoint accepts two query parameters that let you shape the re
 
 <Note>**Availability:** Both parameters require the **Supporter plan or above**. Detail endpoints accept `?fields=`; list endpoints accept both `?fields=` and `?sort=`.</Note>
 
-<Info>Filtering and sorting are applied **server-side after cache**, so a typical request still takes <10 ms even on large responses. The full payload is cached once; each `?fields=`/`?sort=` permutation receives its own ETag.</Info>
+<Info>Filtering and sorting are applied **server-side after cache**, so a typical request still takes under 10 ms even on large responses. The full payload is cached once; each `?fields=`/`?sort=` permutation receives its own ETag.</Info>
 
 ---
 
