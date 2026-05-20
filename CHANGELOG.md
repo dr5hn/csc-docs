@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-05-20
+
+### Added
+
+- **Field Filtering & Sorting** cross-cutting guide — documents `?fields=` and `?sort=` syntax, tier gating (Supporter+), per-entity sortable fields, behaviour rules, and error responses
+- **ISO Code Endpoints** group: lookup country by alpha-2/alpha-3/numeric, lookup state by ISO 3166-2 subdivision code, convert between ISO formats
+- **Phone Endpoints** group: list dial codes with reverse lookup, get dial code by country, parse E.164 phone number into country + national parts
+- **Timezone Endpoints** group: timezone by country, state, and city — with DST-aware response (IANA name, abbreviation, std/DST offsets, current-DST flag)
+- Per-endpoint `?fields=` / `?sort=` callout on every geographic list and detail page (12 endpoints) linking back to the cross-cutting guide
+
+### Changed
+
+- Updated `llms.txt` to surface the new endpoint groups for AI assistants
+- Standardised the "Related Endpoints" footer pattern across the new endpoint pages
+
 ## [1.1.0] - 2026-04-03
 
 ### Added

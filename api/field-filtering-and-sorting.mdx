@@ -1,0 +1,207 @@
+---
+title: "Field Filtering & Sorting"
+description: "Reduce payload size and order results with ?fields= and ?sort= on every geographic endpoint"
+---
+
+Every geographic endpoint accepts two query parameters that let you shape the response payload without changing the URL:
+
+- **`?fields=`** — return only the fields you ask for. Trim large list responses down to what your UI actually renders.
+- **`?sort=`** — order list results by one or more fields, ascending or descending.
+
+<Note>**Availability:** Both parameters require the **Supporter plan or above**. Detail endpoints accept `?fields=`; list endpoints accept both `?fields=` and `?sort=`.</Note>
+
+<Info>Filtering and sorting are applied **server-side after cache**, so a typical request still takes <10 ms even on large responses. The full payload is cached once; each `?fields=`/`?sort=` permutation receives its own ETag.</Info>
+
+---
+
+## `?fields=` — request only the columns you need
+
+Pass a comma-separated list of field names. The response includes only those fields, plus `id` (always returned so responses are never empty).
+
+```bash
+# Return only name + iso2 for every country
+curl -X GET 'https://api.countrystatecity.in/v1/countries?fields=name,iso2' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```json 200 - Trimmed response
+[
+  { "id": 1, "name": "Afghanistan", "iso2": "AF" },
+  { "id": 2, "name": "Albania",     "iso2": "AL" },
+  { "id": 3, "name": "Algeria",     "iso2": "DZ" }
+]
+```
+
+### Behaviour rules
+
+| Input | Behaviour |
+|---|---|
+| Field name is **unknown** for that entity | `400 Bad Request` listing valid fields |
+| Field is **valid but outside your tier** | Silently dropped — response stays a 200, that field just doesn't appear |
+| Field list is **empty** (`?fields=`) | Treated as if the parameter wasn't sent (no filtering). Still trips the Supporter+ check. |
+| `id` not in your list | Added automatically — every response item carries `id` |
+| `?fields=` sent multiple times | `400 Bad Request` — repeated params arrive as an array, which is rejected. Send one comma-separated list. |
+
+### Per-entity field lists
+
+The fields available to `?fields=` are the same as the columns returned by each endpoint (after tier gating). For the full lists, see the **Tier-Based Field Availability** table at the bottom of every endpoint page.
+
+---
+
+## `?sort=` — order list results
+
+Pass a comma-separated list of `field` or `field:asc|desc` tokens. Sort is applied to the list **after filtering**.
+
+```bash
+# Largest countries by population, descending
+curl -X GET 'https://api.countrystatecity.in/v1/countries?fields=name,population&sort=population:desc' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```json 200 - Top of response
+[
+  { "id": 45,  "name": "China",         "population": 1444216107 },
+  { "id": 101, "name": "India",         "population": 1380004385 },
+  { "id": 233, "name": "United States", "population":  331002651 }
+]
+```
+
+### Multi-field sort
+
+Chain fields with commas — earlier tokens take precedence on ties.
+
+```bash
+# Region first (A→Z), population second (largest first within each region)
+curl -X GET 'https://api.countrystatecity.in/v1/countries?sort=region:asc,population:desc' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+### Sortable fields per entity
+
+Only fields with comparable scalar values are sortable. Translation blobs, JSON columns, and similar non-scalar columns are not.
+
+| Entity | Sortable fields |
+|---|---|
+| countries | `id`, `name`, `iso2`, `iso3`, `population`, `gdp`, `area_sq_km`, `latitude`, `longitude` |
+| states | `id`, `name`, `iso2`, `country_code`, `population`, `latitude`, `longitude` |
+| cities | `id`, `name`, `state_code`, `country_code`, `population`, `latitude`, `longitude` |
+| regions | `id`, `name` |
+| subregions | `id`, `name`, `region_id` |
+
+### Behaviour rules
+
+| Input | Behaviour |
+|---|---|
+| Field is not in the sortable list above | `400 Bad Request` listing the valid fields |
+| Field is sortable but **outside your tier** (e.g. `population` on Starter) | `400 Bad Request` — sort surfaces a clear error instead of silently dropping, so you don't get nonsense order |
+| Direction is anything other than `asc` or `desc` (case-insensitive) | `400 Bad Request` |
+| Token has more than one `:` (e.g. `name:asc:extra`) | `400 Bad Request` — guards against silently swallowed typos |
+| Empty `?sort=` | Treated as if the parameter wasn't sent. Still trips the Supporter+ check. |
+| `?sort=` sent on a detail endpoint (e.g. `/countries/IN`) | Ignored — sort only applies to list endpoints |
+| Numeric strings (`latitude`, `longitude`) | Compared numerically, not lexicographically. `"9.0"` sorts before `"10.0"`. |
+| `null` values | Sorted first in `asc`, last in `desc` |
+
+### Whitespace
+
+Whitespace inside a sort token is tolerated. Both `sort=name:desc` and `sort=name: desc` are valid.
+
+---
+
+## Combining `?fields=` and `?sort=`
+
+You can use both together. Sort is applied first, then fields are trimmed.
+
+```bash
+curl -X GET 'https://api.countrystatecity.in/v1/cities?fields=name,population&sort=population:desc' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+You can sort by a field you didn't include in `?fields=` — the sort happens on the full row, then unwanted columns are dropped.
+
+```bash
+# Sort by population (not returned), keep only the city name
+curl -X GET 'https://api.countrystatecity.in/v1/cities?fields=name&sort=population:desc' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+---
+
+## Caching
+
+| Header | Meaning |
+|---|---|
+| `Cache-Control: public, max-age=86400` | The underlying full payload is cached server-side and at the edge for 24 h |
+| `ETag` | Each `?fields=`/`?sort=` permutation gets its own ETag so conditional requests work per-permutation |
+| `X-Cache: HIT` / `MISS` | Whether the **underlying** entity payload was served from cache. Filtering and sorting always run on the response — they're cheap relative to network round-trip. |
+
+---
+
+## Error responses
+
+```json 400 - Unknown field in ?fields=
+{
+  "error": "Unknown field(s): fakeColumn. Valid fields: id, name, iso2, iso3, ..."
+}
+```
+
+```json 400 - Non-sortable field
+{
+  "error": "Field \"timezones\" is not sortable. Sortable fields for countries: id, name, iso2, iso3, population, gdp, area_sq_km, latitude, longitude"
+}
+```
+
+```json 400 - Sort field outside tier
+{
+  "error": "Field \"population\" is not available on your current plan."
+}
+```
+
+```json 400 - Malformed sort token
+{
+  "error": "Invalid sort token \"name:asc:extra\". Expected \"field\" or \"field:asc|desc\"."
+}
+```
+
+```json 403 - Feature not on plan
+{
+  "error": "This feature is not available on your current plan.",
+  "feature": "fieldsFiltering",
+  "upgradeUrl": "https://app.countrystatecity.in/pricing"
+}
+```
+
+---
+
+## When to use which parameter
+
+<AccordionGroup>
+<Accordion title="Cutting payload for a dropdown / typeahead">
+  Use `?fields=` to keep only the columns the UI renders. A country selector usually needs `id`, `name`, `iso2`, `emoji` — that's roughly 1 KB per request instead of 50+ KB for the full response.
+
+  ```bash
+  curl 'https://api.countrystatecity.in/v1/countries?fields=name,iso2,emoji'
+  ```
+</Accordion>
+
+<Accordion title="Ordering a list for display">
+  Use `?sort=` to push the work server-side. Sorting 150,000 cities by population in your client is slow and ships a lot of data you'll discard.
+
+  ```bash
+  curl 'https://api.countrystatecity.in/v1/cities?sort=population:desc&fields=name,state_code,population'
+  ```
+</Accordion>
+
+<Accordion title="Both at once for a paginated table">
+  Combine `?fields=` and `?sort=` to ship exactly the rendered columns in the rendered order. Pair with client-side slicing for pagination.
+
+  ```bash
+  curl 'https://api.countrystatecity.in/v1/states?sort=name:asc&fields=name,iso2,country_code'
+  ```
+</Accordion>
+</AccordionGroup>
+
+## Related Topics
+
+- [Authentication](/api/authentication) — how to send `X-CSCAPI-KEY`
+- [Pricing](https://app.countrystatecity.in/pricing) — which plans include filtering and sorting
+- Every endpoint page links back to this guide

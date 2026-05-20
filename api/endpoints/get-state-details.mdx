@@ -19,6 +19,10 @@ Retrieve detailed information for a specific state or province using the country
   ISO2 code of the state/province (e.g., "MH" for Maharashtra, "CA" for California)
 </ParamField>
 
+<Tip>
+**Trim response columns:** Add `?fields=name,iso2,...` to receive only the columns you need. Available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax.
+</Tip>
+
 ## Authentication
 
 <ParamField header="X-CSCAPI-KEY" type="string" required>

@@ -1,0 +1,126 @@
+---
+title: "Get Timezone by City"
+api: "GET https://api.countrystatecity.in/v1/timezone/{ciso}/{siso}/{city_id}"
+authMethod: "key"
+description: "Retrieve the timezone for a specific city"
+---
+
+Get the timezone for a specific city. The country and state codes in the path are not redundant — they're enforced server-side as an **ownership check**: a city ID is only resolved if it actually belongs to the given state inside the given country.
+
+This prevents "city-ID spoofing" — a caller can't learn the timezone of an arbitrary city by trying its ID under a different country/state pair.
+
+<Note>**Availability:** All plans (Community and above). Only an API key is required.</Note>
+
+<Info>Responses are cached server-side for 24 hours. The cache key includes country, state, **and** city ID, so the ownership check holds on cache HIT — a city ID looked up under one (ciso, siso) pair won't satisfy a request under a different pair.</Info>
+
+## Authentication
+
+<ParamField header="X-CSCAPI-KEY" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="ciso" type="string" required>
+  Country code: ISO 3166-1 alpha-2 (`US`), alpha-3 (`USA`), or numeric CSC ID. Case-insensitive.
+</ParamField>
+
+<ParamField path="siso" type="string" required>
+  State/province code (e.g. `CA` for California). Case-insensitive.
+</ParamField>
+
+<ParamField path="city_id" type="integer" required>
+  Numeric CSC city ID. Get this from `/v1/countries/:ciso/states/:siso/cities` or `/v1/cities`.
+</ParamField>
+
+## Response
+
+Same shape as the country and state timezone endpoints:
+
+<ResponseField name="iana" type="string">
+  Canonical IANA timezone name (e.g. `"America/Los_Angeles"`).
+</ResponseField>
+
+<ResponseField name="abbreviation" type="string">
+  Locale-aware short name at request time.
+</ResponseField>
+
+<ResponseField name="offset_utc" type="string">
+  Standard UTC offset in `±HH:MM` form.
+</ResponseField>
+
+<ResponseField name="dst_offset_utc" type="string">
+  DST UTC offset in `±HH:MM` form.
+</ResponseField>
+
+<ResponseField name="is_dst_now" type="boolean">
+  Whether DST is in effect at request time.
+</ResponseField>
+
+<RequestExample>
+```bash cURL (San Francisco, CA)
+curl -X GET 'https://api.countrystatecity.in/v1/timezone/US/CA/24295' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (Mumbai, IN-MH)
+curl -X GET 'https://api.countrystatecity.in/v1/timezone/IN/MH/57614' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```javascript JavaScript
+const response = await fetch(
+  'https://api.countrystatecity.in/v1/timezone/US/CA/24295',  // San Francisco
+  { headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' } }
+);
+
+const tz = await response.json();
+const localNow = new Date().toLocaleString('en-US', { timeZone: tz.iana });
+console.log(`Current local time: ${localNow}`);
+```
+
+```python Python
+import requests
+
+response = requests.get(
+  'https://api.countrystatecity.in/v1/timezone/US/NY/124394',  # New York City
+  headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+)
+
+print(response.json()['iana'])  # "America/New_York"
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 - San Francisco (DST in summer)
+{
+  "iana": "America/Los_Angeles",
+  "abbreviation": "PDT",
+  "offset_utc": "-08:00",
+  "dst_offset_utc": "-07:00",
+  "is_dst_now": true
+}
+```
+
+```json 404 - City not in this country/state
+{
+  "error": "City not found."
+}
+```
+
+```json 404 - No timezone on record
+{
+  "error": "No timezone data available for this city."
+}
+```
+</ResponseExample>
+
+## Related Endpoints
+
+- [Get Timezone by Country](/api/endpoints/get-timezone-by-country) — country-level (uses the capital's timezone)
+- [Get Timezone by State](/api/endpoints/get-timezone-by-state) — state-level precision
+- [Get Cities by State](/api/endpoints/get-cities-by-state) — list cities to find the right city ID
+
+## Notes on `city_id`
+
+The `city_id` is the same numeric ID returned by all list endpoints (`/v1/countries/:ciso/states/:siso/cities`, `/v1/cities`, etc.). If you stored a city ID in your own database, this endpoint is the canonical way to look up its timezone without re-fetching the full city record.

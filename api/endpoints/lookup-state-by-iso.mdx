@@ -1,0 +1,145 @@
+---
+title: "Lookup State by ISO Code"
+api: "GET https://api.countrystatecity.in/v1/iso/state"
+authMethod: "key"
+description: "Find a state or province by ISO 3166-2 subdivision code"
+---
+
+Resolve an ISO 3166-2 subdivision code (e.g. `US-CA`, `IN-MH`, `DE-BY`) to the state/province record.
+
+The match prefers the canonical `iso3166_2` column. When that column is `NULL` for a row (common in older imports), the endpoint falls back to matching the legacy `iso2` column scoped to the same country — so the lookup works even for partially-coded rows without risking cross-country false matches.
+
+<Note>**Availability:** Starter plan and above. Returns `403` on Community plan.</Note>
+
+<Info>Responses are cached server-side for 1 hour. The lookup key is the full ISO 3166-2 code, so `US-CA` and `us-ca` collapse to the same cache slot (input is auto-uppercased).</Info>
+
+## Authentication
+
+<ParamField header="X-CSCAPI-KEY" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="iso" type="string" required>
+  ISO 3166-2 subdivision code in the form `XX-YYY` — 2-letter country code, hyphen, then 1–3 alphanumeric characters for the subdivision. Case-insensitive (auto-uppercased).
+
+  Examples: `US-CA`, `IN-MH`, `DE-BY`, `GB-ENG`, `JP-13`
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="integer">
+  Internal CSC state ID — same value used by `/v1/states/:id` and as a foreign key from `/cities`.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Official state/province name in English (e.g. `"California"`).
+</ResponseField>
+
+<ResponseField name="iso2" type="string | null">
+  Legacy subdivision code without the country prefix (e.g. `"CA"`). May be `null` for some entries.
+</ResponseField>
+
+<ResponseField name="iso3166_2" type="string | null">
+  Canonical ISO 3166-2 code (e.g. `"US-CA"`). May be `null` for older entries — the endpoint still resolves them via the `iso2` fallback.
+</ResponseField>
+
+<ResponseField name="country_id" type="integer">
+  Internal CSC country ID — foreign key into `/countries`.
+</ResponseField>
+
+<ResponseField name="country_code" type="string">
+  ISO 3166-1 alpha-2 code of the parent country (e.g. `"US"`).
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X GET 'https://api.countrystatecity.in/v1/iso/state?iso=US-CA' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (case-insensitive)
+curl -X GET 'https://api.countrystatecity.in/v1/iso/state?iso=in-mh' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```javascript JavaScript
+const response = await fetch(
+  'https://api.countrystatecity.in/v1/iso/state?iso=US-CA',
+  { headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' } }
+);
+
+const state = await response.json();
+console.log(`${state.name}, ${state.country_code} (id ${state.id})`);
+```
+
+```python Python
+import requests
+
+response = requests.get(
+  'https://api.countrystatecity.in/v1/iso/state',
+  params={'iso': 'DE-BY'},
+  headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+)
+
+state = response.json()
+print(state['name'])  # "Bavaria"
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 - Success
+{
+  "id": 1416,
+  "name": "California",
+  "iso2": "CA",
+  "iso3166_2": "US-CA",
+  "country_id": 233,
+  "country_code": "US"
+}
+```
+
+```json 200 - Resolved via legacy fallback
+{
+  "id": 4022,
+  "name": "Maharashtra",
+  "iso2": "MH",
+  "iso3166_2": null,
+  "country_id": 101,
+  "country_code": "IN"
+}
+```
+
+```json 400 - Missing param
+{
+  "error": "Invalid query parameters: iso: is required (e.g. iso=US-CA)"
+}
+```
+
+```json 400 - Malformed code
+{
+  "error": "Invalid query parameters: iso: must be an ISO 3166-2 code (e.g. US-CA)"
+}
+```
+
+```json 403 - Feature Restricted
+{
+  "error": "This feature is not available on your current plan.",
+  "feature": "isoLookup",
+  "upgradeUrl": "https://app.countrystatecity.in/pricing"
+}
+```
+
+```json 404 - No Match
+{
+  "error": "State not found for the given ISO code"
+}
+```
+</ResponseExample>
+
+## Related Endpoints
+
+- [Lookup Country by ISO Code](/api/endpoints/lookup-country-by-iso) — country-level ISO lookup (alpha-2/alpha-3/numeric)
+- [Get State Details](/api/endpoints/get-state-details) — full state record (all fields, tier-gated)
+- [Get States by Country](/api/endpoints/get-states-by-country) — all states for a given country
