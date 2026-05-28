@@ -14,6 +14,7 @@ This comprehensive Mintlify documentation site covers the complete Country State
 - Phone dial-code endpoints including reverse lookup and E.164 number parsing
 - Timezone endpoints by country, state, and city with DST awareness
 - Field filtering (?fields=) and custom sort (?sort=) on every geographic endpoint (Supporter+)
+- Fuzzy / typo-tolerant search (?q=) for cities, states, and countries via trigram similarity, with match scores (Professional+)
 
 ### CSC Database
 - Complete geographical database with regular updates

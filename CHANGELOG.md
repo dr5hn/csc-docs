@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-05-28
+
+### Added
+
+- **Search Endpoints** group: fuzzy / typo-tolerant search (`GET /v1/search/fuzzy`) for cities, states, and countries using trigram similarity — documents `q`, `type`, `country`, `limit`, `threshold` parameters, the `match_score` / `matched_alias` response fields, native-script matching, and Professional+ tier gating
+
+### Changed
+
+- Updated `llms.txt` to surface the fuzzy search capability for AI assistants
+
 ## [1.2.0] - 2026-05-20
 
 ### Added
