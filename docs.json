@@ -98,6 +98,12 @@
             ]
           },
           {
+            "group": "Search Endpoints",
+            "pages": [
+              "api/endpoints/fuzzy-search"
+            ]
+          },
+          {
             "group": "SDKs & Examples",
             "pages": [
               "api/sdks",

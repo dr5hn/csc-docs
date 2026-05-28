@@ -1,0 +1,154 @@
+---
+title: "Fuzzy Search"
+api: "GET https://api.countrystatecity.in/v1/search/fuzzy"
+authMethod: "key"
+description: "Typo-tolerant search for cities, states, and countries using trigram similarity"
+---
+
+Search cities, states, and countries by an approximate query that tolerates **misspellings, transliterations, and native-script variants**. Unlike the exact/substring [inline search](/api/endpoints/get-all-countries) (`?q=`), fuzzy search ranks results by how *similar* they are to your query, so `Banglore` still resolves to **Bangalore** and `Beijng` to **Beijing**.
+
+Matching uses PostgreSQL trigram similarity over both the English `name` and the `native` name, returning a `match_score` so you can decide how confident a hit is.
+
+<Note>**Availability:** Professional plan and above. Returns `403` on Community, Starter, and Supporter plans.</Note>
+
+<Info>Each result is scored against both the English and native names; the higher of the two wins. Responses are cached server-side, keyed by query, type, country filter, limit, threshold, and your plan's data-access level.</Info>
+
+## Authentication
+
+<ParamField header="X-CSCAPI-KEY" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="q" type="string" required>
+  The search text. 2–100 characters. Matched case-insensitively against the English and native names.
+</ParamField>
+
+<ParamField query="type" type="string" default="city">
+  What to search. One of `city`, `state`, or `country`.
+</ParamField>
+
+<ParamField query="country" type="string">
+  Restrict results to a single country by ISO 3166-1 alpha-2 code, e.g. `IN`, `US`. Case-insensitive (auto-uppercased). Applies to `type=city` and `type=state` only — sending it with `type=country` returns `400`.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="10">
+  Maximum number of results to return. 1–50.
+</ParamField>
+
+<ParamField query="threshold" type="number" default="0.3">
+  Minimum trigram similarity a row must reach to be returned. 0.1–1. Lower values are more permissive (more, looser matches); higher values are stricter. The default `0.3` is a good balance for typo tolerance.
+</ParamField>
+
+## Response
+
+Returns an array sorted by `match_score` descending. Each item carries the standard fields for the entity (`city`, `state`, or `country`) at your plan's data-access level — Professional and Business resolve to the **full** field set — plus two fuzzy-specific fields:
+
+<ResponseField name="match_score" type="number">
+  Trigram similarity of the best-matching name (English or native), from `0` to `1`, rounded to 2 decimals. Higher means a closer match.
+</ResponseField>
+
+<ResponseField name="matched_alias" type="string | null">
+  The native name when it scored higher than the English name (e.g. a Devanagari or Han query that matched the local spelling). `null` when the English name was the better match.
+</ResponseField>
+
+<RequestExample>
+```bash cURL (typo)
+curl -X GET 'https://api.countrystatecity.in/v1/search/fuzzy?q=Banglore&type=city&country=IN' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (country)
+curl -X GET 'https://api.countrystatecity.in/v1/search/fuzzy?q=Deutschlnd&type=country' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (looser threshold)
+curl -X GET 'https://api.countrystatecity.in/v1/search/fuzzy?q=Munchen&type=city&threshold=0.2&limit=5' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```javascript JavaScript
+const params = new URLSearchParams({ q: 'Banglore', type: 'city', country: 'IN' });
+const response = await fetch(
+  `https://api.countrystatecity.in/v1/search/fuzzy?${params}`,
+  { headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' } }
+);
+
+const matches = await response.json();
+matches.forEach((m) => console.log(`${m.name} (${m.match_score})`));
+```
+
+```python Python
+import requests
+
+response = requests.get(
+  'https://api.countrystatecity.in/v1/search/fuzzy',
+  params={'q': 'Banglore', 'type': 'city', 'country': 'IN'},
+  headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+)
+
+for match in response.json():
+    print(f"{match['name']} -> {match['match_score']}")
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 - City match (Professional / Business)
+[
+  {
+    "id": 57885,
+    "name": "Bangalore",
+    "state_id": 4026,
+    "state_code": "KA",
+    "country_id": 101,
+    "country_code": "IN",
+    "latitude": "12.97194000",
+    "longitude": "77.59369000",
+    "timezone": "Asia/Kolkata",
+    "native": "ಬೆಂಗಳೂರು",
+    "match_score": 0.87,
+    "matched_alias": null
+  }
+]
+```
+
+```json 200 - Native-script match
+[
+  {
+    "id": 57885,
+    "name": "Bangalore",
+    "native": "ಬೆಂಗಳೂರು",
+    "match_score": 1,
+    "matched_alias": "ಬೆಂಗಳೂರು"
+  }
+]
+```
+
+```json 400 - Query too short
+{
+  "error": "Invalid query parameters: q: Search query must be at least 2 characters"
+}
+```
+
+```json 400 - country with type=country
+{
+  "error": "Invalid query parameters: country: country is not a valid filter when type=country"
+}
+```
+
+```json 403 - Feature Restricted
+{
+  "error": "This feature is not available on your current plan.",
+  "feature": "fuzzySearch",
+  "upgradeUrl": "https://app.countrystatecity.in/pricing"
+}
+```
+</ResponseExample>
+
+## Related Endpoints
+
+- [Get All Countries](/api/endpoints/get-all-countries) — exact/substring inline search via `?q=`
+- [Get Cities by Country](/api/endpoints/get-cities-by-country) — list cities, filterable by `?q=`
+- [Lookup Country by ISO Code](/api/endpoints/lookup-country-by-iso) — resolve a known ISO code to a country
