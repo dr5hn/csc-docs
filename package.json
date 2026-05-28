@@ -6,6 +6,8 @@
   "scripts": {
     "sync-changelog": "node scripts/sync-changelog.js",
     "update-database-stats": "node scripts/update-database-stats.js",
+    "sync-tier-matrices": "node scripts/sync-tier-matrices.js",
+    "check-tier-matrices": "node scripts/sync-tier-matrices.js --check",
     "dev": "mintlify dev",
     "build": "mintlify build"
   },
