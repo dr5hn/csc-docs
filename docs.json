@@ -16,8 +16,7 @@
           {
             "group": "Getting Started",
             "pages": [
-              "index",
-              "changelog"
+              "index"
             ]
           }
         ]
@@ -107,6 +106,8 @@
             "group": "SDKs & Examples",
             "pages": [
               "api/sdks",
+              "api/sdks/npm",
+              "api/sdks/python",
               "api/examples"
             ]
           },
@@ -175,8 +176,7 @@
           {
             "group": "Support",
             "pages": [
-              "database/contributing",
-              "donate"
+              "database/contributing"
             ]
           }
         ]

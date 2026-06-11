@@ -1,0 +1,125 @@
+---
+title: "Python Packages"
+description: "Official countrystatecity Python packages — type-safe, lazily loaded geographical data with Pydantic models and zero extra dependencies"
+icon: "python"
+---
+
+The `countrystatecity` Python packages provide access to countries, states, and cities data with full type hints, Pydantic models, and lazy loading. All data is bundled directly — no API key or network requests needed.
+
+<Note>
+  Always install using the suffixed package name (e.g. `countrystatecity-countries`). There is no bare `countrystatecity` package on PyPI — `pip install countrystatecity` will not work.
+</Note>
+
+## Available Packages
+
+| Package | Status | Description |
+|---|---|---|
+| `countrystatecity-countries` | Released | Countries, states, and cities with lazy loading |
+| `countrystatecity-timezones` | Coming soon | IANA timezone data and utilities |
+| `countrystatecity-currencies` | Coming soon | Currency codes, symbols, and formatting |
+| `countrystatecity-languages` | Coming soon | Language codes and metadata |
+| `countrystatecity-phonecodes` | Coming soon | International dialing codes and validation |
+
+## Installation
+
+```bash
+pip install countrystatecity-countries
+```
+
+## Usage
+
+### Countries
+
+```python
+from countrystatecity_countries import get_countries, get_country_by_code
+
+countries = get_countries()
+print(f"Total countries: {len(countries)}")
+
+usa = get_country_by_code("US")
+print(f"{usa.emoji} {usa.name}")
+print(f"Capital: {usa.capital}")
+print(f"Currency: {usa.currency_symbol} {usa.currency_name}")
+```
+
+### States
+
+```python
+from countrystatecity_countries import get_states_of_country
+
+states = get_states_of_country("IN")
+print(f"Total states in India: {len(states)}")
+
+for state in states[:3]:
+    print(f"{state.name} ({state.iso2})")
+# Maharashtra (MH)
+# Karnataka (KA)
+# Tamil Nadu (TN)
+```
+
+### Cities
+
+```python
+from countrystatecity_countries import get_cities_of_state
+
+cities = get_cities_of_state("US", "CA")
+print(f"Cities in California: {len(cities)}")
+
+for city in cities[:3]:
+    print(f"{city.name} — {city.latitude}, {city.longitude}")
+# Los Angeles — 34.05223, -118.24368
+# San Diego — 32.72541, -117.15726
+# San Jose — 37.33939, -121.89496
+```
+
+### Country Details
+
+```python
+from countrystatecity_countries import get_country_by_code
+
+gb = get_country_by_code("GB")
+print(gb.name)           # United Kingdom
+print(gb.iso2)           # GB
+print(gb.iso3)           # GBR
+print(gb.capital)        # London
+print(gb.currency)       # GBP
+print(gb.currency_name)  # British Pound
+print(gb.region)         # Europe
+print(gb.timezones)      # [...]
+```
+
+## Features
+
+<CardGroup cols={2}>
+  <Card title="Type-safe" icon="shield-check">
+    Full type hints with Pydantic models and mypy support.
+  </Card>
+  <Card title="Lazy loading" icon="bolt">
+    Data loads on first access and caches with LRU cache for minimal memory footprint.
+  </Card>
+  <Card title="Zero dependencies" icon="box">
+    Only requires Pydantic — no other external packages.
+  </Card>
+  <Card title="Full coverage" icon="globe">
+    250+ countries, 5,000+ states, 150,000+ cities with coordinates and metadata.
+  </Card>
+</CardGroup>
+
+## Data Updates
+
+To get the latest geographical data, update the package:
+
+```bash
+pip install --upgrade countrystatecity-countries
+```
+
+## Source
+
+<CardGroup cols={2}>
+  <Card title="GitHub Repository" icon="github" href="https://github.com/dr5hn/countrystatecity-pypi">
+    View source, open issues, or contribute.
+  </Card>
+  <Card title="PyPI" icon="python" href="https://pypi.org/project/countrystatecity-countries/">
+    Browse the published package on PyPI.
+  </Card>
+</CardGroup>

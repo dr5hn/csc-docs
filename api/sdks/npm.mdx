@@ -1,0 +1,146 @@
+---
+title: "npm Packages"
+description: "Official @countrystatecity npm packages for Node.js and browser environments — countries, timezones, currencies, and translations"
+icon: "npm"
+---
+
+The `@countrystatecity` monorepo publishes five packages to npm. All data is bundled directly — no API key or network requests needed.
+
+## Packages
+
+| Package | Environment | Description | Bundle |
+|---|---|---|---|
+| [`@countrystatecity/countries`](https://www.npmjs.com/package/@countrystatecity/countries) | Node.js / Server | Countries, states, cities with lazy loading | &lt;10KB |
+| [`@countrystatecity/countries-browser`](https://www.npmjs.com/package/@countrystatecity/countries-browser) | Browser / Any | Same API as above, loads data via jsDelivr CDN | &lt;10KB |
+| [`@countrystatecity/timezones`](https://www.npmjs.com/package/@countrystatecity/timezones) | Node.js / Server | 392 IANA timezones with conversion utilities | &lt;20KB |
+| [`@countrystatecity/currencies`](https://www.npmjs.com/package/@countrystatecity/currencies) | Node.js / Browser | 155 ISO 4217 currencies with symbols and formatting | &lt;3KB |
+| [`@countrystatecity/translations`](https://www.npmjs.com/package/@countrystatecity/translations) | Node.js / Browser | Country name translations in 19 languages | &lt;3KB |
+
+## Installation
+
+Install only the packages you need:
+
+```bash
+# Countries, states, and cities (Node.js / server-side)
+npm install @countrystatecity/countries
+
+# Countries, states, and cities (browser / React / Vue / Svelte)
+npm install @countrystatecity/countries-browser
+
+# Timezones
+npm install @countrystatecity/timezones
+
+# Currencies
+npm install @countrystatecity/currencies
+
+# Translations
+npm install @countrystatecity/translations
+```
+
+<Note>
+  Use `@countrystatecity/countries` in Node.js, Next.js API routes, or Express. Use `@countrystatecity/countries-browser` in client-side React, Vue, or Svelte apps — it loads data via CDN instead of bundling it.
+</Note>
+
+## Usage
+
+### Countries, States, and Cities
+
+<CodeGroup>
+```typescript Node.js
+import { getCountries, getStatesOfCountry, getCitiesOfState } from '@countrystatecity/countries';
+
+const countries = await getCountries();
+// [{ id: 101, name: 'India', iso2: 'IN', emoji: '🇮🇳', ... }, ...]
+
+const states = await getStatesOfCountry('US');
+// [{ id: 1, name: 'California', iso2: 'CA', ... }, ...]
+
+const cities = await getCitiesOfState('US', 'CA');
+// [{ id: 110992, name: 'Los Angeles', latitude: '34.05', longitude: '-118.24', ... }, ...]
+```
+
+```typescript Browser (React / Vue / Svelte)
+import { getCountries, getStatesOfCountry, getCitiesOfState } from '@countrystatecity/countries-browser';
+
+const countries = await getCountries();
+// [{ id: 101, name: 'India', iso2: 'IN', emoji: '🇮🇳', ... }, ...]
+
+const states = await getStatesOfCountry('IN');
+// [{ id: 1, name: 'Maharashtra', iso2: 'MH', ... }, ...]
+
+const cities = await getCitiesOfState('IN', 'MH');
+// [{ id: 1, name: 'Mumbai', ... }, ...]
+```
+</CodeGroup>
+
+### Timezones
+
+```typescript
+import { getTimezonesByCountry, convertTime, getCurrentTime } from '@countrystatecity/timezones';
+
+const timezones = await getTimezonesByCountry('US');
+// [{ zoneName: 'America/New_York', abbreviation: 'EST', gmtOffset: -18000, ... }, ...]
+
+const result = await convertTime(
+  '2025-10-18T12:00:00Z',
+  'America/New_York',
+  'Europe/London'
+);
+// { originalTime: '2025-10-18T08:00:00', convertedTime: '2025-10-18T13:00:00', timeDifference: 5 }
+
+const now = await getCurrentTime('Asia/Kolkata');
+// "2025-10-18T17:30:00.000Z"
+```
+
+### Currencies
+
+```typescript
+import { getCurrencyByCode, formatCurrencyAmount, getCurrenciesByCountry } from '@countrystatecity/currencies';
+
+const usd = await getCurrencyByCode('USD');
+// { code: 'USD', name: 'US Dollar', symbol: '$', decimalDigits: 2, ... }
+
+const formatted = await formatCurrencyAmount(1234.5, 'USD');
+// "$1,234.50"
+
+const currencies = await getCurrenciesByCountry('IN');
+// [{ code: 'INR', name: 'Indian Rupee', symbol: '₹', ... }]
+```
+
+### Translations
+
+```typescript
+import { getTranslation, getTranslationOrFallback, getCountryTranslations } from '@countrystatecity/translations';
+
+const name = await getTranslation('DE', 'fr');
+// "Allemagne"
+
+const entry = await getCountryTranslations('IN');
+// { iso2: 'IN', name: 'India', translations: { fr: 'Inde', de: 'Indien', 'zh-CN': '印度', ... } }
+
+getTranslationOrFallback(entry, 'hi');  // "भारत"
+getTranslationOrFallback(entry, 'xx');  // "India"  ← falls back to English
+```
+
+**Supported locales:** `ar`, `br`, `de`, `es`, `fa`, `fr`, `hi`, `hr`, `it`, `ja`, `ko`, `nl`, `pl`, `pt`, `pt-BR`, `ru`, `tr`, `uk`, `zh-CN`
+
+## Data Updates
+
+All packages update automatically every week via a CI pipeline that fetches the latest data from the [countries-states-cities-database](https://github.com/dr5hn/countries-states-cities-database), runs tests, and publishes a patch release to npm.
+
+To get the latest data in your project, update the package:
+
+```bash
+npm update @countrystatecity/countries
+```
+
+## Source
+
+<CardGroup cols={2}>
+  <Card title="GitHub Repository" icon="github" href="https://github.com/dr5hn/countrystatecity-npm">
+    View the monorepo source, open issues, or contribute.
+  </Card>
+  <Card title="npm Organization" icon="npm" href="https://www.npmjs.com/org/countrystatecity">
+    Browse all published packages on npm.
+  </Card>
+</CardGroup>
