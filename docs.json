@@ -224,8 +224,7 @@
       {
         "label": "Encyclopedia",
         "href": "https://countrystatecity.org"
-      },
-
+      }
     ],
     "primary": {
       "type": "button",
