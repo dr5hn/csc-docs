@@ -25,14 +25,6 @@ Choose the perfect format for your project. Each format is optimized for specifi
 - BI tools and dashboards
 </Card>
 
-<Card title="Excel (.xlsx)" icon="file-spreadsheet">
-**+4 Credits**
-- Native Excel workbook
-- Business reporting
-- No CSV import step
-- Multi-sheet output
-</Card>
-
 <Card title="XML" icon="code">
 **+2 Credits**
 - Enterprise systems
@@ -49,20 +41,44 @@ Choose the perfect format for your project. Each format is optimized for specifi
 - Human-readable data
 </Card>
 
-<Card title="SQL" icon="database">
+<Card title="MySQL" icon="database">
 **+4 Credits**
-- Database seeding
-- Generic INSERT statements
-- Direct imports
-- Production deployments
+- MySQL / MariaDB imports
+- Full schema with indexes
+- Foreign key constraints
+- Production-ready DDL
 </Card>
 
-<Card title="PostgreSQL / SQL Server / SQLite3" icon="database">
+<Card title="PostgreSQL" icon="server">
 **+5 Credits**
-- Dialect-specific schema
+- PostgreSQL-specific DDL
 - Type inference and indexes
 - Constraints and check rules
-- Ready-to-import DDL
+- PostGIS compatible
+</Card>
+
+<Card title="SQLite" icon="hard-drive">
+**+5 Credits**
+- Embedded and mobile apps
+- Single-file database
+- Lightweight deployments
+- Zero-config setup
+</Card>
+
+<Card title="SQL Server" icon="microsoft">
+**+5 Credits**
+- Microsoft SQL Server DDL
+- T-SQL compatible
+- Enterprise deployments
+- Azure SQL ready
+</Card>
+
+<Card title="MongoDB" icon="leaf">
+**+4 Credits**
+- NoSQL document store
+- Flexible schema queries
+- mongorestore compatible
+- Aggregation pipeline ready
 </Card>
 
 <Card title="GeoJSON" icon="map">
@@ -83,7 +99,7 @@ Choose the perfect format for your project. Each format is optimized for specifi
 </CardGroup>
 
 <Info>
-PostgreSQL, SQL Server, and SQLite3 all produce dialect-specific DDL with type inference, indexes, and constraints — they're priced higher than generic SQL because the schema is ready-to-deploy.
+PostgreSQL, SQLite, and SQL Server produce dialect-specific DDL with type inference, indexes, and constraints. MySQL produces a full schema with foreign keys and indexes. All SQL formats are ready-to-import.
 </Info>
 
 ## JSON Format (+2 Credits)
@@ -1375,6 +1391,204 @@ class GeographicalController extends Controller
         return Country::with('states')->get();
     }
 }
+```
+</Tab>
+</Tabs>
+
+## MongoDB Format (+4 Credits)
+
+A `mongodump`-compatible BSON/JSON export ready to load directly into MongoDB using `mongorestore` or `mongoimport`.
+
+<Tabs>
+<Tab title="Structure & Examples">
+**Document structure for countries:**
+
+```json Sample Countries Export
+[
+  {
+    "_id": { "$oid": "64f1a2b3c4d5e6f7a8b9c0d1" },
+    "name": "India",
+    "iso2": "IN",
+    "iso3": "IND",
+    "phonecode": "+91",
+    "capital": "New Delhi",
+    "currency": "INR",
+    "currency_symbol": "₹",
+    "region": "Asia",
+    "subregion": "Southern Asia",
+    "latitude": 20.593684,
+    "longitude": 78.96288,
+    "emoji": "🇮🇳"
+  }
+]
+```
+
+**Nested states export:**
+```json Countries with States
+[
+  {
+    "_id": { "$oid": "64f1a2b3c4d5e6f7a8b9c0d2" },
+    "name": "India",
+    "iso2": "IN",
+    "states": [
+      { "name": "Maharashtra", "state_code": "MH", "latitude": 19.7515, "longitude": 75.7139 },
+      { "name": "Karnataka", "state_code": "KA", "latitude": 15.3173, "longitude": 75.7139 }
+    ]
+  }
+]
+```
+</Tab>
+
+<Tab title="Import & Query">
+**Import using mongoimport:**
+
+```bash
+# Import countries
+mongoimport --uri "mongodb://localhost:27017/geoDb" \
+  --collection countries \
+  --file countries.json \
+  --jsonArray
+
+# Import states
+mongoimport --uri "mongodb://localhost:27017/geoDb" \
+  --collection states \
+  --file states.json \
+  --jsonArray
+
+# Import cities
+mongoimport --uri "mongodb://localhost:27017/geoDb" \
+  --collection cities \
+  --file cities.json \
+  --jsonArray
+```
+
+**Common queries:**
+
+```javascript Node.js with MongoDB driver
+const { MongoClient } = require('mongodb');
+const client = new MongoClient('mongodb://localhost:27017');
+const db = client.db('geoDb');
+
+// Get all states for India
+const states = await db.collection('states')
+  .find({ country_code: 'IN' })
+  .sort({ name: 1 })
+  .toArray();
+
+// Get cities in Maharashtra
+const cities = await db.collection('cities')
+  .find({ country_code: 'IN', state_code: 'MH' })
+  .project({ name: 1, latitude: 1, longitude: 1 })
+  .toArray();
+
+// Countries by region
+const asianCountries = await db.collection('countries')
+  .find({ region: 'Asia' })
+  .sort({ name: 1 })
+  .toArray();
+```
+</Tab>
+</Tabs>
+
+## GeoJSON Format (+4 Credits)
+
+GeoJSON is a standard format for encoding geographical data structures. Each city or region is exported as a GeoJSON `Feature` with coordinates and properties, making it directly usable with mapping libraries and spatial databases.
+
+<Tabs>
+<Tab title="Structure & Examples">
+**FeatureCollection for cities:**
+
+```json Sample GeoJSON Export
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.24368, 34.05223]
+      },
+      "properties": {
+        "id": 111968,
+        "name": "Los Angeles",
+        "state_code": "CA",
+        "state_name": "California",
+        "country_code": "US",
+        "country_name": "United States"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [72.87765, 19.07283]
+      },
+      "properties": {
+        "id": 1,
+        "name": "Mumbai",
+        "state_code": "MH",
+        "state_name": "Maharashtra",
+        "country_code": "IN",
+        "country_name": "India"
+      }
+    }
+  ]
+}
+```
+
+<Note>
+  Coordinates follow the GeoJSON standard: `[longitude, latitude]` (not `[latitude, longitude]`). The coordinate reference system is WGS 84 (EPSG:4326).
+</Note>
+</Tab>
+
+<Tab title="Integration Examples">
+**Mapbox GL JS:**
+
+```javascript
+map.addSource('cities', {
+  type: 'geojson',
+  data: '/data/cities.geojson'
+});
+
+map.addLayer({
+  id: 'city-points',
+  type: 'circle',
+  source: 'cities',
+  paint: {
+    'circle-radius': 4,
+    'circle-color': '#2563EB'
+  }
+});
+```
+
+**Leaflet:**
+
+```javascript
+fetch('/data/cities.geojson')
+  .then(r => r.json())
+  .then(data => {
+    L.geoJSON(data, {
+      pointToLayer: (feature, latlng) =>
+        L.circleMarker(latlng, { radius: 5 }),
+      onEachFeature: (feature, layer) =>
+        layer.bindPopup(feature.properties.name)
+    }).addTo(map);
+  });
+```
+
+**Load into PostGIS:**
+
+```sql
+-- Requires ogr2ogr (GDAL)
+-- ogr2ogr -f PostgreSQL PG:"dbname=geoDb" cities.geojson
+
+-- Or use ST_GeomFromGeoJSON
+INSERT INTO city_points (name, country_code, geom)
+SELECT
+  f->>'name',
+  f->>'country_code',
+  ST_SetSRID(ST_GeomFromGeoJSON(f->'geometry'), 4326)
+FROM jsonb_array_elements(:'geojson'::jsonb->'features') AS f;
 ```
 </Tab>
 </Tabs>
