@@ -225,14 +225,7 @@
         "label": "Encyclopedia",
         "href": "https://countrystatecity.org"
       },
-      {
-        "label": "Donate",
-        "href": "http://docs.countrystatecity.in/donate"
-      },
-      {
-        "label": "Changelog",
-        "href": "http://docs.countrystatecity.in/changelog"
-      }
+
     ],
     "primary": {
       "type": "button",
