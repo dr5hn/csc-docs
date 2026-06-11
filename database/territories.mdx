@@ -1,0 +1,126 @@
+---
+title: "Multi-Level Territories"
+description: "How overseas territories and autonomous regions are dual-modeled as both countries and state subdivisions, and how to query them correctly"
+icon: "map"
+---
+
+Some geographical entities appear in this database at **two levels simultaneously** — as an independent ISO 3166-1 country *and* as an ISO 3166-2 subdivision of a parent country. This is not a bug; it reflects how the ISO standard itself models these territories.
+
+## Why Dual Modeling Exists
+
+A handful of overseas or autonomous territories are listed by ISO 3166 at both levels:
+
+- **ISO 3166-1** assigns them their own two-letter country code (e.g. `MQ` for Martinique).
+- **ISO 3166-2** also lists them as subdivisions of a parent state (e.g. `FR-MQ` as a subdivision of France).
+
+Martinique *is* an integral region of the French Republic — its residents vote in French national elections, use the euro, and are EU citizens — but it also has its own TLD (`.mq`), its own ISO codes, and independent representation in certain international contexts.
+
+**Both representations are kept in sync. Neither is canonical; both are first-class.**
+
+## The 12 French Overseas Territories
+
+| ISO 3166-1 | ISO 3166-2 | Name | State type |
+|:---|:---|:---|:---|
+| `GF` | `FR-GF` | French Guiana | overseas region |
+| `PF` | `FR-PF` | French Polynesia | overseas collectivity |
+| `TF` | `FR-TF` | French Southern and Antarctic Lands | overseas territory |
+| `GP` | `FR-GP` | Guadeloupe | overseas region |
+| `MQ` | `FR-MQ` | Martinique | overseas region |
+| `YT` | `FR-YT` | Mayotte | overseas region |
+| `NC` | `FR-NC` | New Caledonia | overseas collectivity |
+| `RE` | `FR-RE` | Réunion | overseas region |
+| `PM` | `FR-PM` | Saint Pierre and Miquelon | overseas collectivity |
+| `BL` | `FR-BL` | Saint-Barthélemy | overseas collectivity |
+| `MF` | `FR-MF` | Saint-Martin (French part) | overseas collectivity |
+| `WF` | `FR-WF` | Wallis and Futuna | overseas collectivity |
+
+## Other Dual-Modeled Territories
+
+The same pattern applies to territories of other countries:
+
+| Parent | Territory | `countries.iso2` | Notes |
+|:---|:---|:---|:---|
+| `CN` | Hong Kong SAR | `HK` | special administrative region |
+| `CN` | Macau SAR | `MO` | special administrative region |
+| `US` | Puerto Rico | `PR` | outlying area |
+| `US` | Guam | `GU` | outlying area |
+| `US` | American Samoa | `AS` | outlying area |
+| `US` | Northern Mariana Islands | `MP` | outlying area |
+| `US` | U.S. Virgin Islands | `VI` | outlying area |
+| `NO` | Svalbard | `SJ` | arctic region |
+
+## How to Query
+
+Pick the model that matches the question being asked.
+
+### Everything in France (metropolitan + all overseas territories)
+
+Use the `FR` country and traverse via `state_id`:
+
+```sql
+SELECT c.*
+FROM cities c
+JOIN states s ON c.state_id = s.id
+WHERE s.country_code = 'FR';
+-- includes all 12 overseas territories
+```
+
+### Only Martinique (the territory in isolation)
+
+Filter by the territory's own ISO 3166-1 code:
+
+```sql
+SELECT * FROM cities WHERE country_code = 'MQ';
+```
+
+### Metropolitan France only (exclude overseas)
+
+Exclude the 12 overseas codes explicitly:
+
+```sql
+SELECT * FROM cities
+WHERE country_code = 'FR'
+  AND state_code NOT IN (
+    'GF','PF','TF','GP','MQ','YT','NC','RE','PM','BL','MF','WF',
+    '971','972','973','974','976'  -- INSEE codes for DROM
+  );
+```
+
+<Note>
+  The five DROM territories (French Guiana, Guadeloupe, Martinique, Réunion, Mayotte) currently use INSEE numeric codes (`971`–`976`) as their `state_code`, while the overseas collectivities use ISO 3166-2 alphabetic codes. A future update will align all to ISO 3166-2 alphabetic format.
+</Note>
+
+### JavaScript
+
+```javascript
+import { getCitiesOfCountry } from '@countrystatecity/countries';
+
+// All French cities including overseas territories
+const allFrench = await getCitiesOfCountry('FR');
+
+// Martinique only
+const martinique = await getCitiesOfCountry('MQ');
+
+// Metropolitan France only
+const OVERSEAS = new Set(['GF','PF','TF','GP','MQ','YT','NC','RE','PM','BL','MF','WF']);
+const metropolitan = allFrench.filter(c => !OVERSEAS.has(c.country_code));
+```
+
+## Impact on API Responses
+
+When you query `/v1/countries`, both `MQ` (Martinique) and `FR` (France) appear as separate entries. Both return valid states and cities. This is intentional — it ensures that code doing `country_code === 'MQ'` continues to work correctly.
+
+<Warning>
+  If you are building country pickers or dropdowns, you may want to filter out the overseas territories from the top-level country list to avoid showing both "France" and "Martinique" as separate country options. Use the `region`/`subregion` fields or an explicit exclusion list.
+</Warning>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="City Types" icon="building" href="/database/city-types">
+    How the cities.type field works and how to filter to genuine settlements.
+  </Card>
+  <Card title="Database Schema" icon="sitemap" href="/database/schema">
+    Full table definitions including level and parent_id fields on states and cities.
+  </Card>
+</CardGroup>

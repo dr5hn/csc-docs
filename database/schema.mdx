@@ -46,10 +46,18 @@ erDiagram
         int region_id FK
         int subregion_id FK
         string nationality
+        int population
+        decimal gdp
+        decimal area_sq_km
+        string postal_code_format
+        string postal_code_regex
+        json timezones
+        json translations
         decimal latitude
         decimal longitude
         string emoji
         string emojiU
+        string wikiDataId
         timestamp created_at
         timestamp updated_at
     }
@@ -61,9 +69,18 @@ erDiagram
         string country_code
         string country_name
         string state_code
+        string fips_code
+        string iso3166_2
         string type
+        int level
+        int parent_id FK
+        string native
+        string timezone
+        json translations
+        int population
         decimal latitude
         decimal longitude
+        string wikiDataId
         timestamp created_at
         timestamp updated_at
     }
@@ -77,8 +94,27 @@ erDiagram
         int country_id FK
         string country_code
         string country_name
+        string type
+        int level
+        int parent_id FK
+        string native
+        int population
+        string timezone
+        json translations
         decimal latitude
         decimal longitude
+        string wikiDataId
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    postcodes {
+        int id PK
+        string postcode
+        string country_code FK
+        string type
+        string source
+        string locality_name
         string wikiDataId
         timestamp created_at
         timestamp updated_at
@@ -89,6 +125,7 @@ erDiagram
     regions ||--o{ countries : contains
     countries ||--o{ states : contains
     states ||--o{ cities : contains
+    countries ||--o{ postcodes : contains
 ```
 </div>
 
@@ -257,6 +294,38 @@ Unicode emoji flag representation
 Unicode code points for the flag emoji
 </ParamField>
 
+<ParamField path="population" type="integer">
+Country population (may be null for territories with no dedicated census)
+</ParamField>
+
+<ParamField path="gdp" type="decimal">
+Gross domestic product in USD billions (approximate)
+</ParamField>
+
+<ParamField path="area_sq_km" type="decimal">
+Total area in square kilometres
+</ParamField>
+
+<ParamField path="postal_code_format" type="varchar(255)">
+Human-readable postal code format pattern (e.g., `#####` for US zip codes)
+</ParamField>
+
+<ParamField path="postal_code_regex" type="varchar(255)">
+Regular expression for validating postal codes for this country
+</ParamField>
+
+<ParamField path="timezones" type="json">
+JSON array of timezone objects for the country. Each object contains `zoneName`, `gmtOffset`, `gmtOffsetName`, `abbreviation`, and `tzName`.
+</ParamField>
+
+<ParamField path="translations" type="json">
+JSON object of country name translations keyed by locale code (e.g., `"fr": "États-Unis"`, `"de": "Vereinigte Staaten"`). 19 languages supported.
+</ParamField>
+
+<ParamField path="wikiDataId" type="varchar(255)">
+Wikidata identifier for cross-referencing additional metadata
+</ParamField>
+
 **Sample Data:**
 ```json
 {
@@ -277,10 +346,22 @@ Unicode code points for the flag emoji
   "region_id": 2,
   "subregion_id": 21,
   "nationality": "American",
+  "population": 331000000,
+  "gdp": 23000.00,
+  "area_sq_km": 9833517.00,
+  "postal_code_format": "#####-####",
+  "postal_code_regex": "^\\d{5}(-\\d{4})?$",
+  "timezones": [
+    { "zoneName": "America/New_York", "gmtOffset": -18000, "gmtOffsetName": "UTC-05:00", "abbreviation": "EST", "tzName": "Eastern Standard Time" }
+  ],
+  "translations": {
+    "fr": "États-Unis", "de": "Vereinigte Staaten", "hi": "संयुक्त राज्य", "zh-CN": "美国"
+  },
   "latitude": 37.09024000,
   "longitude": -95.71289100,
   "emoji": "🇺🇸",
-  "emojiU": "U+1F1FA U+1F1F8"
+  "emojiU": "U+1F1FA U+1F1F8",
+  "wikiDataId": "Q30"
 }
 ```
 
@@ -313,7 +394,43 @@ Official state/province code when available
 </ParamField>
 
 <ParamField path="type" type="varchar(191)">
-Type of administrative division (state, province, region, etc.)
+Type of administrative division (state, province, region, municipality, etc.)
+</ParamField>
+
+<ParamField path="fips_code" type="varchar(10)">
+FIPS (Federal Information Processing Standards) code, primarily used for US states
+</ParamField>
+
+<ParamField path="iso3166_2" type="varchar(10)">
+ISO 3166-2 subdivision code (e.g., `US-CA`, `IN-MH`, `GB-ENG`)
+</ParamField>
+
+<ParamField path="level" type="integer">
+Hierarchy level within the country. `1` = top-level region/state, `2` = department/province. Used in countries with multi-tier administration (France, Italy). Null for countries with a flat structure.
+</ParamField>
+
+<ParamField path="parent_id" type="integer">
+Foreign key to the parent state row for level-2 subdivisions (e.g., a French department points to its region). Null for level-1 states.
+</ParamField>
+
+<ParamField path="native" type="varchar(255)">
+State name in the local/native language and script
+</ParamField>
+
+<ParamField path="timezone" type="varchar(255)">
+Primary IANA timezone identifier for the state (e.g., `America/Los_Angeles`)
+</ParamField>
+
+<ParamField path="translations" type="json">
+JSON object of state name translations keyed by locale code
+</ParamField>
+
+<ParamField path="population" type="integer">
+State population estimate
+</ParamField>
+
+<ParamField path="wikiDataId" type="varchar(255)">
+Wikidata identifier for cross-referencing additional metadata
 </ParamField>
 
 <ParamField path="latitude" type="decimal(10,8)">
@@ -333,7 +450,16 @@ Geographical longitude coordinate of state center
   "country_code": "US",
   "country_name": "United States",
   "state_code": "CA",
+  "fips_code": "06",
+  "iso3166_2": "US-CA",
   "type": "state",
+  "level": 1,
+  "parent_id": null,
+  "native": "California",
+  "timezone": "America/Los_Angeles",
+  "translations": { "fr": "Californie", "de": "Kalifornien", "hi": "कैलिफ़ोर्निया" },
+  "population": 39538223,
+  "wikiDataId": "Q99",
   "latitude": 36.77826100,
   "longitude": -119.41793240
 }
@@ -375,6 +501,34 @@ ISO 2-letter country code for quick reference
 Country name (denormalized for performance)
 </ParamField>
 
+<ParamField path="type" type="varchar(191)">
+Place classification inherited from GeoNames (e.g., `city`, `town`, `adm2`, `county`). See the [city types reference](/database/city-types) for all 35 values and filtering guidance.
+</ParamField>
+
+<ParamField path="level" type="integer">
+Administrative hierarchy level within the state, mirroring the state-level structure where applicable
+</ParamField>
+
+<ParamField path="parent_id" type="integer">
+Foreign key to the parent city row for nested subdivisions (e.g., a district within a city)
+</ParamField>
+
+<ParamField path="native" type="varchar(255)">
+City name in the local/native language and script
+</ParamField>
+
+<ParamField path="population" type="integer">
+City population estimate
+</ParamField>
+
+<ParamField path="timezone" type="varchar(255)">
+IANA timezone identifier for the city (e.g., `America/Los_Angeles`)
+</ParamField>
+
+<ParamField path="translations" type="json">
+JSON object of city name translations keyed by locale code
+</ParamField>
+
 <ParamField path="latitude" type="decimal(10,8)" required>
 Geographical latitude coordinate
 </ParamField>
@@ -394,15 +548,86 @@ Wikidata identifier for additional reference data
   "name": "Los Angeles",
   "state_id": 1416,
   "state_code": "CA",
-  "state_name": "California", 
+  "state_name": "California",
   "country_id": 231,
   "country_code": "US",
   "country_name": "United States",
+  "type": "adm2",
+  "level": null,
+  "parent_id": null,
+  "native": "Los Angeles",
+  "population": 3898747,
+  "timezone": "America/Los_Angeles",
+  "translations": { "fr": "Los Angeles", "de": "Los Angeles", "hi": "लॉस एंजेलेस" },
   "latitude": 34.05223000,
   "longitude": -118.24368000,
   "wikiDataId": "Q65"
 }
 ```
+
+### 6. Postcodes Table
+
+844,248 postal codes across 125 countries with type classification and source tracking.
+
+<ParamField path="id" type="integer" required>
+Unique identifier for the postcode record (Primary Key)
+</ParamField>
+
+<ParamField path="postcode" type="varchar(20)" required>
+The postal / ZIP code string (e.g., `90210`, `SW1A 1AA`, `110001`)
+</ParamField>
+
+<ParamField path="country_code" type="char(2)" required>
+ISO 3166-1 alpha-2 country code linking to the countries table
+</ParamField>
+
+<ParamField path="type" type="enum">
+Granularity of the postcode. One of:
+- `full` — complete postcode identifying a specific delivery point or small area
+- `outward` — first part of a UK-style postcode identifying the postal district
+- `sector` — intermediate granularity within a district
+- `district` — broadest level, covering an entire postal district
+</ParamField>
+
+<ParamField path="source" type="varchar(255)">
+Data source attribution for the postcode record
+</ParamField>
+
+<ParamField path="locality_name" type="varchar(255)">
+Name of the locality or area associated with this postcode
+</ParamField>
+
+<ParamField path="wikiDataId" type="varchar(255)">
+Wikidata identifier for cross-referencing
+</ParamField>
+
+**Sample Data:**
+```json
+[
+  {
+    "id": 1,
+    "postcode": "90210",
+    "country_code": "US",
+    "type": "full",
+    "source": "GeoNames",
+    "locality_name": "Beverly Hills",
+    "wikiDataId": null
+  },
+  {
+    "id": 2,
+    "postcode": "SW1A 1AA",
+    "country_code": "GB",
+    "type": "full",
+    "source": "GeoNames",
+    "locality_name": "London",
+    "wikiDataId": null
+  }
+]
+```
+
+<Note>
+  The postcodes table is available in the self-hosted database exports. See the [postcodes reference](/database/postcodes) for coverage details and query examples.
+</Note>
 
 ## Indexes and Performance
 

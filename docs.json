@@ -158,7 +158,10 @@
             "group": "Database Documentation",
             "pages": [
               "database/overview",
-              "database/schema"
+              "database/schema",
+              "database/postcodes",
+              "database/city-types",
+              "database/territories"
             ]
           },
           {

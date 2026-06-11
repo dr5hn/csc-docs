@@ -72,6 +72,14 @@ Choose the perfect format for your project. Each format is optimized for specifi
 - Map libraries (Mapbox, Leaflet)
 - Compatible with PostGIS
 </Card>
+
+<Card title="TOON" icon="robot">
+**+2 Credits**
+- LLM and AI applications
+- ~40% fewer tokens than JSON
+- Structured prompts and RAG pipelines
+- Token-efficient data transfer
+</Card>
 </CardGroup>
 
 <Info>
@@ -1596,12 +1604,55 @@ WHERE LENGTH(iso2) != 2 OR iso2 !~ '^[A-Z]{2}$';
 
 ---
 
+## TOON Format (+2 Credits)
+
+TOON is an LLM-optimised format that produces approximately **40% fewer tokens than equivalent JSON** by using a compact tabular notation. It is ideal for feeding geographical data into AI pipelines, RAG systems, or structured prompts where token count directly affects cost and context window usage.
+
+```
+# countries
+id|name|iso2|iso3|capital|currency
+101|India|IN|IND|New Delhi|INR
+231|United States|US|USA|Washington|USD
+232|United Kingdom|GB|GBR|London|GBP
+```
+
+<Tip>
+  TOON is parsed like a TSV/CSV with `|` as the delimiter and `#` as the table header marker. Most CSV parsers can read it with a minor configuration change.
+</Tip>
+
+### Token Comparison
+
+| Format | Tokens (10k cities) | Relative size |
+|---|---:|---:|
+| JSON | ~520,000 | 100% |
+| XML | ~680,000 | 131% |
+| TOON | ~310,000 | ~60% |
+| CSV | ~280,000 | ~54% |
+
+### When to use TOON
+
+<CardGroup cols={2}>
+<Card title="AI / LLM Pipelines" icon="robot">
+  Feed country, state, or city data into prompts, tool responses, or RAG retrieval chunks while staying within model context limits.
+</Card>
+<Card title="Token-Sensitive APIs" icon="bolt">
+  Reduce token costs when passing geographical data to Claude, GPT, or Gemini APIs where you pay per token.
+</Card>
+</CardGroup>
+
+### TOON spec
+
+The full TOON specification and reference parser are maintained at [github.com/toon-format/toon](https://github.com/toon-format/toon).
+
+---
+
 <Note>
 **Need help choosing a format?** Consider your primary use case:
 - **Quick prototyping**: Start with JSON for web apps
 - **Data analysis**: Use CSV for spreadsheet compatibility
 - **Production database**: Invest in SQL for proper setup
 - **Configuration management**: YAML for readability
+- **AI / LLM pipelines**: Use TOON for token efficiency
 
 <Card
   title="View Pricing"
