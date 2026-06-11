@@ -3,7 +3,21 @@
     "allow": [
       "WebFetch(domain:countrystatecity.org)",
       "Bash(git push:*)",
-      "Bash(gh release create v1.0.2 --title v1.0.2 --notes ':*)"
+      "Bash(gh release create v1.0.2 --title v1.0.2 --notes ':*)",
+      "Bash(gh repo *)",
+      "Bash(npm run *)",
+      "Bash(npm install *)",
+      "Bash(npm list *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(gh run *)",
+      "Bash(gh api *)",
+      "Bash(python3 -m json.tool /Users/sozoadmin/Rahul/csc-docs/docs.json)",
+      "Bash(sed -i '' 's/247+ countries/250 countries/g' /Users/sozoadmin/Rahul/csc-docs/index.mdx /Users/sozoadmin/Rahul/csc-docs/api/introduction.mdx /Users/sozoadmin/Rahul/csc-docs/api/faq.mdx /Users/sozoadmin/Rahul/csc-docs/llms.txt)",
+      "Bash(sed -i '' 's/247+ countries/250 countries/g' /Users/sozoadmin/Rahul/csc-docs/tools/export-tool/faq.mdx)",
+      "Bash(sed -i '' 's/~247 countries/~250 countries/g' /Users/sozoadmin/Rahul/csc-docs/tools/export-tool/faq.mdx)",
+      "Bash(sed -i '' 's/total_records>247/total_records>250/g' /Users/sozoadmin/Rahul/csc-docs/tools/export-tool/formats.mdx)",
+      "Bash(sed -i '' 's/total_countries: 247/total_countries: 250/g' /Users/sozoadmin/Rahul/csc-docs/tools/export-tool/formats.mdx)"
     ]
   }
 }
