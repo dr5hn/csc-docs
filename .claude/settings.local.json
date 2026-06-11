@@ -17,7 +17,12 @@
       "Bash(sed -i '' 's/247+ countries/250 countries/g' /Users/sozoadmin/Rahul/csc-docs/tools/export-tool/faq.mdx)",
       "Bash(sed -i '' 's/~247 countries/~250 countries/g' /Users/sozoadmin/Rahul/csc-docs/tools/export-tool/faq.mdx)",
       "Bash(sed -i '' 's/total_records>247/total_records>250/g' /Users/sozoadmin/Rahul/csc-docs/tools/export-tool/formats.mdx)",
-      "Bash(sed -i '' 's/total_countries: 247/total_countries: 250/g' /Users/sozoadmin/Rahul/csc-docs/tools/export-tool/formats.mdx)"
+      "Bash(sed -i '' 's/total_countries: 247/total_countries: 250/g' /Users/sozoadmin/Rahul/csc-docs/tools/export-tool/formats.mdx)",
+      "Bash(sed -i '' 's/5,000+ states\\\\/provinces/5,299+ states\\\\/provinces/g' /Users/sozoadmin/Rahul/csc-docs/index.mdx /Users/sozoadmin/Rahul/csc-docs/api/faq.mdx /Users/sozoadmin/Rahul/csc-docs/api/sdks/python.mdx /Users/sozoadmin/Rahul/csc-docs/tools/export-tool/faq.mdx)",
+      "Bash(sed -i '' 's/5000+ states\\\\/provinces/5,299+ states\\\\/provinces/g' /Users/sozoadmin/Rahul/csc-docs/llms.txt /Users/sozoadmin/Rahul/csc-docs/api/introduction.mdx)",
+      "Bash(sed -i '' 's/5000+ states,/5,299+ states,/g' /Users/sozoadmin/Rahul/csc-docs/api/introduction.mdx)",
+      "Bash(sed -i '' 's/5000+ states/5,299+ states/g' /Users/sozoadmin/Rahul/csc-docs/database/overview.mdx /Users/sozoadmin/Rahul/csc-docs/api/endpoints/get-all-states.mdx)",
+      "Bash(sed -i '' 's/~5,000 states/~5,299 states/g' /Users/sozoadmin/Rahul/csc-docs/tools/export-tool/faq.mdx)"
     ]
   }
 }
