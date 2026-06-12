@@ -18,8 +18,8 @@ The `countrystatecity` Python packages provide access to countries, states, citi
 | `countrystatecity-timezones` | Released | IANA timezone data and time conversion utilities |
 | `countrystatecity-currencies` | Released | Currency codes, symbols, and country associations |
 | `countrystatecity-translations` | Released | Country name translations in 19 languages |
+| `countrystatecity-phonecodes` | Released | International dialing codes for 250+ countries |
 | `countrystatecity-languages` | Coming soon | Language codes and metadata |
-| `countrystatecity-phonecodes` | Coming soon | International dialing codes and validation |
 
 ## Installation
 
@@ -30,6 +30,7 @@ pip install countrystatecity-countries
 pip install countrystatecity-timezones
 pip install countrystatecity-currencies
 pip install countrystatecity-translations
+pip install countrystatecity-phonecodes
 ```
 
 ## Usage
@@ -163,6 +164,31 @@ japanese = get_translations_by_language("ja")
 print(f"Japanese translations: {len(japanese)}")
 ```
 
+### Phone Codes
+
+```python
+from countrystatecity_phonecodes import (
+    get_all_phonecodes,
+    get_phonecode_by_country,
+    get_countries_by_phonecode,
+    search_phonecodes,
+)
+
+# Phone code for a country
+us = get_phonecode_by_country("US")
+print(f"+{us.phoneCode} — {us.countryName}")  # +1 — United States
+
+# All countries sharing a dialing code
+plus1 = get_countries_by_phonecode("1")
+print(f"{len(plus1)} countries use +1")  # 25 countries use +1
+
+# Works with or without + prefix
+plus44 = get_countries_by_phonecode("+44")
+
+# Search by country name, code, or phone code
+results = search_phonecodes("united")
+```
+
 ## Features
 
 <CardGroup cols={2}>
@@ -189,6 +215,7 @@ pip install --upgrade countrystatecity-countries
 pip install --upgrade countrystatecity-timezones
 pip install --upgrade countrystatecity-currencies
 pip install --upgrade countrystatecity-translations
+pip install --upgrade countrystatecity-phonecodes
 ```
 
 ## Source
@@ -208,5 +235,8 @@ pip install --upgrade countrystatecity-translations
   </Card>
   <Card title="countrystatecity-translations" icon="python" href="https://pypi.org/project/countrystatecity-translations/">
     Translations data on PyPI.
+  </Card>
+  <Card title="countrystatecity-phonecodes" icon="python" href="https://pypi.org/project/countrystatecity-phonecodes/">
+    Phone codes data on PyPI.
   </Card>
 </CardGroup>

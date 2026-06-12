@@ -1,10 +1,10 @@
 ---
 title: "npm Packages"
-description: "Official @countrystatecity npm packages for Node.js and browser environments — countries, timezones, currencies, and translations"
+description: "Official @countrystatecity npm packages for Node.js and browser environments — countries, timezones, currencies, translations, and a CLI tool"
 icon: "npm"
 ---
 
-The `@countrystatecity` monorepo publishes five packages to npm. All data is bundled directly — no API key or network requests needed.
+The `@countrystatecity` monorepo publishes six packages to npm. All data is bundled directly — no API key or network requests needed (except the CLI, which calls the REST API).
 
 ## Packages
 
@@ -15,6 +15,7 @@ The `@countrystatecity` monorepo publishes five packages to npm. All data is bun
 | [`@countrystatecity/timezones`](https://www.npmjs.com/package/@countrystatecity/timezones) | Node.js / Server | 392 IANA timezones with conversion utilities | &lt;20KB |
 | [`@countrystatecity/currencies`](https://www.npmjs.com/package/@countrystatecity/currencies) | Node.js / Browser | 155 ISO 4217 currencies with symbols and formatting | &lt;3KB |
 | [`@countrystatecity/translations`](https://www.npmjs.com/package/@countrystatecity/translations) | Node.js / Browser | Country name translations in 19 languages | &lt;3KB |
+| [`@countrystatecity/cli`](https://www.npmjs.com/package/@countrystatecity/cli) | Terminal | Search, explore, and generate code from geographic data | – |
 
 ## Installation
 
@@ -35,6 +36,9 @@ npm install @countrystatecity/currencies
 
 # Translations
 npm install @countrystatecity/translations
+
+# CLI (global install)
+npm install -g @countrystatecity/cli
 ```
 
 <Note>
@@ -123,6 +127,38 @@ getTranslationOrFallback(entry, 'xx');  // "India"  ← falls back to English
 ```
 
 **Supported locales:** `ar`, `br`, `de`, `es`, `fa`, `fr`, `hi`, `hr`, `it`, `ja`, `ko`, `nl`, `pl`, `pt`, `pt-BR`, `ru`, `tr`, `uk`, `zh-CN`
+
+### CLI
+
+```bash
+# Authenticate with your free API key
+csc auth login
+
+# Search countries, states, and cities
+csc search countries
+csc search states --country IN
+csc search cities --country IN --state MH
+
+# Get detailed info as JSON
+csc get country US --json
+
+# Interactive browser: pick country → state → view cities or generate code
+csc explore
+
+# Generate a React dropdown component (Supporter plan+)
+csc generate dropdown --entity countries --format react
+csc generate dropdown --entity states --format react --country IN
+
+# Generate a Prisma seed file (Supporter plan+)
+csc generate seed --entity countries --format prisma
+
+# Open the online bulk export tool
+csc export
+```
+
+<Note>
+  Code generation (`csc generate`) requires a Supporter plan or above. Run `csc upgrade` to view plans and pricing.
+</Note>
 
 ## Data Updates
 
