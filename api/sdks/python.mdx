@@ -4,7 +4,7 @@ description: "Official countrystatecity Python packages — type-safe, lazily lo
 icon: "python"
 ---
 
-The `countrystatecity` Python packages provide access to countries, states, and cities data with full type hints, Pydantic models, and lazy loading. All data is bundled directly — no API key or network requests needed.
+The `countrystatecity` Python packages provide access to countries, states, cities, timezones, currencies, and translations data with full type hints, Pydantic models, and lazy loading. All data is bundled directly — no API key or network requests needed.
 
 <Note>
   Always install using the suffixed package name (e.g. `countrystatecity-countries`). There is no bare `countrystatecity` package on PyPI — `pip install countrystatecity` will not work.
@@ -15,15 +15,21 @@ The `countrystatecity` Python packages provide access to countries, states, and 
 | Package | Status | Description |
 |---|---|---|
 | `countrystatecity-countries` | Released | Countries, states, and cities with lazy loading |
-| `countrystatecity-timezones` | Coming soon | IANA timezone data and utilities |
-| `countrystatecity-currencies` | Coming soon | Currency codes, symbols, and formatting |
+| `countrystatecity-timezones` | Released | IANA timezone data and time conversion utilities |
+| `countrystatecity-currencies` | Released | Currency codes, symbols, and country associations |
+| `countrystatecity-translations` | Released | Country name translations in 19 languages |
 | `countrystatecity-languages` | Coming soon | Language codes and metadata |
 | `countrystatecity-phonecodes` | Coming soon | International dialing codes and validation |
 
 ## Installation
 
+Install only what you need:
+
 ```bash
 pip install countrystatecity-countries
+pip install countrystatecity-timezones
+pip install countrystatecity-currencies
+pip install countrystatecity-translations
 ```
 
 ## Usage
@@ -88,6 +94,75 @@ print(gb.region)         # Europe
 print(gb.timezones)      # [...]
 ```
 
+### Timezones
+
+```python
+from countrystatecity_timezones import (
+    get_all_timezones,
+    get_timezones_by_country,
+    get_timezone_by_zone_name,
+    convert_time,
+)
+
+# Timezones for a country
+timezones = get_timezones_by_country("US")
+print(f"US timezones: {len(timezones)}")
+
+# Lookup by zone name
+tz = get_timezone_by_zone_name("America/New_York")
+print(f"{tz.zone_name} — {tz.gmt_offset_name}")
+
+# Convert time between zones
+from datetime import datetime
+dt = datetime(2024, 1, 1, 12, 0, 0)
+converted = convert_time(dt, "America/New_York", "Asia/Kolkata")
+```
+
+### Currencies
+
+```python
+from countrystatecity_currencies import (
+    get_all_currencies,
+    get_currency_by_country,
+    get_countries_by_currency,
+    search_currencies,
+)
+
+# Currency for a country
+currency = get_currency_by_country("US")
+print(f"{currency.symbol} {currency.name} ({currency.code})")
+# $ United States Dollar (USD)
+
+# All countries using a currency
+countries = get_countries_by_currency("EUR")
+print(f"Countries using EUR: {len(countries)}")
+
+# Search by name
+results = search_currencies("dollar")
+```
+
+### Translations
+
+```python
+from countrystatecity_translations import (
+    get_all_translations,
+    get_translations_by_country,
+    get_translations_by_language,
+    get_translation,
+)
+
+# Country name in a specific language
+translation = get_translation("US", "fr")
+print(translation.translation)  # États-Unis
+
+# All translations for a country (all 19 languages)
+translations = get_translations_by_country("IN")
+
+# All countries translated into Japanese
+japanese = get_translations_by_language("ja")
+print(f"Japanese translations: {len(japanese)}")
+```
+
 ## Features
 
 <CardGroup cols={2}>
@@ -107,10 +182,13 @@ print(gb.timezones)      # [...]
 
 ## Data Updates
 
-To get the latest geographical data, update the package:
+To get the latest data, upgrade any package:
 
 ```bash
 pip install --upgrade countrystatecity-countries
+pip install --upgrade countrystatecity-timezones
+pip install --upgrade countrystatecity-currencies
+pip install --upgrade countrystatecity-translations
 ```
 
 ## Source
@@ -119,7 +197,16 @@ pip install --upgrade countrystatecity-countries
   <Card title="GitHub Repository" icon="github" href="https://github.com/dr5hn/countrystatecity-pypi">
     View source, open issues, or contribute.
   </Card>
-  <Card title="PyPI" icon="python" href="https://pypi.org/project/countrystatecity-countries/">
-    Browse the published package on PyPI.
+  <Card title="countrystatecity-countries" icon="python" href="https://pypi.org/project/countrystatecity-countries/">
+    Countries, states, and cities on PyPI.
+  </Card>
+  <Card title="countrystatecity-timezones" icon="python" href="https://pypi.org/project/countrystatecity-timezones/">
+    Timezone data on PyPI.
+  </Card>
+  <Card title="countrystatecity-currencies" icon="python" href="https://pypi.org/project/countrystatecity-currencies/">
+    Currency data on PyPI.
+  </Card>
+  <Card title="countrystatecity-translations" icon="python" href="https://pypi.org/project/countrystatecity-translations/">
+    Translations data on PyPI.
   </Card>
 </CardGroup>
