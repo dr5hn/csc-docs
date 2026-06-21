@@ -199,7 +199,7 @@ countries = csc.get_countries()
 #### Cards for highlighting features
 ```mdx
 <Card title="Countries API" icon="globe" href="/api/countries">
-Access data for 247+ countries with ISO codes, phone codes, and currencies.
+Access data for 250+ countries with ISO codes, phone codes, and currencies.
 </Card>
 
 <CardGroup cols={2}>
@@ -207,7 +207,7 @@ Access data for 247+ countries with ISO codes, phone codes, and currencies.
   Get states, provinces, and regions for any country.
 </Card>
 <Card title="Cities API" icon="building" href="/api/cities">
-  Access 150,000+ cities with coordinates and timezone data.
+  Access 153,000+ cities with coordinates and timezone data.
 </Card>
 </CardGroup>
 ```
