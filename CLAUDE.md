@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 This is a Mintlify-based documentation site for the Country State City (CSC) ecosystem. The ecosystem includes:
-- **CSC API**: REST API for 247+ countries, 5,000+ states, 150,000+ cities
+- **CSC API**: REST API for 250+ countries, 5,299+ states, 153,765+ cities
 - **Database**: Self-hosted geographical data in multiple formats
 - **Update Tool**: Community data submission and corrections
 - **Export Tool**: Data export in JSON, CSV, SQL, XML formats
