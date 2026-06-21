@@ -36,14 +36,14 @@ npm run update-database-stats
    Regions: 6
    Subregions: 22
    Countries: 250
-   States: 5,038
-   Cities: 151,024
+   States: 5,299
+   Cities: 153,765
 
 📝 Updating overview.mdx file...
 ✅ Successfully updated overview.mdx with new statistics
 
 🎉 Successfully updated database statistics!
-📅 Updated date: 21st September 2025
+📅 Updated date: 21st June 2026
 ```
 
 ### sync-changelog.js

@@ -53,8 +53,8 @@ function parseStatistics(readmeContent) {
   // Total Regions : 6 <br>
   // Total Sub Regions : 22 <br>
   // Total Countries : 250 <br>
-  // Total States/Regions/Municipalities : 5,038 <br>
-  // Total Cities/Towns/Districts : 151,024 <br>
+  // Total States/Regions/Municipalities : 5,299 <br>
+  // Total Cities/Towns/Districts : 153,765 <br>
 
   const patterns = [
     /Total\s+Regions?\s*:\s*(\d+(?:,\d+)*)/i,

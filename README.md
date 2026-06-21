@@ -10,7 +10,7 @@
 
 The Country State City ecosystem is a complete geographical data solution that provides developers with:
 
-- **REST API**: Access to 247+ countries, 5,000+ states/provinces, and 150,000+ cities
+- **REST API**: Access to 250+ countries, 5,299+ states/provinces, and 153,765+ cities
 - **Database**: Ready-to-use geographical data in multiple database formats
 - **Tools**: Export and update tools for data management
 - **SDKs**: Official libraries for popular programming languages
