@@ -17,12 +17,28 @@ Choose the perfect format for your project. Each format is optimized for specifi
 - Mobile app backends
 </Card>
 
+<Card title="NDJSON" icon="list">
+**+2 Credits**
+- Streaming and ETL pipelines
+- Line-by-line processing
+- Bulk loading (BigQuery, Elasticsearch)
+- Append-only data logs
+</Card>
+
 <Card title="CSV" icon="table">
 **+3 Credits**
 - Spreadsheet analysis
 - Data science workflows
 - Excel/Google Sheets
 - BI tools and dashboards
+</Card>
+
+<Card title="Markdown" icon="hashtag">
+**+3 Credits**
+- Documentation and READMEs
+- Wikis and knowledge bases
+- Pull-request summaries
+- Human-readable tables
 </Card>
 
 <Card title="XML" icon="code">
@@ -87,14 +103,6 @@ Choose the perfect format for your project. Each format is optimized for specifi
 - Spatial queries
 - Map libraries (Mapbox, Leaflet)
 - Compatible with PostGIS
-</Card>
-
-<Card title="TOON" icon="robot">
-**+2 Credits**
-- LLM and AI applications
-- ~40% fewer tokens than JSON
-- Structured prompts and RAG pipelines
-- Token-efficient data transfer
 </Card>
 </CardGroup>
 
@@ -1818,45 +1826,57 @@ WHERE LENGTH(iso2) != 2 OR iso2 !~ '^[A-Z]{2}$';
 
 ---
 
-## TOON Format (+2 Credits)
+## NDJSON Format (+2 Credits)
 
-TOON is an LLM-optimised format that produces approximately **40% fewer tokens than equivalent JSON** by using a compact tabular notation. It is ideal for feeding geographical data into AI pipelines, RAG systems, or structured prompts where token count directly affects cost and context window usage.
+NDJSON (Newline-Delimited JSON) writes one JSON object per line with no enclosing array, so each line is an independent, fully-valid JSON record. This makes it ideal for streaming, append-only logs, and big-data tools that process input line by line without loading the whole file into memory.
 
 ```
-# countries
-id|name|iso2|iso3|capital|currency
-101|India|IN|IND|New Delhi|INR
-231|United States|US|USA|Washington|USD
-232|United Kingdom|GB|GBR|London|GBP
+{"id":101,"name":"India","iso2":"IN","iso3":"IND","capital":"New Delhi","currency":"INR"}
+{"id":231,"name":"United States","iso2":"US","iso3":"USA","capital":"Washington","currency":"USD"}
+{"id":232,"name":"United Kingdom","iso2":"GB","iso3":"GBR","capital":"London","currency":"GBP"}
 ```
 
 <Tip>
-  TOON is parsed like a TSV/CSV with `|` as the delimiter and `#` as the table header marker. Most CSV parsers can read it with a minor configuration change.
+  Because each line stands alone, you can stream an NDJSON export straight into tools like `jq`, BigQuery, ClickHouse, Spark, or Elasticsearch's bulk API with no array-unwrapping step.
 </Tip>
 
-### Token Comparison
-
-| Format | Tokens (10k cities) | Relative size |
-|---|---:|---:|
-| JSON | ~520,000 | 100% |
-| XML | ~680,000 | 131% |
-| TOON | ~310,000 | ~60% |
-| CSV | ~280,000 | ~54% |
-
-### When to use TOON
+### When to use NDJSON
 
 <CardGroup cols={2}>
-<Card title="AI / LLM Pipelines" icon="robot">
-  Feed country, state, or city data into prompts, tool responses, or RAG retrieval chunks while staying within model context limits.
+<Card title="Streaming & ETL" icon="bolt">
+  Process records one line at a time in data pipelines without buffering the entire dataset in memory.
 </Card>
-<Card title="Token-Sensitive APIs" icon="bolt">
-  Reduce token costs when passing geographical data to Claude, GPT, or Gemini APIs where you pay per token.
+<Card title="Bulk loading" icon="database">
+  Feed warehouses and search engines (BigQuery, ClickHouse, Elasticsearch) that natively accept newline-delimited JSON.
 </Card>
 </CardGroup>
 
-### TOON spec
+## Markdown Format (+3 Credits)
 
-The full TOON specification and reference parser are maintained at [github.com/toon-format/toon](https://github.com/toon-format/toon).
+The Markdown export renders your selected data as GitHub-flavoured Markdown tables — one table per dataset, with a header row and one row per record. It is meant for documentation, READMEs, wikis, and pull-request descriptions where the data needs to be readable at a glance without any extra tooling.
+
+```
+| id  | name           | iso2 | iso3 | capital    | currency |
+| --- | -------------- | ---- | ---- | ---------- | -------- |
+| 101 | India          | IN   | IND  | New Delhi  | INR      |
+| 231 | United States  | US   | USA  | Washington | USD      |
+| 232 | United Kingdom | GB   | GBR  | London     | GBP      |
+```
+
+<Tip>
+  Markdown is best for smaller, curated exports embedded in docs. For large datasets, prefer CSV or JSON — a table with tens of thousands of rows is impractical to render in a Markdown viewer.
+</Tip>
+
+### When to use Markdown
+
+<CardGroup cols={2}>
+<Card title="Documentation" icon="book">
+  Drop ready-made tables into READMEs, wikis, or Mintlify / Docusaurus pages.
+</Card>
+<Card title="Reports & PRs" icon="file-lines">
+  Share a quick, readable snapshot of geographical data in issues, pull requests, or notes.
+</Card>
+</CardGroup>
 
 ---
 
@@ -1866,7 +1886,7 @@ The full TOON specification and reference parser are maintained at [github.com/t
 - **Data analysis**: Use CSV for spreadsheet compatibility
 - **Production database**: Invest in SQL for proper setup
 - **Configuration management**: YAML for readability
-- **AI / LLM pipelines**: Use TOON for token efficiency
+- **Streaming & big data**: Use NDJSON for line-delimited records
 
 <Card
   title="View Pricing"
