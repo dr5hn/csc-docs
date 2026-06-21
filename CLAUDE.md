@@ -36,6 +36,12 @@ npm run sync-changelog
 
 # Update database statistics from GitHub
 npm run update-database-stats
+
+# Regenerate per-tier field-availability tables from csc-app sources
+npm run sync-tier-matrices
+
+# CI-friendly drift check (exits 1 on drift, no writes)
+npm run check-tier-matrices
 ```
 
 ## Architecture & Structure
@@ -73,8 +79,28 @@ Located in `scripts/` directory:
 
 - **sync-changelog.js**: Fetches and synchronizes changelog data
 - **update-database-stats.js**: Fetches latest stats from GitHub repo and updates `database/overview.mdx`
+- **sync-tier-matrices.js**: Reads `services/dataAccessService.ts` and `config/pricingTiers.ts` from csc-app and rewrites `<!-- AUTOGEN:tier-matrix:<entity> -->` blocks in `api/endpoints/*.mdx`. Source path defaults to `../csc-app/api/src` (sibling checkout); override with `--source <path>` or `CSC_APP_SRC` env. Run `--check` mode in CI to fail on drift.
 
-Both scripts use Node.js 18+ built-in fetch and include comprehensive error handling.
+All scripts use Node.js 18+ built-in fetch and include comprehensive error handling.
+
+### Tier-Matrix Drift Workflow
+
+The "Tier-Based Field Availability" tables in each endpoint doc are generated from csc-app's source-of-truth files. After any change to `dataAccessService.ts` (which fields each access level returns) or `pricingTiers.ts` (which plans map to which `dataAccessLevel`), regenerate the docs:
+
+```bash
+cd /path/to/csc-docs
+npm run sync-tier-matrices
+git diff   # inspect the regenerated tables
+```
+
+To add a tier matrix to a new endpoint doc, wrap a placeholder with the markers and run the generator:
+
+```mdx
+<!-- AUTOGEN:tier-matrix:countries START -->
+<!-- AUTOGEN:tier-matrix:countries END -->
+```
+
+Valid entity names: `countries`, `states`, `cities`, `regions`, `subregions` (whatever keys exist in `FIELD_ACCESS` in csc-app).
 
 ## Writing Guidelines
 
