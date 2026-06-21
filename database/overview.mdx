@@ -77,13 +77,14 @@ The database is available in multiple formats to suit different technical requir
       - **XML** (.xml) - Structured markup format
       - **YAML** (.yaml) - Human-readable data serialization
       - **GeoJSON** (.geojson) - Standard geospatial format for mapping libraries
+      - **TOON** (.toon) - Token-Oriented Object Notation, ~40% fewer LLM tokens than JSON
     </div>
   </Tab>
   
   <Tab title="Analytics">
     <div className="space-y-3">
       - **DuckDB** - Analytical database (via conversion from SQLite)
-      - **Parquet** - Columnar storage format (planned)
+      - **Parquet** (.parquet) - Columnar, Snappy-compressed format for analytics & OLAP tooling
     </div>
   </Tab>
 </Tabs>
@@ -92,16 +93,16 @@ The database is available in multiple formats to suit different technical requir
 
 Different data combinations are available depending on your needs:
 
-| File Type | JSON | MySQL | PostgreSQL | SQLite | SQL Server | MongoDB | XML | YAML | CSV | GeoJSON |
-|-----------|------|-------|------------|--------|------------|---------|-----|------|-----|---------|
-| **Regions** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| **Subregions** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| **Countries** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **States** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Cities** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Country+States** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Country+Cities** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Complete World** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| File Type | JSON | MySQL | PostgreSQL | SQLite | SQL Server | MongoDB | XML | YAML | CSV | GeoJSON | TOON | Parquet |
+|-----------|------|-------|------------|--------|------------|---------|-----|------|-----|---------|------|---------|
+| **Regions** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ |
+| **Subregions** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ |
+| **Countries** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **States** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Cities** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Country+States** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Country+Cities** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Complete World** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
 <Note>
 Hierarchical combinations (Country+States, Country+Cities) are primarily available in JSON format for optimal nested data representation.
