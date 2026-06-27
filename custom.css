@@ -1,0 +1,29 @@
+/* MakeMySiteLive banner — white bg, black text, clickable */
+#banner {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+#banner a,
+#banner a span,
+#banner span,
+#banner p {
+  color: #111827 !important;
+  text-decoration: none !important;
+}
+
+#banner a:hover {
+  opacity: 0.75 !important;
+}
+
+#banner a::before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  background: url('/images/makemysitelive-icon.png') no-repeat center / contain;
+  vertical-align: middle;
+  margin-right: 8px;
+  border-radius: 3px;
+}

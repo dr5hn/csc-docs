@@ -276,5 +276,9 @@
   },
   "search": {
     "prompt": "Search the documentation..."
+  },
+  "customCss": ["/custom.css"],
+  "banner": {
+    "content": "[**MakeMySiteLive** — Publish your website in under 2 minutes](https://makemysitelive.com)"
   }
 }

@@ -6,8 +6,8 @@
   "scripts": {
     "sync-changelog": "node scripts/sync-changelog.js",
     "update-database-stats": "node scripts/update-database-stats.js",
-    "dev": "mintlify dev",
-    "build": "mintlify build"
+    "dev": "npx mintlify dev",
+    "build": "npx mintlify build"
   },
   "keywords": ["documentation", "geography", "api", "countries", "states", "cities"],
   "author": "Country State City Team",
