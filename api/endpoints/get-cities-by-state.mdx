@@ -35,6 +35,14 @@ Retrieve all cities within a specific state or province using both the country's
   Search filter on name. Case-insensitive match on `name` and `native` fields. Minimum 2 characters. **Requires Supporter+ plan.** Without this parameter, all results are returned (no plan restriction for search).
 </ParamField>
 
+<ParamField query="kind" type="string">
+  Filter by derived place classification. Comma-separated list of `settlement`, `administrative`, `section`, `unknown` (e.g. `?kind=settlement` or `?kind=settlement,section`). Free on every plan — no tier restriction. Invalid values return a `400` error listing the accepted values. See [City Types](/database/city-types) for what each value covers and how it's derived from `type`.
+</ParamField>
+
+<ParamField query="type" type="string">
+  Filter by the raw source `type` value. Comma-separated list of one or more values from the [City Types](/database/city-types) reference (e.g. `?type=city,adm2`). **Requires Supporter+ plan** — matches the same tier gate as the `type` response field. Unrecognized values simply match zero rows rather than erroring.
+</ParamField>
+
 ## Response
 
 <ResponseField name="id" type="integer">
@@ -45,7 +53,11 @@ Retrieve all cities within a specific state or province using both the country's
   Official name of the city
 </ResponseField>
 
-<Info>City responses on the **Basic** tier only return `id` and `name`. Upgrading to **Supporter+** unlocks `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, and `native`. **Professional+** adds `translations` and `wikiDataId`. See **Tier-Based Field Availability** below.</Info>
+<ResponseField name="kind" type="string">
+  Derived classification of the place: one of `settlement`, `administrative`, `section`, or `unknown`. Computed from `type` — available on every tier, including **Basic**. See [City Types](/database/city-types) for the full mapping.
+</ResponseField>
+
+<Info>City responses on the **Basic** tier return `id`, `name`, and `kind`. Upgrading to **Supporter+** unlocks `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, and `native`. **Professional+** adds `translations` and `wikiDataId`. See **Tier-Based Field Availability** below.</Info>
 
 <RequestExample>
 ```bash cURL
@@ -55,6 +67,11 @@ curl -X GET 'https://api.countrystatecity.in/v1/countries/IN/states/MH/cities' \
 
 ```bash cURL (with search)
 curl -X GET 'https://api.countrystatecity.in/v1/countries/IN/states/MH/cities?q=pune' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (filter by kind)
+curl -X GET 'https://api.countrystatecity.in/v1/countries/IN/states/MH/cities?kind=settlement' \
   -H 'X-CSCAPI-KEY: YOUR_API_KEY'
 ```
 
@@ -78,6 +95,27 @@ def get_cities_by_state(country_code, state_code):
 cities = get_cities_by_state('IN', 'MH')
 ```
 
+```python Python (filter by kind)
+import requests
+
+def get_settlements_by_state(country_code, state_code):
+    response = requests.get(
+      f'https://api.countrystatecity.in/v1/countries/{country_code}/states/{state_code}/cities',
+      params={'kind': 'settlement'},
+      headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+    )
+
+    if response.ok:
+        cities = response.json()
+        print(f'Found {len(cities)} settlements in {state_code}, {country_code}')
+        return cities
+    else:
+        print('State not found or no cities available')
+        return []
+
+cities = get_settlements_by_state('IN', 'MH')
+```
+
 ```javascript JavaScript
 const getCitiesByState = async (countryCode, stateCode) => {
   const response = await fetch(
@@ -98,6 +136,26 @@ const getCitiesByState = async (countryCode, stateCode) => {
 };
 
 getCitiesByState('IN', 'MH');
+```
+
+```javascript JavaScript (filter by kind)
+const getSettlementsByState = async (countryCode, stateCode) => {
+  const response = await fetch(
+    `https://api.countrystatecity.in/v1/countries/${countryCode}/states/${stateCode}/cities?kind=settlement`,
+    { headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' } }
+  );
+
+  if (response.ok) {
+    const cities = await response.json();
+    console.log(`Found ${cities.length} settlements in ${stateCode}, ${countryCode}`);
+    return cities;
+  } else {
+    console.error('State not found or no cities available');
+    return [];
+  }
+};
+
+getSettlementsByState('IN', 'MH');
 ```
 
 ```php PHP
@@ -241,9 +299,9 @@ cities = get_cities_by_state('IN', 'MH')
 <ResponseExample>
 ```json 200 - Basic tier (Community, Starter, Legacy)
 [
-  { "id": 133024, "name": "Mumbai" },
-  { "id": 132332, "name": "Pune" },
-  { "id": 133351, "name": "Nashik" }
+  { "id": 133024, "name": "Mumbai", "kind": "unknown" },
+  { "id": 132332, "name": "Pune", "kind": "settlement" },
+  { "id": 133351, "name": "Nashik", "kind": "settlement" }
 ]
 ```
 
@@ -252,6 +310,7 @@ cities = get_cities_by_state('IN', 'MH')
   {
     "id": 133024,
     "name": "Mumbai",
+    "kind": "unknown",
     "state_id": 4008,
     "state_code": "MH",
     "country_id": 101,
@@ -388,7 +447,7 @@ This endpoint provides the optimal balance between data size and specificity, ma
 
 | Tier | Plans | Fields |
 |------|-------|--------|
-| **Basic** | Community, Starter, Legacy | `id`, `name` |
+| **Basic** | Community, Starter, Legacy | `id`, `name`, `kind` |
 | **Coordinates** | Supporter | All Basic **+** `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, `native` |
 | **Full** | Professional, Business | All Coordinates **+** `translations`, `wikiDataId` |
 

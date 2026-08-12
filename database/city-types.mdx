@@ -1,60 +1,89 @@
 ---
 title: "City Types"
-description: "Reference for the 35 distinct values of the cities.type field, their meanings, and how to filter down to genuine settlements"
+description: "Reference for the 35 distinct values of the cities.type field, the derived kind classification, and how to filter for genuine settlements via the API or raw data"
 icon: "building"
 ---
 
 Every city record carries an optional `type` field describing what kind of place it is. The value is inherited from the upstream [GeoNames](https://www.geonames.org/) feature classification.
 
+<Tip>
+  Building against the API? Skip manual filtering — pass `?kind=settlement` on [Get Cities by Country](/api/endpoints/get-cities-by-country) or [Get Cities by State](/api/endpoints/get-cities-by-state) to get genuine settlements directly, no exclusion list required. The manual `type`-based filtering further down this page is for teams running their own copy of the raw database outside the API.
+</Tip>
+
 <Note>
   The `type` field mixes two ideas — *what a place is* (`city`, `town`, `village`) and *what administrative role it fills* (`adm2`, `county`, `parish`). The same place can be tagged either way. For example, **Dallas** is `adm2` because it is the seat of Dallas County, and major Australian cities are `adm1` because they are seats of state-level governments.
 </Note>
 
+## The `kind` Field
+
+Every city response also includes a derived `kind` field — a simplified classification computed server-side from `type`, so you don't have to memorize which of the 35 raw values count as real places. It's one of four values:
+
+| `kind` | Meaning |
+|---|---|
+| `settlement` | An actual populated place — city, town, village, or similar |
+| `administrative` | A governed administrative division that is not itself a settlement (county, province, regency, and similar) |
+| `section` | A suburb or district of a larger city (the `section` type) |
+| `unknown` | Neither a live settlement nor a governed administrative area — defunct, historical, or unclassified entries, including `null` and not-yet-reviewed `type` values |
+
+<Warning>
+  The `administrative` vs. `unknown` split is this project's own interpretation layered on top of the source data — the upstream [countries-states-cities-database](https://github.com/dr5hn/countries-states-cities-database) project (and the GeoNames classification it inherits from) does not define a 4-way split like this itself. We separate genuine administrative divisions (`county`, `province`, `regency`, and similar) from defunct or non-place entries (`abandoned`, `historical`, `religious`, and similar) so that `administrative` only contains types you'd reasonably call a governed area — not a ghost town or a place of worship.
+</Warning>
+
+<Note>
+  `null` types and any `type` value not yet in our mapping default to `kind: unknown`. New or unrecognized type strings are picked up by an internal weekly review process and reclassified once triaged, so this bucket narrows over time rather than silently growing.
+</Note>
+
+Use `?kind=settlement` (or any comma-separated combination, e.g. `?kind=settlement,section`) on [Get Cities by Country](/api/endpoints/get-cities-by-country) or [Get Cities by State](/api/endpoints/get-cities-by-state) to filter server-side. `kind` is available on every plan, including Community and Starter — no tier upgrade required. Raw `type` filtering (`?type=`) is also available but requires a Supporter+ plan, matching the existing `type` field's tier gate.
+
 ## All Type Values
 
-There are **35 distinct values** across **153,765** city rows.
+There are **35 distinct values** across **153,765** city rows. The **Kind** column shows the `kind` value derived from each `type` — see above for what each value means.
 
-| `type` | Count | Settlement? | Meaning |
+| `type` | Count | Kind | Meaning |
 |---|---:|:---:|---|
-| `city` | 96,098 | ✅ | Actual city |
-| `adm2` | 20,796 | ✅ | 2nd-order admin division — usually a real city that is also a county/district seat |
-| `adm3` | 15,774 | ✅ | Mostly real municipalities/communes tagged with their admin role |
-| `section` | 5,346 | ✅ | Suburbs and districts of larger cities |
-| `county` | 4,409 | ❌ | County-level admin unit — not a settlement |
-| `adm4` | 3,909 | ✅ | Similar mix to `adm3` |
-| `adm1` | 3,505 | ✅ | 1st-order admin division — usually a state/region seat (e.g. major Australian cities) |
-| `district` | 2,381 | ✅ | District-level populated place |
-| _(null)_ | 1,900 | ⚠️ | No type assigned — see below |
-| `regency` | 390 | ❌ | Indonesian *kabupaten* — admin division |
-| `prefecture` | 369 | ❌ | Prefecture-level admin division |
-| `locality` | 319 | ✅ | Named populated place |
-| `capital` | 281 | ✅ | National or regional capital |
-| `municipality` | 209 | ✅ | Municipality |
-| `parish` | 80 | ❌ | Louisiana-style parish (= county) |
-| `banner` | 52 | ❌ | Inner Mongolia *banner* — admin division |
-| `town` | 48 | ✅ | Town |
-| `province` | 36 | ❌ | Province-level admin division |
-| `adm5` | 16 | ✅ | 5th-order admin division (populated) |
-| `abandoned` | 15 | ❌ | Abandoned place |
-| `cities` | 13 | ✅ | Data artifact of `city` |
-| `area` | 12 | ❌ | Generic administrative area |
-| `village` | 10 | ✅ | Village |
-| `historical` | 9 | ❌ | Historical place — not a live settlement |
-| `settlement` | 9 | ✅ | Settlement |
-| `oblast` | 8 | ❌ | Oblast — admin division |
-| `gov_seat` | 6 | ✅ | Government seat (populated) |
-| `special municipality` | 6 | ✅ | Special municipality |
-| `administrative zone` | 5 | ❌ | Administrative zone |
-| `region` | 4 | ❌ | Region-level admin division |
-| `destroyed` | 3 | ❌ | Destroyed place |
-| `township` | 3 | ✅ | Township |
-| `religious` | 2 | ❌ | Religious site — not a settlement |
-| `subdistrict` | 1 | ✅ | Subdistrict (populated) |
-| `historical_capital` | 1 | ❌ | Former capital — not a live settlement |
+| `city` | 96,098 | `settlement` | Actual city |
+| `adm2` | 20,796 | `settlement` | 2nd-order admin division — usually a real city that is also a county/district seat |
+| `adm3` | 15,774 | `settlement` | Mostly real municipalities/communes tagged with their admin role |
+| `section` | 5,346 | `section` | Suburbs and districts of larger cities |
+| `county` | 4,409 | `administrative` | County-level admin unit — not a settlement |
+| `adm4` | 3,909 | `settlement` | Similar mix to `adm3` |
+| `adm1` | 3,505 | `settlement` | 1st-order admin division — usually a state/region seat (e.g. major Australian cities) |
+| `district` | 2,381 | `settlement` | District-level populated place |
+| _(null)_ | 1,900 | `unknown` | No type assigned — see below |
+| `regency` | 390 | `administrative` | Indonesian *kabupaten* — admin division |
+| `prefecture` | 369 | `administrative` | Prefecture-level admin division |
+| `locality` | 319 | `settlement` | Named populated place |
+| `capital` | 281 | `settlement` | National or regional capital |
+| `municipality` | 209 | `settlement` | Municipality |
+| `parish` | 80 | `administrative` | Louisiana-style parish (= county) |
+| `banner` | 52 | `administrative` | Inner Mongolia *banner* — admin division |
+| `town` | 48 | `settlement` | Town |
+| `province` | 36 | `administrative` | Province-level admin division |
+| `adm5` | 16 | `settlement` | 5th-order admin division (populated) |
+| `abandoned` | 15 | `unknown` | Abandoned place |
+| `cities` | 13 | `settlement` | Data artifact of `city` |
+| `area` | 12 | `administrative` | Generic administrative area |
+| `village` | 10 | `settlement` | Village |
+| `historical` | 9 | `unknown` | Historical place — not a live settlement |
+| `settlement` | 9 | `settlement` | Settlement |
+| `oblast` | 8 | `administrative` | Oblast — admin division |
+| `gov_seat` | 6 | `settlement` | Government seat (populated) |
+| `special municipality` | 6 | `settlement` | Special municipality |
+| `administrative zone` | 5 | `administrative` | Administrative zone |
+| `region` | 4 | `administrative` | Region-level admin division |
+| `destroyed` | 3 | `unknown` | Destroyed place |
+| `township` | 3 | `settlement` | Township |
+| `religious` | 2 | `unknown` | Religious site — not a settlement |
+| `subdistrict` | 1 | `settlement` | Subdistrict (populated) |
+| `historical_capital` | 1 | `unknown` | Former capital — not a live settlement |
 
-## Filtering to Genuine Settlements
+## Filtering via Raw SQL/JS/Python (Self-Hosted Data)
 
-For use cases like "find the nearest city to a location" or "populate a dropdown", you want to exclude admin-only and non-place types. Use an **exclusion list** rather than an inclusion list — any new settlement-style value added in the future is kept by default.
+<Note>
+  If you're calling the API, use `?kind=settlement` instead — see [The `kind` Field](#the-kind-field) above. This section is for teams running their own copy of the [raw database](/database/overview) outside the API, where no `kind` field exists and you need to replicate the same exclusion logic yourself.
+</Note>
+
+For use cases like "find the nearest city to a location" or "populate a dropdown" against a self-hosted copy of the data, exclude admin-only and non-place types directly. Use an **exclusion list** rather than an inclusion list — any new settlement-style value added in the future is kept by default.
 
 **Exclude these types:**
 
@@ -118,7 +147,7 @@ settlements = [
 
 ## Records with No Type
 
-About **1,900** rows have a `null` type. They are a mix of legitimate places and unclassified entries. For strict settlement queries, the safest signal is the presence of valid coordinates (`latitude`/`longitude` not null), and — where available — a non-null `population`.
+About **1,900** rows have a `null` type. They are a mix of legitimate places and unclassified entries. For strict settlement queries, the safest signal is the presence of valid coordinates (`latitude`/`longitude` not null), and — where available — a non-null `population`. Via the API, these rows surface with `kind: unknown`, same as other unclassified entries.
 
 ## Related
 
@@ -128,5 +157,8 @@ About **1,900** rows have a `null` type. They are a mix of legitimate places and
   </Card>
   <Card title="Multi-Level Territories" icon="map" href="/database/territories">
     How overseas territories and dual-modeled entities affect city queries.
+  </Card>
+  <Card title="Get Cities by Country" icon="filter" href="/api/endpoints/get-cities-by-country">
+    Filter cities by `kind` or `type` directly via the API.
   </Card>
 </CardGroup>
