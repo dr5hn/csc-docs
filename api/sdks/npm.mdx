@@ -170,6 +170,24 @@ To get the latest data in your project, update the package:
 npm update @countrystatecity/countries
 ```
 
+### Checking your installed data version
+
+Both `@countrystatecity/countries` and `@countrystatecity/countries-browser` export a `getDataVersion()` loader so you can confirm which release your installed package is bundling, without loading the full dataset:
+
+```typescript
+import { getDataVersion } from '@countrystatecity/countries';
+
+const version = await getDataVersion();
+// {
+//   dataVersion: 'v3.2-export.7-2026.07.29',
+//   sourceRelease: 'v3.2-export.7',
+//   updatedAt: '2026-07-29T09:01:18Z',
+//   recordCounts: { countries: 250, states: 5308, cities: 152970 }
+// }
+```
+
+`dataVersion` matches the [Get Data Version](/api/endpoints/get-data-version) API endpoint's `dataVersion` field exactly, so you can confirm your bundled data and the live API are on the same release. The package's `recordCounts` is narrower than the API's, though — `countries`/`states`/`cities` only, no `regions`/`subregions`.
+
 ## Source
 
 <CardGroup cols={2}>

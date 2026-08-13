@@ -103,6 +103,12 @@
             ]
           },
           {
+            "group": "Meta Endpoints",
+            "pages": [
+              "api/endpoints/get-data-version"
+            ]
+          },
+          {
             "group": "SDKs & Examples",
             "pages": [
               "api/sdks",

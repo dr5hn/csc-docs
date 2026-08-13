@@ -1,0 +1,137 @@
+---
+title: "Get Data Version"
+api: "GET https://api.countrystatecity.in/v1/meta/data-version"
+authMethod: "key"
+description: "Check which geographic data release your API responses are currently served from"
+---
+
+Returns the version of the underlying geographic dataset currently live behind the API — which upstream release it was exported from, when it was imported, and a record-count snapshot taken at import time.
+
+<Note>**Availability:** All plans (Community and above) — no tier restriction. The request still counts toward your daily/monthly usage quota like any other endpoint.</Note>
+
+## Authentication
+
+<ParamField header="X-CSCAPI-KEY" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+## Response
+
+<ResponseField name="dataVersion" type="string">
+  The full version string, in `<source-release>-<YYYY.MM.DD>` format (e.g. `v3.2-export.7-2026.07.29`). This is the same value sent on the `X-CSC-Data-Version` header of every `/v1/*` response — see **Response headers on every request** below.
+</ResponseField>
+
+<ResponseField name="sourceRelease" type="string">
+  The upstream release tag from the [countries-states-cities-database](https://github.com/dr5hn/countries-states-cities-database) this data was exported from.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string">
+  ISO 8601 UTC timestamp of when this data was imported.
+</ResponseField>
+
+<ResponseField name="recordCounts" type="object">
+  A snapshot of row counts taken at import time — not computed live on each request.
+
+  <Expandable title="properties">
+    <ResponseField name="regions" type="integer">Number of regions</ResponseField>
+    <ResponseField name="subregions" type="integer">Number of subregions</ResponseField>
+    <ResponseField name="countries" type="integer">Number of countries</ResponseField>
+    <ResponseField name="states" type="integer">Number of states/provinces</ResponseField>
+    <ResponseField name="cities" type="integer">Number of cities</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X GET 'https://api.countrystatecity.in/v1/meta/data-version' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```python Python
+import requests
+
+def get_data_version():
+    response = requests.get(
+      'https://api.countrystatecity.in/v1/meta/data-version',
+      headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+    )
+
+    if response.ok:
+        return response.json()
+    else:
+        print('Data version temporarily unavailable')
+        return None
+
+version = get_data_version()
+```
+
+```javascript JavaScript
+const getDataVersion = async () => {
+  const response = await fetch('https://api.countrystatecity.in/v1/meta/data-version', {
+    headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' }
+  });
+
+  if (response.ok) {
+    return await response.json();
+  } else {
+    console.error('Data version temporarily unavailable');
+    return null;
+  }
+};
+
+getDataVersion();
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 - Success
+{
+  "dataVersion": "v3.2-export.7-2026.07.29",
+  "sourceRelease": "v3.2-export.7",
+  "updatedAt": "2026-07-29T09:01:18Z",
+  "recordCounts": {
+    "regions": 6,
+    "subregions": 22,
+    "countries": 250,
+    "states": 5308,
+    "cities": 152970
+  }
+}
+```
+
+```json 503 - Temporarily unavailable
+{
+  "status": "error",
+  "message": "Data version information is temporarily unavailable."
+}
+```
+</ResponseExample>
+
+## Response headers on every request
+
+Two of the fields above are also stamped as headers on **every** `/v1/*` response, not just this endpoint — so you can track the live data version without an extra request:
+
+| Header | Meaning |
+|---|---|
+| `X-CSC-Data-Version` | Same value as `dataVersion` above |
+| `X-CSC-Data-Updated-At` | Same value as `updatedAt` above |
+| `X-Request-ID` | Server-generated UUID, unique per request — include it when contacting support about a specific request |
+
+<Note>
+  These headers are read from an in-memory cache refreshed every 30 seconds, while this dedicated route reads through a 5-minute-TTL cache backed by Redis. In practice that means the headers can lag this route (and the actual imported data) by up to ~30 seconds right after a new import — a deliberate tradeoff so stamping them never adds latency or a new failure mode to every single request. `X-Request-ID` is always present; the two `X-CSC-Data-*` headers are omitted until the in-memory cache has warmed after a server restart. All three appear on error responses too (they're set before routing, not per-endpoint) — see [Errors & Rate Limits](/api/errors).
+</Note>
+
+## npm package parity
+
+The [`@countrystatecity/countries`](https://www.npmjs.com/package/@countrystatecity/countries) and [`@countrystatecity/countries-browser`](https://www.npmjs.com/package/@countrystatecity/countries-browser) npm packages ship a `getDataVersion()` loader with the same `dataVersion`/`sourceRelease`/`updatedAt` fields, read from a small bundled `version.json` instead of a network call — so the `dataVersion` string in your npm package matches this API response exactly. Its `recordCounts` is narrower, though: `countries`/`states`/`cities` only, no `regions`/`subregions`. See [npm Packages](/api/sdks/npm#data-updates) for usage.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Errors & Rate Limits" icon="triangle-exclamation" href="/api/errors">
+    The `status`/`message` envelope used by the 503 response above, plus usage limits and response headers.
+  </Card>
+  <Card title="npm Packages" icon="npm" href="/api/sdks/npm">
+    Get the same version info without a network call via `getDataVersion()`.
+  </Card>
+</CardGroup>
