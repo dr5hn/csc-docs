@@ -6,7 +6,7 @@ icon: "code"
 
 ## Official Packages
 
-The Country State City ecosystem provides official packages for JavaScript/TypeScript and Python. These packages embed the geographical data directly, so you can query countries, states, and cities without making HTTP requests or managing an API key.
+The Country State City ecosystem provides official packages for JavaScript/TypeScript and Python, plus a live API client SDK. The npm and Python packages embed the geographical data directly, so you can query countries, states, and cities without making HTTP requests or managing an API key. The TypeScript SDK is the opposite — a live REST API client for when you need always-current data, quota-aware usage, or capabilities like search that the offline packages don't have.
 
 <CardGroup cols={2}>
   <Card title="npm Packages" icon="npm" href="/api/sdks/npm">
@@ -14,6 +14,9 @@ The Country State City ecosystem provides official packages for JavaScript/TypeS
   </Card>
   <Card title="Python Packages" icon="python" href="/api/sdks/python">
     Type-safe Python packages built with Pydantic, with lazy loading and zero external dependencies.
+  </Card>
+  <Card title="TypeScript SDK" icon="js" color="#f7df1e" href="/api/sdks/typescript">
+    Live REST API client for Node.js and browser — search, usage tracking, and always-current data over HTTP.
   </Card>
 </CardGroup>
 
@@ -24,11 +27,8 @@ The Country State City ecosystem provides official packages for JavaScript/TypeS
 We're currently developing official SDKs for the following languages and platforms:
 
 <CardGroup cols={2}>
-  <Card title="JavaScript/TypeScript" icon="js" color="#f7df1e">
-    Node.js and browser-compatible SDK with full TypeScript support
-  </Card>
   <Card title="Python" icon="python" color="#3776ab">
-    Pythonic client library with async support
+    Pythonic live API client library with async support
   </Card>
   <Card title="PHP" icon="php" color="#777bb4">
     Modern PHP SDK with PSR compliance
