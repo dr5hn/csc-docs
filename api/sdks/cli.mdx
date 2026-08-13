@@ -1,0 +1,185 @@
+---
+title: "CLI"
+description: "Official @countrystatecity/cli — search, explore, and generate code from the terminal, with typo-tolerant fuzzy search and live plan data"
+icon: "terminal"
+---
+
+Official CLI for the Country State City API — search, explore, and generate code from geographic data, right from your terminal.
+
+<Note>
+  Like the [TypeScript SDK](/api/sdks/typescript) — which the CLI is built on internally — this calls the **live API**, not a bundled snapshot. It needs an API key and is subject to your plan's usage quotas. For offline/bundled data with no API key, see [npm Packages](/api/sdks/npm).
+</Note>
+
+## Installation
+
+```bash
+npm install -g @countrystatecity/cli
+```
+
+## Quick Start
+
+```bash
+# 1. Get your free API key at https://app.countrystatecity.in
+csc auth login
+
+# 2. Search countries
+csc search countries
+
+# 3. Get country details
+csc get country IN
+```
+
+## Global Flags
+
+These flags work on every command:
+
+| Flag | Short | Description |
+|---|---|---|
+| `--json` | | Output raw JSON instead of formatted tables |
+| `--quiet` | `-q` | Suppress all decorative output (spinners, tips) |
+| `--no-footer` | | Hide the API usage footer after each command |
+
+## Authentication
+
+```bash
+csc auth login                # Interactive login with API key
+csc auth login --key <KEY>    # Login with key directly
+csc auth status               # Check current auth status
+csc auth logout               # Remove stored API key
+```
+
+## Search
+
+```bash
+csc search countries
+csc search countries --filter "united"
+csc search states --country IN
+csc search cities --country IN --state MH
+csc search regions   # Requires Starter+ plan
+csc search india     # Global search — matches country names
+```
+
+### Fuzzy, typo-tolerant search
+
+<Note>**Requires Professional+ plan.**</Note>
+
+Works two ways:
+
+**Global**, across a chosen entity type:
+
+```bash
+csc search "Banglore" --type city --country IN --fuzzy
+```
+
+`--type` defaults to `city` if omitted. `--country` scopes results and isn't used with `--type country`.
+
+**Per-entity**, reusing `--filter`'s value as the fuzzy query:
+
+```bash
+csc search countries --filter "Indea" --fuzzy
+csc search states --country IN --filter "Maharastra" --fuzzy
+csc search cities --country IN --filter "Banglore" --fuzzy
+```
+
+`--fuzzy` requires `--filter` on these subcommands — the CLI exits with an error if you pass `--fuzzy` without it. On `cities`, `--state` is ignored when `--fuzzy` is set, since fuzzy search only scopes by country.
+
+Fuzzy results replace the usual per-entity table with a shared one:
+
+| Column | Meaning |
+|---|---|
+| Type | `country`, `state`, or `city` |
+| Name | Matched name |
+| Location | State + country for cities, country for states, blank for countries |
+| ID | Record ID |
+| Score | Match confidence — the API's `match_score`, shown to 2 decimal places |
+
+### `--fields` and `--sort`
+
+<Note>**Requires Supporter+ plan.**</Note>
+
+Available on `search countries`/`states`/`cities` — passed straight through to the API instead of the CLI always fetching full objects:
+
+```bash
+csc search cities --country IN --fields name,population --sort population:desc
+csc search countries --fields name,iso2 --sort name:asc
+```
+
+<Note>
+  When `--fields` narrows the response, output falls back to a generic table showing whatever columns actually came back — the CLI's usual hardcoded columns (ISO2, Capital, Phone, and so on) may not all be present anymore.
+</Note>
+
+## Get Details
+
+```bash
+csc get country IN
+csc get country US --json
+csc get country           # Interactive — prompts to pick a country (TTY only)
+
+csc get state IN MH
+csc get state              # Interactive — prompts for country then state (TTY only)
+```
+
+## Usage & Billing
+
+```bash
+csc usage
+csc usage --json          # Returns { plan, price, daily, monthly }
+
+csc upgrade
+csc upgrade --json        # Returns { plans, currentPlan }
+```
+
+<Note>
+  `csc upgrade` fetches live plan and pricing data from the API on every run, so what you see always matches the current [pricing page](https://app.countrystatecity.in/pricing) — it isn't a table baked into the CLI's own code that can drift out of date.
+</Note>
+
+## Plan-Gated Features
+
+Hitting a command your plan doesn't include shows the specific plan you need and a direct upgrade link, not just a generic message:
+
+```
+Access denied — this endpoint requires a higher plan.
+Requires: Professional plan or higher.
+Run `csc upgrade` to view available plans: https://app.countrystatecity.in/pricing
+```
+
+## Code Generation
+
+<Note>**Requires Supporter+ plan.**</Note>
+
+Generate ready-to-use components and seed files from live API data:
+
+```bash
+csc generate dropdown --entity countries --format react
+csc generate dropdown -e states -f react --country IN
+csc generate seed --entity countries --format prisma
+csc generate seed -e states -f prisma --country IN
+```
+
+## Interactive Explorer
+
+```bash
+csc explore
+```
+
+Pick a country, then a state, then an action — view cities, view full details, or get the equivalent `csc generate` command to copy-paste.
+
+<Note>Requires an interactive terminal (TTY). Use `csc search` for scripts.</Note>
+
+## Export
+
+```bash
+csc export           # Opens the online bulk export tool in your browser
+csc export --json    # Returns the export URL as JSON, useful for scripts
+```
+
+## Source
+
+<CardGroup cols={2}>
+  <Card title="GitHub Repository" icon="github" href="https://github.com/dr5hn/countrystatecity-npm/tree/main/packages/cli">
+    View the CLI source, open issues, or contribute.
+  </Card>
+  <Card title="npm Package" icon="npm" href="https://www.npmjs.com/package/@countrystatecity/cli">
+    View published versions and changelog.
+  </Card>
+</CardGroup>
