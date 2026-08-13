@@ -30,6 +30,7 @@
               "api/introduction",
               "api/authentication",
               "api/field-filtering-and-sorting",
+              "api/errors",
               "api/faq"
             ]
           },
