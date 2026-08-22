@@ -139,35 +139,48 @@ curl -X GET 'https://api.countrystatecity.in/v1/cities?fields=name&sort=populati
 
 ## Error responses
 
+<Note>
+  `?fields=` and `?sort=` errors use the `status`/`message`/`details` envelope shown below. A small set of geographical `404`s return a bare `{"error": "..."}` object instead. See [Errors & Rate Limits](/api/errors) for both shapes and how to read either one.
+</Note>
+
 ```json 400 - Unknown field in ?fields=
 {
-  "error": "Unknown field(s): fakeColumn. Valid fields: id, name, iso2, iso3, ..."
+  "status": "error",
+  "message": "Unknown field(s): fakeColumn. Valid fields: id, name, iso2, iso3, ..."
 }
 ```
 
 ```json 400 - Non-sortable field
 {
-  "error": "Field \"timezones\" is not sortable. Sortable fields for countries: id, name, iso2, iso3, population, gdp, area_sq_km, latitude, longitude"
+  "status": "error",
+  "message": "Field \"timezones\" is not sortable. Sortable fields for countries: id, name, iso2, iso3, population, gdp, area_sq_km, latitude, longitude"
 }
 ```
 
 ```json 400 - Sort field outside tier
 {
-  "error": "Field \"population\" is not available on your current plan."
+  "status": "error",
+  "message": "Field \"population\" is not available on your current plan."
 }
 ```
 
 ```json 400 - Malformed sort token
 {
-  "error": "Invalid sort token \"name:asc:extra\". Expected \"field\" or \"field:asc|desc\"."
+  "status": "error",
+  "message": "Invalid sort token \"name:asc:extra\". Expected \"field\" or \"field:asc|desc\"."
 }
 ```
 
 ```json 403 - Feature not on plan
 {
-  "error": "This feature is not available on your current plan.",
-  "feature": "fieldsFiltering",
-  "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  "status": "error",
+  "message": "This feature is not available on your current plan.",
+  "details": {
+    "feature": "fieldsFiltering",
+    "currentTier": "starter",
+    "requiredTier": "supporter",
+    "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  }
 }
 ```
 
