@@ -140,7 +140,7 @@ curl -X GET 'https://api.countrystatecity.in/v1/cities?fields=name&sort=populati
 ## Error responses
 
 <Note>
-  See [Errors & Rate Limits](/api/errors) for the full `status`/`message`/`details` envelope every error response uses. The examples below use the messages specific to `?fields=`/`?sort=`.
+  `?fields=` and `?sort=` errors use the `status`/`message`/`details` envelope shown below. Other failures — the geographical `404`s in particular — return a bare `{"error": "..."}` object instead. See [Errors & Rate Limits](/api/errors) for both shapes and how to read either one.
 </Note>
 
 ```json 400 - Unknown field in ?fields=

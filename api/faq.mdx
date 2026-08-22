@@ -148,11 +148,11 @@ icon: "circle-question"
   **Best practices for handling rate limits:**
   - Read `details.resetAt` and wait until then before retrying
   - Cache responses to reduce API calls
-  - Monitor usage proactively via the `X-CSC-Daily-Used`/`X-CSC-Daily-Limit` response headers
+  - Monitor usage proactively via the `X-CSC-Daily-Used`/`X-CSC-Daily-Limit` response headers on successful requests — they aren't returned on the `429` itself
   - Consider upgrading your plan if limits are consistently hit — plans start at $5/month for higher limits. Visit [https://app.countrystatecity.in/pricing](https://app.countrystatecity.in/pricing) to compare plans.
 
   <Tip>
-  See [Errors & Rate Limits](/api/errors) for the full envelope shape, the monthly-limit variant, and usage limits per tier.
+  See [Errors & Rate Limits](/api/errors) for the monthly-limit variant, the usage headers, and limits per tier.
   </Tip>
 </Accordion>
 
@@ -175,8 +175,12 @@ icon: "circle-question"
   Check `details.requiredTier` for the minimum plan that unlocks it, and `details.upgradeUrl` to upgrade directly.
 
   <Note>
-  `requiredTier` is occasionally `null` — that means your current tier normally includes this feature, but an account-specific override is denying it. Upgrading won't fix that; [contact support](mailto:api@countrystatecity.in) instead.
+  `requiredTier` can be `null`. That means the API couldn't read the live plan catalogue while building the response, so it has no upgrade advice to give — the gate is still real. Use `details.upgradeUrl` (or the [pricing page](https://app.countrystatecity.in/pricing)) to find the plan that includes the feature.
   </Note>
+
+  <Warning>
+  Not every `403` is a plan gate. A `403` raised for another reason returns `status` and `message` with no `details` object, so check `details` exists before reading `details.feature` or `details.requiredTier`.
+  </Warning>
 
   <Tip>
   See [Errors & Rate Limits](/api/errors) for the full 403/429 reference.
