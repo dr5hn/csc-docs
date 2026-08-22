@@ -7,7 +7,7 @@ icon: "building"
 Every city record carries an optional `type` field describing what kind of place it is. The value is inherited from the upstream [GeoNames](https://www.geonames.org/) feature classification.
 
 <Tip>
-  Building against the API? Skip manual filtering — pass `?kind=settlement` on [Get Cities by Country](/api/endpoints/get-cities-by-country) or [Get Cities by State](/api/endpoints/get-cities-by-state) to get genuine settlements directly, no exclusion list required. The manual `type`-based filtering further down this page is for teams running their own copy of the raw database outside the API.
+  Building against the API? Filter server-side with `?kind=` on [Get Cities by Country](/api/endpoints/get-cities-by-country) or [Get Cities by State](/api/endpoints/get-cities-by-state) instead of applying a `type` exclusion list yourself. It is not a drop-in swap: `?kind=settlement` is stricter than the exclusion list further down this page, and `?kind=settlement,section,unknown` is the closest match. That manual filtering is for teams running their own copy of the raw database outside the API.
 </Tip>
 
 <Note>
@@ -16,28 +16,28 @@ Every city record carries an optional `type` field describing what kind of place
 
 ## The `kind` Field
 
-Every city response also includes a derived `kind` field — a simplified classification computed server-side from `type`, so you don't have to memorize which of the 35 raw values count as real places. It's one of four values:
+[Get Cities by Country](/api/endpoints/get-cities-by-country) and [Get Cities by State](/api/endpoints/get-cities-by-state) also return a derived `kind` field — a simplified classification computed server-side from `type`, so you don't have to memorize which of the 35 raw values count as real places. Other endpoints that return city records do not include it. `kind` is one of four values:
 
 | `kind` | Meaning |
 |---|---|
 | `settlement` | An actual populated place — city, town, village, or similar |
 | `administrative` | A governed administrative division that is not itself a settlement (county, province, regency, and similar) |
 | `section` | A suburb or district of a larger city (the `section` type) |
-| `unknown` | Neither a live settlement nor a governed administrative area — defunct, historical, or unclassified entries, including `null` and not-yet-reviewed `type` values |
+| `unknown` | Neither a live settlement nor a governed administrative area — defunct or unclassified entries, including `null` and any `type` value not yet in the mapping |
 
 <Warning>
   The `administrative` vs. `unknown` split is this project's own interpretation layered on top of the source data — the upstream [countries-states-cities-database](https://github.com/dr5hn/countries-states-cities-database) project (and the GeoNames classification it inherits from) does not define a 4-way split like this itself. We separate genuine administrative divisions (`county`, `province`, `regency`, and similar) from defunct or non-place entries (`abandoned`, `historical`, `religious`, and similar) so that `administrative` only contains types you'd reasonably call a governed area — not a ghost town or a place of worship.
 </Warning>
 
 <Note>
-  `null` types and any `type` value not yet in our mapping default to `kind: unknown`. New or unrecognized type strings are picked up by an internal weekly review process and reclassified once triaged, so this bucket narrows over time rather than silently growing.
+  `null` types and any `type` value not yet in our mapping default to `kind: unknown`. Read `unknown` as *not classified*, not as *not a place* — the bucket holds both defunct entries (`abandoned`, `historical`, `destroyed`, `religious`, `historical_capital`) and the 1,900 rows that carry no `type` at all.
 </Note>
 
-Use `?kind=settlement` (or any comma-separated combination, e.g. `?kind=settlement,section`) on [Get Cities by Country](/api/endpoints/get-cities-by-country) or [Get Cities by State](/api/endpoints/get-cities-by-state) to filter server-side. `kind` is available on every plan, including Community and Starter — no tier upgrade required. Raw `type` filtering (`?type=`) is also available but requires a Supporter+ plan, matching the existing `type` field's tier gate.
+Use `?kind=settlement` (or any comma-separated combination, e.g. `?kind=settlement,section`) on [Get Cities by Country](/api/endpoints/get-cities-by-country) or [Get Cities by State](/api/endpoints/get-cities-by-state) to filter server-side. `kind` is available on every plan, including Community and Starter — no tier upgrade required. Raw `type` filtering (`?type=`) is also available but requires a Supporter+ plan, matching the existing `type` field's tier gate — on a lower plan the request is rejected with a `400` error rather than being ignored.
 
 ## All Type Values
 
-There are **35 distinct values** across **153,765** city rows. The **Kind** column shows the `kind` value derived from each `type` — see above for what each value means.
+There are **35 distinct values**. The counts below come from the upstream [`TYPE_FIELD.md`](https://github.com/dr5hn/countries-states-cities-database/blob/master/TYPE_FIELD.md) reference, snapshotted on **2026-05-24**, and add up to **156,025** rows. Treat them as approximate: they drift as the data changes, so they do not match the **153,765+** city total quoted elsewhere in these docs, which is the upstream project's README figure counted at a different time. The **Kind** column shows the `kind` value derived from each `type` — see above for what each value means.
 
 | `type` | Count | Kind | Meaning |
 |---|---:|:---:|---|
@@ -80,7 +80,7 @@ There are **35 distinct values** across **153,765** city rows. The **Kind** colu
 ## Filtering via Raw SQL/JS/Python (Self-Hosted Data)
 
 <Note>
-  If you're calling the API, use `?kind=settlement` instead — see [The `kind` Field](#the-kind-field) above. This section is for teams running their own copy of the [raw database](/database/overview) outside the API, where no `kind` field exists and you need to replicate the same exclusion logic yourself.
+  Calling the API instead? Use `?kind=` — see [The `kind` Field](#the-kind-field) above. It is **not** a drop-in swap for the exclusion list below. `?kind=settlement` is stricter, because the list also keeps the 5,346 `section` rows and the 1,900 `null`-type rows. `?kind=settlement,section,unknown` is the closest match; it differs only by also returning the ~30 defunct rows the list drops (`abandoned`, `historical`, `destroyed`, `religious`, `historical_capital`), which map to `unknown` too. This section is for teams running their own copy of the [raw database](/database/overview) outside the API, where no `kind` field exists.
 </Note>
 
 For use cases like "find the nearest city to a location" or "populate a dropdown" against a self-hosted copy of the data, exclude admin-only and non-place types directly. Use an **exclusion list** rather than an inclusion list — any new settlement-style value added in the future is kept by default.

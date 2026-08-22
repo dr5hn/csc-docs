@@ -34,7 +34,7 @@ Retrieve all cities within a specific country using the country's ISO2 code. Thi
 </ParamField>
 
 <ParamField query="type" type="string">
-  Filter by the raw source `type` value. Comma-separated list of one or more values from the [City Types](/database/city-types) reference (e.g. `?type=city,adm2`). **Requires Supporter+ plan** — matches the same tier gate as the `type` response field. Unrecognized values simply match zero rows rather than erroring.
+  Filter by the raw source `type` value. Comma-separated list of one or more values from the [City Types](/database/city-types) reference (e.g. `?type=city,adm2`). **Requires Supporter+ plan** — matches the same tier gate as the `type` response field. On a lower plan the request is rejected with a `400` error rather than being ignored. Unrecognized values simply match zero rows rather than erroring.
 </ParamField>
 
 ## Response
@@ -292,7 +292,7 @@ cities = get_cities_by_country('IN')
   {
     "id": 133024,
     "name": "Mumbai",
-    "kind": "unknown",
+    "kind": "settlement",
     "state_id": 4008,
     "state_code": "MH",
     "country_id": 101,
@@ -301,7 +301,7 @@ cities = get_cities_by_country('IN')
     "longitude": "72.88261000",
     "timezone": "Asia/Kolkata",
     "population": 12442373,
-    "type": null,
+    "type": "adm1",
     "level": null,
     "parent_id": null,
     "native": "मुंबई"
@@ -319,12 +319,6 @@ cities = get_cities_by_country('IN')
     "wikiDataId": "Q1156"
   }
 ]
-```
-
-```json 404 - Not Found
-{
-  "error": "No Cities found."
-}
 ```
 
 ```json 401 - Unauthorized
