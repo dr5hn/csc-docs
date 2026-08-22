@@ -20,7 +20,7 @@ The Country State City API returns errors in two shapes. Which one you get depen
 
 `details` is optional. It's present when the error carries structured metadata, like the `403` and `429` responses below. Other errors in this shape return just `status` and `message`.
 
-**Bare error object** — used by the deliberate geographical `404` responses (an unknown code, or a record that has no data for what you asked) and by the `401` from the authentication layer:
+**Bare error object** — used by a small set of geographical `404` responses: country details, state details, region details, subregion details, and currency by country:
 
 ```json
 {
@@ -103,7 +103,7 @@ Returned when the endpoint, query parameter, or feature you're using isn't inclu
 </ResponseField>
 
 <Note>
-  `requiredTier` is `null` when the API can't read the live plan catalogue while building the response, so it has no upgrade advice to give. The gate itself is still real — only the "upgrade to this tier" hint is missing. Follow `details.upgradeUrl` (or see [Pricing](https://app.countrystatecity.in/pricing)) to find the plan that includes the feature. Handle it as `details.requiredTier ?? 'see pricing'` rather than printing `null` to your users.
+  `requiredTier` is `null` when there is no higher active plan the API can safely recommend, or when the live plan catalogue could not be read. The gate itself is still real — only the "upgrade to this tier" hint is missing. Follow `details.upgradeUrl` (or see [Pricing](https://app.countrystatecity.in/pricing)) to compare the available plans. Handle it as `details.requiredTier ?? 'see pricing'` rather than printing `null` to your users.
 </Note>
 
 ### Other 403s
@@ -123,7 +123,7 @@ Not every `403` is a plan gate. A `403` raised for any other reason returns the 
 
 ## 404 — Not Found
 
-The geographical endpoints return a bare error object, not the envelope. There are two deliberate cases:
+Most `404` responses use the structured envelope. Five geographical handlers deliberately return the bare error object instead: country details, state details, region details, subregion details, and currency by country. They use it for two cases:
 
 ```json 404 - Record doesn't exist
 {
@@ -133,7 +133,7 @@ The geographical endpoints return a bare error object, not the envelope. There a
 
 ```json 404 - No data for this record
 {
-  "error": "No timezone data available for this city."
+  "error": "No currency data available for this country."
 }
 ```
 

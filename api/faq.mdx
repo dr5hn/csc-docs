@@ -175,7 +175,7 @@ icon: "circle-question"
   Check `details.requiredTier` for the minimum plan that unlocks it, and `details.upgradeUrl` to upgrade directly.
 
   <Note>
-  `requiredTier` can be `null`. That means the API couldn't read the live plan catalogue while building the response, so it has no upgrade advice to give — the gate is still real. Use `details.upgradeUrl` (or the [pricing page](https://app.countrystatecity.in/pricing)) to find the plan that includes the feature.
+  `requiredTier` can be `null`. That means there is no higher active plan the API can safely recommend, or the live plan catalogue could not be read. The gate is still real. Use `details.upgradeUrl` (or the [pricing page](https://app.countrystatecity.in/pricing)) to compare the available plans.
   </Note>
 
   <Warning>
