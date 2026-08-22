@@ -5,7 +5,7 @@ authMethod: "key"
 description: "Check which geographic data release your API responses are currently served from"
 ---
 
-Returns the version of the underlying geographic dataset currently live behind the API — which upstream release it was exported from, when it was imported, and a record-count snapshot taken at import time.
+Returns the version of the underlying geographic dataset currently live behind the API — which upstream release it was exported from, when that release was imported, and a record-count snapshot taken at import time.
 
 <Note>**Availability:** All plans (Community and above) — no tier restriction. The request still counts toward your daily/monthly usage quota like any other endpoint.</Note>
 
@@ -18,19 +18,19 @@ Returns the version of the underlying geographic dataset currently live behind t
 ## Response
 
 <ResponseField name="dataVersion" type="string">
-  The full version string, in `<source-release>-<YYYY.MM.DD>` format (e.g. `v3.2-export.7-2026.07.29`). This is the same value sent on the `X-CSC-Data-Version` header of every `/v1/*` response — see **Response headers on every request** below.
+  The full version string, in `<source-release>-<YYYY.MM.DD>` format (e.g. `v3.2-export.7-2026.07.30`). The date part is the day the release was **imported into the API**, not the day the release was published — so the same data can carry a different date string in the npm package. See [npm package parity](#npm-package-parity) below. This is the same value sent on the `X-CSC-Data-Version` header of every `/v1/*` response — see [Response headers on every request](#response-headers-on-every-request) below.
 </ResponseField>
 
 <ResponseField name="sourceRelease" type="string">
-  The upstream release tag from the [countries-states-cities-database](https://github.com/dr5hn/countries-states-cities-database) this data was exported from.
+  The upstream release tag from the [countries-states-cities-database](https://github.com/dr5hn/countries-states-cities-database) this data was exported from. Compare this field — not `dataVersion` — when you want to check whether two copies of the data are on the same release.
 </ResponseField>
 
 <ResponseField name="updatedAt" type="string">
-  ISO 8601 UTC timestamp of when this data was imported.
+  ISO 8601 UTC timestamp of when this release was imported, with milliseconds — for example `2026-07-30T09:01:18.000Z`.
 </ResponseField>
 
 <ResponseField name="recordCounts" type="object">
-  A snapshot of row counts taken at import time — not computed live on each request.
+  A snapshot of row counts taken at import time — not computed live on each request. The counts change with every release, so treat the numbers in the example below as illustrative.
 
   <Expandable title="properties">
     <ResponseField name="regions" type="integer">Number of regions</ResponseField>
@@ -51,6 +51,7 @@ curl -X GET 'https://api.countrystatecity.in/v1/meta/data-version' \
 import requests
 
 def get_data_version():
+    """Fetch the geographic data release currently live behind the API."""
     response = requests.get(
       'https://api.countrystatecity.in/v1/meta/data-version',
       headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
@@ -86,15 +87,15 @@ getDataVersion();
 <ResponseExample>
 ```json 200 - Success
 {
-  "dataVersion": "v3.2-export.7-2026.07.29",
+  "dataVersion": "v3.2-export.7-2026.07.30",
   "sourceRelease": "v3.2-export.7",
-  "updatedAt": "2026-07-29T09:01:18Z",
+  "updatedAt": "2026-07-30T09:01:18.000Z",
   "recordCounts": {
     "regions": 6,
     "subregions": 22,
     "countries": 250,
-    "states": 5308,
-    "cities": 152970
+    "states": 5299,
+    "cities": 153765
   }
 }
 ```
@@ -118,18 +119,28 @@ Two of the fields above are also stamped as headers on **every** `/v1/*` respons
 | `X-Request-ID` | Server-generated UUID, unique per request — include it when contacting support about a specific request |
 
 <Note>
-  These headers are read from an in-memory cache refreshed every 30 seconds, while this dedicated route reads through a 5-minute-TTL cache backed by Redis. In practice that means the headers can lag this route (and the actual imported data) by up to ~30 seconds right after a new import — a deliberate tradeoff so stamping them never adds latency or a new failure mode to every single request. `X-Request-ID` is always present; the two `X-CSC-Data-*` headers are omitted until the in-memory cache has warmed after a server restart. All three appear on error responses too (they're set before routing, not per-endpoint) — see [Errors & Rate Limits](/api/errors).
+  **This metadata is cached, so it can trail a fresh import.** This route reads through a 5-minute-TTL cache backed by Redis, so right after an import it can report the previous release for up to about 5 minutes while the new data is already being served. The headers are stamped from an in-memory copy that refreshes every 30 seconds on top of that same cache, so they can trail the imported data by about 5.5 minutes — a deliberate tradeoff so stamping them never adds latency or a new failure mode to every request. Both catch up on their own; no action is needed on your side.
+
+  `X-Request-ID` is always present. The two `X-CSC-Data-*` headers are omitted until the in-memory copy has warmed after a server restart. All three appear on error responses too, because they're set before routing rather than per endpoint — see [Errors & Rate Limits](/api/errors).
 </Note>
 
 ## npm package parity
 
-The [`@countrystatecity/countries`](https://www.npmjs.com/package/@countrystatecity/countries) and [`@countrystatecity/countries-browser`](https://www.npmjs.com/package/@countrystatecity/countries-browser) npm packages ship a `getDataVersion()` loader with the same `dataVersion`/`sourceRelease`/`updatedAt` fields, read from a small bundled `version.json` instead of a network call — so the `dataVersion` string in your npm package matches this API response exactly. Its `recordCounts` is narrower, though: `countries`/`states`/`cities` only, no `regions`/`subregions`. See [npm Packages](/api/sdks/npm#data-updates) for usage.
+The [`@countrystatecity/countries`](https://www.npmjs.com/package/@countrystatecity/countries) and [`@countrystatecity/countries-browser`](https://www.npmjs.com/package/@countrystatecity/countries-browser) npm packages ship a `getDataVersion()` loader with the same `dataVersion`/`sourceRelease`/`updatedAt` fields, read from a small bundled `version.json` instead of a network call. See [npm Packages](/api/sdks/npm#data-updates) for usage.
+
+<Warning>
+  **Compare `sourceRelease`, not `dataVersion`.** Both sides build `dataVersion` from the same release tag, but they append different dates: the npm package uses the date the release was **published**, while the API uses the date that release was **imported**. An import lands after the release is published, so the two strings usually differ by a day or more even when both sides hold exactly the same data. `sourceRelease` is the same string on both sides, which makes it the reliable parity key.
+
+  For example, the same `v3.2-export.7` release can read as `v3.2-export.7-2026.07.29` in the package and `v3.2-export.7-2026.07.30` from the API.
+</Warning>
+
+The package's `recordCounts` is also narrower than the API's: `countries`/`states`/`cities` only, no `regions`/`subregions`.
 
 ## Related
 
 <CardGroup cols={2}>
   <Card title="Errors & Rate Limits" icon="triangle-exclamation" href="/api/errors">
-    The `status`/`message` envelope used by the 503 response above, plus usage limits and response headers.
+    The `status`/`message` envelope used by the 503 response above, plus usage limits by tier.
   </Card>
   <Card title="npm Packages" icon="npm" href="/api/sdks/npm">
     Get the same version info without a network call via `getDataVersion()`.

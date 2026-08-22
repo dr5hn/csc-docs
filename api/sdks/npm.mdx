@@ -181,12 +181,49 @@ const version = await getDataVersion();
 // {
 //   dataVersion: 'v3.2-export.7-2026.07.29',
 //   sourceRelease: 'v3.2-export.7',
-//   updatedAt: '2026-07-29T09:01:18Z',
-//   recordCounts: { countries: 250, states: 5308, cities: 152970 }
+//   updatedAt: '2026-07-29T14:22:05.000Z',
+//   recordCounts: { countries: 250, states: 5299, cities: 153765 }
 // }
 ```
 
-`dataVersion` matches the [Get Data Version](/api/endpoints/get-data-version) API endpoint's `dataVersion` field exactly, so you can confirm your bundled data and the live API are on the same release. The package's `recordCounts` is narrower than the API's, though — `countries`/`states`/`cities` only, no `regions`/`subregions`.
+The counts above are from one release and are illustrative — they change every time the data is refreshed.
+
+### Comparing your package against the live API
+
+The [Get Data Version](/api/endpoints/get-data-version) endpoint returns the same three fields for the data the API is serving. **Compare `sourceRelease`, not `dataVersion`.**
+
+Both sides build `dataVersion` from the same release tag, but they append different dates: the package uses the date the release was **published**, while the API uses the date that release was **imported**. Because the import happens after the release is published, the two strings usually differ by a day or more even when both sides hold exactly the same data. `sourceRelease` is identical on both sides, so it is the reliable parity key.
+
+```typescript
+import { getDataVersion } from '@countrystatecity/countries';
+
+async function isPackageInSyncWithApi(apiKey: string): Promise<boolean | null> {
+  const local = await getDataVersion();
+
+  const response = await fetch('https://api.countrystatecity.in/v1/meta/data-version', {
+    headers: { 'X-CSCAPI-KEY': apiKey }
+  });
+
+  if (!response.ok) {
+    console.error(`Could not read the live data version (HTTP ${response.status})`);
+    return null;
+  }
+
+  const live = await response.json();
+
+  // Compare sourceRelease — the dataVersion date suffixes differ by design.
+  return local.sourceRelease === live.sourceRelease;
+}
+
+const inSync = await isPackageInSyncWithApi('YOUR_API_KEY');
+console.log(inSync); // true
+```
+
+<Note>
+  The API's version metadata is cached and can trail a fresh import by about 5 minutes (about 5.5 minutes for the `X-CSC-Data-*` response headers). If a comparison comes back out of sync right after a data refresh, retry a few minutes later before treating it as a real mismatch.
+</Note>
+
+The package's `recordCounts` is narrower than the API's — `countries`/`states`/`cities` only, no `regions`/`subregions`.
 
 ## Source
 
