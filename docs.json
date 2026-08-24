@@ -107,6 +107,12 @@
             ]
           },
           {
+            "group": "Data Changes",
+            "pages": [
+              "api/endpoints/get-data-changes"
+            ]
+          },
+          {
             "group": "Meta Endpoints",
             "pages": [
               "api/endpoints/get-data-version"
