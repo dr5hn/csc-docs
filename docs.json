@@ -100,7 +100,8 @@
           {
             "group": "Search Endpoints",
             "pages": [
-              "api/endpoints/fuzzy-search"
+              "api/endpoints/fuzzy-search",
+              "api/endpoints/get-search-autocomplete"
             ]
           },
           {
