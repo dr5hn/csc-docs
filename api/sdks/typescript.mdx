@@ -7,7 +7,7 @@ icon: "js"
 Official JS/TS client for the live Country State City REST API — countries, states, cities, regions, currencies, phone codes, timezones, fuzzy search, and account usage. Zero runtime dependencies, dual ESM/CJS builds, full TypeScript types.
 
 <Note>
-  This is not the same thing as the [npm Packages](/api/sdks/npm) covered elsewhere on this site. Those embed the geographical data directly — no API key, no network call. `@countrystatecity/sdk` is the opposite: a **live REST API client**. It needs an API key, makes real HTTP requests, and is subject to your plan's usage quotas — in exchange, it's always current and covers endpoints the offline packages don't have (`search`, `usage`, `changes`, live currency/timezone/phone lookups). You can use both together — see **Migrating from the local packages** below.
+  This is not the same thing as the [npm Packages](/api/sdks/npm) covered elsewhere on this site. Those embed the geographical data directly — no API key, no network call. `@countrystatecity/sdk` is the opposite: a **live REST API client**. It needs an API key, makes real HTTP requests, and is subject to your plan's usage quotas — in exchange, it's always current and covers endpoints the offline packages don't have (`search`, `usage`, and live currency/timezone/phone lookups). You can use both together — see **Migrating from the local packages** below.
 </Note>
 
 <Warning>
@@ -20,7 +20,7 @@ Official JS/TS client for the live Country State City REST API — countries, st
 npm install @countrystatecity/sdk
 ```
 
-Requires **Node.js 18+** (for native `fetch`) or any modern browser. Zero runtime dependencies — built entirely on native `fetch`, `URL`/`URLSearchParams`, and `AbortController`. You'll need an API key — get one at [countrystatecity.in](https://countrystatecity.in).
+Requires **Node.js 18+** (for native `fetch`) or any modern browser. Zero runtime dependencies — built entirely on native `fetch`, `URL`/`URLSearchParams`, and `AbortController`. You'll need an API key — get one at [countrystatecity.in](https://countrystatecity.in) and compare [plans and quotas](https://countrystatecity.in/pricing).
 
 ## Quick Start
 
@@ -41,7 +41,7 @@ const { data: matches } = await csc.search.fuzzy({
 });
 ```
 
-Every resource method returns `{ data, meta }` — `data` is exactly the API's entity payload, unwrapped and untouched; `meta` carries request/rate-limit/cache metadata alongside it. See **Response Metadata** below.
+Every resource method returns `{ data, meta }` — `data` contains the typed result and `meta` carries request, usage, pagination, and cache information alongside it. See **Response Metadata** below.
 
 ## Configuration
 
@@ -67,25 +67,20 @@ Every `list`/`get`/etc. method also accepts a trailing `{ signal?, timeout?, hea
 
 | Resource | Methods |
 |---|---|
-| `csc.countries` | `list(params?)`, `get(iso2)` |
-| `csc.states` | `list({ country?, limit?, offset? })`, `get(country, stateCode)` |
-| `csc.cities` | `list({ country?, state?, kind?, limit?, offset? })`, `get(country, stateCode, cityId)` |
+| `csc.countries` | `list({ limit?, offset?, fields?, sort? })`, `get(iso2)` |
+| `csc.states` | `list({ country?, limit?, offset?, fields?, sort? })`, `get(country, stateCode)` |
+| `csc.cities` | `list({ country?, state?, kind?, limit?, offset?, fields?, sort? })`, `get(country, stateCode, cityId)` |
 | `csc.regions` | `list()`, `get(id)`, `subregions(id)` |
 | `csc.currencies` | `list()`, `get(code)`, `byCountry(iso2)` |
 | `csc.iso` | `lookup({ iso2? \| iso3? \| numeric? })` |
 | `csc.phone` | `list()`, `get(iso2)`, `byDialCode(dialCode)` |
 | `csc.timezones` | `list()`, `byCountry(iso2)`, `convert({ time, from, to })` |
-| `csc.search` | `fuzzy({ query, type?, country?, limit? })` |
+| `csc.search` | `fuzzy({ query, type?, country?, limit?, threshold? })` — `type` defaults to `city` |
 | `csc.usage` | `get()` — returns cached rate-limit usage from the last request when available, otherwise makes one lightweight request |
-| `csc.changes` | `list({ since?, resource?, limit? })` — `@beta`, see note below |
 
 <Note>
   `csc.cities.list({ state })` requires `country` to also be set — a `ValidationError` is thrown client-side otherwise, before any network call.
 </Note>
-
-<Warning>
-  `csc.changes` is `@beta`. Endpoint availability isn't confirmed across all accounts/plans yet — calls may 404 until it ships on your account. It's typed now so upgrading later requires no SDK changes.
-</Warning>
 
 ## Error Handling
 
@@ -94,6 +89,7 @@ All errors extend `CSCError` (`message`, `statusCode`, `requestId`, `url`, `retr
 ```typescript
 import {
   AuthenticationError,
+  ForbiddenError,
   ValidationError,
   FeatureRestrictedError,
   RateLimitError,
@@ -109,11 +105,14 @@ try {
     console.error(`Bad input: ${err.field} — ${err.reason}`);
   } else if (err instanceof AuthenticationError) {
     console.error('Invalid or missing API key.');
+  } else if (err instanceof ForbiddenError) {
+    console.error('Request blocked by API-key domain or IP restrictions.');
   } else if (err instanceof FeatureRestrictedError) {
     console.error(`"${err.feature}" needs the ${err.requiredPlan} plan (you're on ${err.currentPlan}).`);
     console.error(`Upgrade: ${err.upgradeUrl}`);
   } else if (err instanceof RateLimitError) {
     console.error(`Rate limited (${err.scope}). Retry after ${err.retryAfter}s.`);
+    console.error(`Upgrade: ${err.upgradeUrl}`);
   } else if (err instanceof NotFoundError) {
     console.error(`${err.resource} "${err.identifier}" not found.`);
   } else if (err instanceof TimeoutError) {
@@ -129,9 +128,10 @@ try {
 | Class | When | Extra fields |
 |---|---|---|
 | `AuthenticationError` | 401 — missing or invalid API key | — |
+| `ForbiddenError` | 403 — blocked by an API-key domain or IP restriction | — |
 | `ValidationError` | Malformed input caught client-side, or a 4xx validation response | `field`, `value`, `reason` |
 | `FeatureRestrictedError` | 403 — current plan doesn't include this feature | `feature`, `currentPlan`, `requiredPlan`, `upgradeUrl` |
-| `RateLimitError` | 429 — daily or monthly quota exceeded | `scope` (`daily`/`monthly`), `limit`, `remaining`, `resetAt`, `retryAfter` |
+| `RateLimitError` | 429 — daily or monthly quota exceeded | `scope` (`daily`/`monthly`), `limit`, `remaining`, `resetAt`, `retryAfter`, `tier`, `upgradeUrl` |
 | `NotFoundError` | 404 — resource doesn't exist | `resource`, `identifier` |
 | `NetworkError` | Connection failure, or a 5xx that exhausted all retries | — |
 | `TimeoutError` | A request (including retries) exceeded its configured timeout | `timeoutMs` |
@@ -169,11 +169,12 @@ meta.requestId;    // string | undefined
 meta.rateLimit;    // { dailyUsed, dailyLimit, monthlyUsed, monthlyLimit } | undefined
 meta.dataVersion;  // string | undefined
 meta.cache;        // 'HIT' | 'MISS' | 'DYNAMIC' | undefined
+meta.pagination;   // { total, limit, offset, hasMore } | undefined
 meta.retryCount;   // number of retries this call needed
 ```
 
 <Tip>
-  `meta.dataVersion` is the SDK-side way to read the same value documented on [Get Data Version](/api/endpoints/get-data-version) — it comes back on every call, no extra request needed.
+  `meta.dataVersion` is the SDK-side way to read the same value documented on [Get Data Version](/api/endpoints/get-data-version). When the response includes the data-version header, no extra request is needed.
 </Tip>
 
 `csc.getLastResponseMeta()` returns the metadata from the most recent successful request on that client instance — useful for surfacing usage in a UI without an extra call.
@@ -197,7 +198,7 @@ Use the SDK directly in any Node.js 18+ script or backend service. In Next.js, k
 
 ## Bundle Size
 
-~6.2KB gzipped (ESM build), against a 20KB budget enforced in CI — zero runtime dependencies.
+~6.9KB gzipped (ESM build), against a 20KB budget enforced in CI — zero runtime dependencies.
 
 ## Migrating from the Local Packages
 
@@ -226,7 +227,7 @@ const { data: cities } = await csc.cities.list({ country: 'US', state: 'CA' });
 ### Why migrate
 
 - You need data more current than the weekly-updated local snapshot.
-- You need `search`, `usage`, or `changes` — none of these have a local-package equivalent.
+- You need `search` or `usage` — neither has a local-package equivalent.
 - You're already calling the live API elsewhere and want one typed client instead of hand-rolled `fetch` calls.
 
 ### Why not to migrate
@@ -241,7 +242,7 @@ If you don't need any of the above, staying on the local package is usually the 
 - **The shape is `{ data, meta }`**, not the bare array/object the local package returns — destructure `data` at the call site.
 
 <Tip>
-  You don't have to choose one. Keep `@countrystatecity/countries` for offline/bundled lookups and add `@countrystatecity/sdk` only for what it uniquely provides — `search`, `usage`, `changes`, and guaranteed-current data. They don't conflict.
+  You don't have to choose one. Keep `@countrystatecity/countries` for offline/bundled lookups and add `@countrystatecity/sdk` only for what it uniquely provides — `search`, `usage`, and guaranteed-current data. They don't conflict.
 </Tip>
 
 ## TypeScript Types
@@ -262,7 +263,6 @@ import type {
   IConvertedTime,
   ISearchResult,
   IUsageSnapshot,
-  IChangeEvent,
 } from '@countrystatecity/sdk';
 ```
 
