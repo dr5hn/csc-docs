@@ -158,6 +158,82 @@ csc generate seed --entity countries --format prisma
 csc generate seed -e states -f prisma --country IN
 ```
 
+## Live Location Components
+
+These commands create live components that call the [Autocomplete API](/api/endpoints/get-search-autocomplete) as the user types. Unlike `dropdown` and `seed`, they do not download data when you generate the files, so the generator works offline.
+
+<Note>
+  The generated component needs a **Professional or Business** API plan when it runs. [Get an API key](https://app.countrystatecity.in?source=cli_docs&campaign=location_components&package=cli) or [compare plans](https://countrystatecity.in/pricing?source=cli_docs&campaign=location_components&package=cli).
+</Note>
+
+```bash
+# Type-ahead search field
+csc generate autocomplete --target nextjs         # server API route + client component (recommended)
+csc generate autocomplete --target react-browser  # calls the API directly from the browser
+
+# Cascading country → state → city picker
+csc generate location-picker --target nextjs
+csc generate location-picker --target react-browser
+```
+
+`--target` is required: `nextjs` or `react-browser`. `--output <dir>` defaults to the current directory. Both generators always produce TypeScript (`.tsx`) — there's no `--typescript`/`--no-typescript` toggle like `dropdown` has.
+
+### Choosing a target
+
+<Tabs>
+<Tab title="nextjs (recommended)">
+  Generates a server Route Handler (`app/api/csc-search/route.ts`) that holds `CSC_API_KEY` server-side and proxies to the Autocomplete API — the key never reaches the browser. `autocomplete` and `location-picker` share this same route file when both are generated with `nextjs`.
+</Tab>
+<Tab title="react-browser">
+  No server — the generated component calls the API directly from the browser via the SDK, so the key ships in your JavaScript bundle.
+
+  <Warning>
+    Before using a `react-browser`-generated component, create an API key in your CSC dashboard **restricted to your site's origin(s)**. Never use an unrestricted/server key here — it would be visible in the browser and every outgoing request. The CLI prints this warning before writing any files, and it's repeated in both the generated component's header comment and the generated README, so it survives past the initial run.
+  </Warning>
+</Tab>
+</Tabs>
+
+### What gets generated
+
+Every run also writes an `.env.example` and a short README:
+
+| Command | Files |
+|---|---|
+| `autocomplete --target nextjs` | `app/api/csc-search/route.ts`, `components/LocationAutocomplete.tsx`, `.env.example`, `CSC-AUTOCOMPLETE-README.md` |
+| `autocomplete --target react-browser` | `components/LocationAutocomplete.tsx`, `.env.example`, `CSC-AUTOCOMPLETE-README.md` |
+| `location-picker --target nextjs` | `app/api/csc-search/route.ts`, `components/LocationPicker.tsx`, `.env.example`, `CSC-LOCATION-PICKER-README.md` |
+| `location-picker --target react-browser` | `components/LocationPicker.tsx`, `.env.example`, `CSC-LOCATION-PICKER-README.md` |
+
+`.env.example` uses a placeholder, never a real key — `CSC_API_KEY=YOUR_API_KEY_HERE` for `nextjs`, `VITE_CSC_API_KEY=YOUR_API_KEY_HERE` for `react-browser`.
+
+For safety, the command stops before writing anything if one of these files already exists. It never replaces your existing files.
+
+### Behavior
+
+Both components share the same search-field logic:
+
+- Debounced input (~250ms), 2-character minimum before searching
+- Cancels the previous in-flight request when new input arrives, so a slow response never overwrites a newer one
+- Five distinct states — `loading`, `empty`, `plan-restricted`, `rate-limited`, `network-error` — each with its own message, not one generic error
+- Full keyboard support: `ArrowUp`/`ArrowDown` to move, `Enter` to select the highlighted result, `Escape` or `Tab` to close
+- ARIA combobox pattern (`role="combobox"`, `aria-expanded`, `aria-controls`, `aria-autocomplete`, `aria-activedescendant`) for screen readers
+
+<Note>
+  Selections carry stable identifiers (`id`, `iso2`, `country_code`, `state_code`, depending on entity) alongside the display `label`. Use the identifiers for anything programmatic — storing a selection, filtering a follow-up request, and so on. `label` is for display only.
+</Note>
+
+`location-picker` cascades three fields — country, then state, then city. The state field is disabled until a country is picked; the city field is disabled until a state is picked. Selecting a country clears both state and city; selecting a state clears only city:
+
+```typescript
+export interface LocationPickerValue {
+  country: IAutocompleteResult | null;
+  state: IAutocompleteResult | null;
+  city: IAutocompleteResult | null;
+}
+```
+
+`autocomplete` reports its selection via `onSelect?: (result: IAutocompleteResult) => void`. `location-picker` reports the whole cascade via `onChange?: (value: LocationPickerValue) => void`, called after every level changes.
+
 ## Interactive Explorer
 
 ```bash
