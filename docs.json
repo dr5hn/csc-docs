@@ -117,6 +117,7 @@
               "api/sdks/npm",
               "api/sdks/python",
               "api/sdks/typescript",
+              "api/sdks/cli",
               "api/examples"
             ]
           },
