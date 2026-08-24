@@ -6,6 +6,8 @@ icon: "terminal"
 
 Official CLI for the Country State City API — search, explore, and generate code from geographic data, right from your terminal.
 
+[Get a free API key](https://app.countrystatecity.in?source=sdk_docs&campaign=sdk_api_migration&package=cli) to start, then [compare plans](https://countrystatecity.in/pricing?source=sdk_docs&campaign=sdk_api_migration&package=cli) when you need more data, higher limits, fuzzy search, or autocomplete.
+
 <Note>
   Like the [TypeScript SDK](/api/sdks/typescript) — which the CLI is built on internally — this calls the **live API**, not a bundled snapshot. It needs an API key and is subject to your plan's usage quotas. For offline/bundled data with no API key, see [npm Packages](/api/sdks/npm).
 </Note>
@@ -55,7 +57,7 @@ csc search countries
 csc search countries --filter "united"
 csc search states --country IN
 csc search cities --country IN --state MH
-csc search regions   # Requires Starter+ plan
+csc search regions   # Requires Supporter+ plan
 csc search india     # Global search — matches country names
 ```
 
@@ -68,7 +70,7 @@ Works two ways:
 **Global**, across a chosen entity type:
 
 ```bash
-csc search "Banglore" --type city --country IN --fuzzy
+csc search "Mumbay" --type city --country IN --fuzzy
 ```
 
 `--type` defaults to `city` if omitted. `--country` scopes results and isn't used with `--type country`.
@@ -78,7 +80,7 @@ csc search "Banglore" --type city --country IN --fuzzy
 ```bash
 csc search countries --filter "Indea" --fuzzy
 csc search states --country IN --filter "Maharastra" --fuzzy
-csc search cities --country IN --filter "Banglore" --fuzzy
+csc search cities --country IN --filter "Mumbay" --fuzzy
 ```
 
 `--fuzzy` requires `--filter` on these subcommands — the CLI exits with an error if you pass `--fuzzy` without it. On `cities`, `--state` is ignored when `--fuzzy` is set, since fuzzy search only scopes by country.
@@ -130,7 +132,7 @@ csc upgrade --json        # Returns { plans, currentPlan }
 ```
 
 <Note>
-  `csc upgrade` fetches live plan and pricing data from the API on every run, so what you see always matches the current [pricing page](https://app.countrystatecity.in/pricing) — it isn't a table baked into the CLI's own code that can drift out of date.
+  `csc upgrade` fetches live plan and pricing data from the API on every run, so what you see always matches the current [pricing page](https://countrystatecity.in/pricing?source=sdk_docs&campaign=sdk_api_migration&package=cli) — it isn't a table baked into the CLI's own code that can drift out of date.
 </Note>
 
 ## Plan-Gated Features
