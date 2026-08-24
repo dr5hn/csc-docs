@@ -1,16 +1,57 @@
 ---
-title: "Python Packages"
-description: "Official countrystatecity Python packages — type-safe, lazily loaded geographical data with Pydantic models and zero extra dependencies"
+title: "Python SDK & Packages"
+description: "Use the official countrystatecity-api client for live managed data, or install type-safe offline geographical data packages"
 icon: "python"
 ---
 
-The `countrystatecity` Python packages provide access to countries, states, cities, timezones, currencies, and translations data with full type hints, Pydantic models, and lazy loading. All data is bundled directly — no API key or network requests needed.
+Python applications can use the live Country State City API or install versioned offline data snapshots:
+
+- **Live API SDK:** `countrystatecity-api` provides typed synchronous and asynchronous clients, structured errors, and current managed data.
+- **Offline packages:** the suffixed `countrystatecity-*` packages bundle data for applications that cannot use an API key or network connection.
 
 <Note>
-  Always install using the suffixed package name (e.g. `countrystatecity-countries`). There is no bare `countrystatecity` package on PyPI — `pip install countrystatecity` will not work.
+  Install the live client with `pip install countrystatecity-api`, then import it as `countrystatecity`. There is no bare `countrystatecity` distribution on PyPI.
 </Note>
 
-## Available Packages
+## Live API SDK
+
+Install the official API client and keep your key in a server-side environment variable:
+
+```bash
+pip install countrystatecity-api
+export CSC_API_KEY="YOUR_API_KEY"
+```
+
+[Create a free API key](https://app.countrystatecity.in/?source=sdk_docs&campaign=sdk_api_migration&package=countrystatecity-api&utm_source=docs&utm_medium=documentation&utm_campaign=python_packages&utm_content=python_sdk) and [compare plans](https://countrystatecity.in/pricing/?source=sdk_docs&campaign=sdk_api_migration&package=countrystatecity-api&utm_source=docs&utm_medium=documentation&utm_campaign=python_packages&utm_content=python_sdk).
+
+```python
+from countrystatecity import CountryStateCity, CountryStateCityError
+
+try:
+    with CountryStateCity() as client:
+        states = client.get_states_of_country("IN")
+        for state in states[:3]:
+            print(state["name"])
+except CountryStateCityError as error:
+    print(f"Country State City request failed: {error}")
+```
+
+Use `AsyncCountryStateCity` with `async with` for non-blocking applications. Both clients cover countries, states, cities, regions, subregions, timezones, currencies, dial codes, ISO conversion, phone parsing, and fuzzy search.
+
+<CardGroup cols={2}>
+  <Card title="Get a free API key" icon="key" href="https://app.countrystatecity.in/?source=sdk_docs&campaign=sdk_api_migration&package=countrystatecity-api&utm_source=docs&utm_medium=documentation&utm_campaign=python_packages&utm_content=python_sdk_card">
+    Start on the free tier and create a server-side API key.
+  </Card>
+  <Card title="Compare API plans" icon="credit-card" href="https://countrystatecity.in/pricing/?source=sdk_docs&campaign=sdk_api_migration&package=countrystatecity-api&utm_source=docs&utm_medium=documentation&utm_campaign=python_packages&utm_content=python_sdk_card">
+    Review quotas and plan-specific capabilities.
+  </Card>
+</CardGroup>
+
+## Offline Packages
+
+The offline packages use full type hints, Pydantic models, and lazy loading. Their data is bundled directly, so they do not require an API key or network request.
+
+### Available Packages
 
 | Package | Status | Description |
 |---|---|---|
@@ -19,8 +60,10 @@ The `countrystatecity` Python packages provide access to countries, states, citi
 | `countrystatecity-currencies` | Released | Currency codes, symbols, and country associations |
 | `countrystatecity-translations` | Released | Country name translations in 19 languages |
 | `countrystatecity-phonecodes` | Released | International dialing codes for 250+ countries |
+| `countrystatecity-regions` | Released | Region and subregion associations |
+| `countrystatecity-postal-codes` | Released | Postal code records and format validation |
 
-## Installation
+### Installation
 
 Install only what you need:
 
@@ -30,11 +73,13 @@ pip install countrystatecity-timezones
 pip install countrystatecity-currencies
 pip install countrystatecity-translations
 pip install countrystatecity-phonecodes
+pip install countrystatecity-regions
+pip install countrystatecity-postal-codes
 ```
 
-## Usage
+### Usage
 
-### Countries
+#### Countries
 
 ```python
 from countrystatecity_countries import get_countries, get_country_by_code
@@ -48,7 +93,7 @@ print(f"Capital: {usa.capital}")
 print(f"Currency: {usa.currency_symbol} {usa.currency_name}")
 ```
 
-### States
+#### States
 
 ```python
 from countrystatecity_countries import get_states_of_country
@@ -63,7 +108,7 @@ for state in states[:3]:
 # Tamil Nadu (TN)
 ```
 
-### Cities
+#### Cities
 
 ```python
 from countrystatecity_countries import get_cities_of_state
@@ -78,7 +123,7 @@ for city in cities[:3]:
 # San Jose — 37.33939, -121.89496
 ```
 
-### Country Details
+#### Country Details
 
 ```python
 from countrystatecity_countries import get_country_by_code
@@ -94,7 +139,7 @@ print(gb.region)         # Europe
 print(gb.timezones)      # [...]
 ```
 
-### Timezones
+#### Timezones
 
 ```python
 from countrystatecity_timezones import (
@@ -118,7 +163,7 @@ dt = datetime(2024, 1, 1, 12, 0, 0)
 converted = convert_time(dt, "America/New_York", "Asia/Kolkata")
 ```
 
-### Currencies
+#### Currencies
 
 ```python
 from countrystatecity_currencies import (
@@ -141,7 +186,7 @@ print(f"Countries using EUR: {len(countries)}")
 results = search_currencies("dollar")
 ```
 
-### Translations
+#### Translations
 
 ```python
 from countrystatecity_translations import (
@@ -163,7 +208,7 @@ japanese = get_translations_by_language("ja")
 print(f"Japanese translations: {len(japanese)}")
 ```
 
-### Phone Codes
+#### Phone Codes
 
 ```python
 from countrystatecity_phonecodes import (
@@ -205,7 +250,7 @@ results = search_phonecodes("united")
   </Card>
 </CardGroup>
 
-## Data Updates
+## Offline Data Updates
 
 To get the latest data, upgrade any package:
 
@@ -215,6 +260,8 @@ pip install --upgrade countrystatecity-timezones
 pip install --upgrade countrystatecity-currencies
 pip install --upgrade countrystatecity-translations
 pip install --upgrade countrystatecity-phonecodes
+pip install --upgrade countrystatecity-regions
+pip install --upgrade countrystatecity-postal-codes
 ```
 
 ## Source
@@ -222,6 +269,9 @@ pip install --upgrade countrystatecity-phonecodes
 <CardGroup cols={2}>
   <Card title="GitHub Repository" icon="github" href="https://github.com/dr5hn/countrystatecity-pypi">
     View source, open issues, or contribute.
+  </Card>
+  <Card title="countrystatecity-api" icon="python" href="https://pypi.org/project/countrystatecity-api/">
+    Official live API client on PyPI.
   </Card>
   <Card title="countrystatecity-countries" icon="python" href="https://pypi.org/project/countrystatecity-countries/">
     Countries, states, and cities on PyPI.
@@ -237,5 +287,11 @@ pip install --upgrade countrystatecity-phonecodes
   </Card>
   <Card title="countrystatecity-phonecodes" icon="python" href="https://pypi.org/project/countrystatecity-phonecodes/">
     Phone codes data on PyPI.
+  </Card>
+  <Card title="countrystatecity-regions" icon="python" href="https://pypi.org/project/countrystatecity-regions/">
+    Regions and subregions on PyPI.
+  </Card>
+  <Card title="countrystatecity-postal-codes" icon="python" href="https://pypi.org/project/countrystatecity-postal-codes/">
+    Postal code records and validation on PyPI.
   </Card>
 </CardGroup>

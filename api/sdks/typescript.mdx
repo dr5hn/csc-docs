@@ -1,0 +1,278 @@
+---
+title: "TypeScript SDK"
+description: "Official @countrystatecity/sdk — a live REST API client for Node.js and browser, with typed resources, structured errors, and automatic retries"
+icon: "js"
+---
+
+Official JS/TS client for the live Country State City REST API — countries, states, cities, regions, currencies, phone codes, timezones, fuzzy search, and account usage. Zero runtime dependencies, dual ESM/CJS builds, full TypeScript types.
+
+<Note>
+  This is not the same thing as the [npm Packages](/api/sdks/npm) covered elsewhere on this site. Those embed the geographical data directly — no API key, no network call. `@countrystatecity/sdk` is the opposite: a **live REST API client**. It needs an API key, makes real HTTP requests, and is subject to your plan's usage quotas — in exchange, it's always current and covers endpoints the offline packages don't have (`search`, `usage`, and live currency/timezone/phone lookups). You can use both together — see **Migrating from the local packages** below.
+</Note>
+
+<Warning>
+  `@countrystatecity/sdk` is currently **0.1.0**, pre-1.0. The API surface may still shift before a stable 1.0 release.
+</Warning>
+
+## Installation
+
+```bash
+npm install @countrystatecity/sdk
+```
+
+Requires **Node.js 18+** (for native `fetch`) or any modern browser. Zero runtime dependencies — built entirely on native `fetch`, `URL`/`URLSearchParams`, and `AbortController`. You'll need an API key — [get one free](https://app.countrystatecity.in?source=sdk_docs&campaign=sdk_api_migration&package=%40countrystatecity%2Fsdk) and compare [plans and quotas](https://countrystatecity.in/pricing?source=sdk_docs&campaign=sdk_api_migration&package=%40countrystatecity%2Fsdk).
+
+## Quick Start
+
+```typescript
+import { createCSCClient } from '@countrystatecity/sdk';
+
+const csc = createCSCClient({ apiKey: process.env.CSC_API_KEY! });
+
+const { data: countries } = await csc.countries.list();
+const { data: states } = await csc.states.list({ country: 'IN' });
+const { data: cities } = await csc.cities.list({ country: 'IN', state: 'MH' });
+
+const { data: matches } = await csc.search.fuzzy({
+  query: 'Banglore',
+  type: 'city',
+  country: 'IN',
+  limit: 10,
+});
+```
+
+Every resource method returns `{ data, meta }` — `data` contains the typed result and `meta` carries request, usage, pagination, and cache information alongside it. See **Response Metadata** below.
+
+## Configuration
+
+```typescript
+const csc = createCSCClient({
+  apiKey: 'your-api-key',        // required — never read from env or persisted by the SDK
+  baseUrl: 'https://api.countrystatecity.in/v1', // default
+  timeout: 10_000,                // ms, per request attempt, default 10000
+  fetch: myCustomFetch,           // optional custom fetch implementation
+  headers: { 'X-Trace-Id': 'x' }, // extra headers merged into every request
+  retry: { retries: 2, baseDelayMs: 200, maxDelayMs: 2000 }, // or `false` to disable
+  userAgent: 'my-app/1.0',        // overrides the default countrystatecity-sdk-js/<version>
+});
+```
+
+<Note>
+  The SDK never reads `apiKey` from an environment variable and never writes it to disk — pass it explicitly at construction time.
+</Note>
+
+## Resource Reference
+
+Every `list`/`get`/etc. method also accepts a trailing `{ signal?, timeout?, headers? }` for per-call overrides — see **Retries & Timeouts** below.
+
+| Resource | Methods |
+|---|---|
+| `csc.countries` | `list({ limit?, offset?, fields?, sort? })`, `get(iso2)` |
+| `csc.states` | `list({ country?, limit?, offset?, fields?, sort? })`, `get(country, stateCode)` |
+| `csc.cities` | `list({ country?, state?, kind?, limit?, offset?, fields?, sort? })`, `get(country, stateCode, cityId)` |
+| `csc.regions` | `list()`, `get(id)`, `subregions(id)` |
+| `csc.currencies` | `list()`, `get(code)`, `byCountry(iso2)` |
+| `csc.iso` | `lookup({ iso2? \| iso3? \| numeric? })` |
+| `csc.phone` | `list()`, `get(iso2)`, `byDialCode(dialCode)` |
+| `csc.timezones` | `list()`, `byCountry(iso2)`, `convert({ time, from, to })` |
+| `csc.search` | `fuzzy({ query, type?, country?, limit?, threshold? })` — `type` defaults to `city` |
+| `csc.usage` | `get()` — returns cached rate-limit usage from the last request when available, otherwise makes one lightweight request |
+
+<Note>
+  `csc.cities.list({ state })` requires `country` to also be set — a `ValidationError` is thrown client-side otherwise, before any network call.
+</Note>
+
+## Error Handling
+
+All errors extend `CSCError` (`message`, `statusCode`, `requestId`, `url`, `retryCount`):
+
+```typescript
+import {
+  AuthenticationError,
+  ForbiddenError,
+  ValidationError,
+  FeatureRestrictedError,
+  RateLimitError,
+  NotFoundError,
+  NetworkError,
+  TimeoutError,
+} from '@countrystatecity/sdk';
+
+try {
+  await csc.search.fuzzy({ query: 'Mumbai' });
+} catch (err) {
+  if (err instanceof ValidationError) {
+    console.error(`Bad input: ${err.field} — ${err.reason}`);
+  } else if (err instanceof AuthenticationError) {
+    console.error('Invalid or missing API key.');
+  } else if (err instanceof ForbiddenError) {
+    console.error('Request blocked by API-key domain or IP restrictions.');
+  } else if (err instanceof FeatureRestrictedError) {
+    console.error(`"${err.feature}" needs the ${err.requiredPlan} plan (you're on ${err.currentPlan}).`);
+    console.error(`Upgrade: ${err.upgradeUrl}`);
+  } else if (err instanceof RateLimitError) {
+    console.error(`Rate limited (${err.scope}). Retry after ${err.retryAfter}s.`);
+    console.error(`Upgrade: ${err.upgradeUrl}`);
+  } else if (err instanceof NotFoundError) {
+    console.error(`${err.resource} "${err.identifier}" not found.`);
+  } else if (err instanceof TimeoutError) {
+    console.error(`Timed out after ${err.timeoutMs}ms.`);
+  } else if (err instanceof NetworkError) {
+    console.error('Network or server error:', err.message);
+  }
+}
+```
+
+### Error class reference
+
+| Class | When | Extra fields |
+|---|---|---|
+| `AuthenticationError` | 401 — missing or invalid API key | — |
+| `ForbiddenError` | 403 — blocked by an API-key domain or IP restriction | — |
+| `ValidationError` | Malformed input caught client-side, or a 4xx validation response | `field`, `value`, `reason` |
+| `FeatureRestrictedError` | 403 — current plan doesn't include this feature | `feature`, `currentPlan`, `requiredPlan`, `upgradeUrl` |
+| `RateLimitError` | 429 — daily or monthly quota exceeded | `scope` (`daily`/`monthly`), `limit`, `remaining`, `resetAt`, `retryAfter`, `tier`, `upgradeUrl` |
+| `NotFoundError` | 404 — resource doesn't exist | `resource`, `identifier` |
+| `NetworkError` | Connection failure, or a 5xx that exhausted all retries | — |
+| `TimeoutError` | A request (including retries) exceeded its configured timeout | `timeoutMs` |
+
+`ValidationError` can also be thrown synchronously — as a rejected promise, before any network call is made — for malformed input like bad ISO codes, out-of-range coordinates, or invalid limits.
+
+## Retries & Timeouts
+
+GET requests are retried automatically on transient network errors, `429`, and `5xx` responses — never on `401`/`403`/`404`/`400`-class responses, and never on a caller-initiated `AbortSignal` cancellation. Defaults: 2 retries, full-jitter exponential backoff (200ms base, 2000ms cap). Any `Retry-After` response header takes precedence over the computed delay.
+
+```typescript
+const csc = createCSCClient({ apiKey: 'k', retry: false }); // disable entirely
+const csc2 = createCSCClient({ apiKey: 'k', retry: { retries: 5, baseDelayMs: 100, maxDelayMs: 5000 } });
+```
+
+<Warning>
+  `timeout` applies **per attempt**, not as a total budget — worst-case latency for a call is roughly `timeout × attempts + sum(backoff delays)`.
+</Warning>
+
+Override per call:
+
+```typescript
+const controller = new AbortController();
+setTimeout(() => controller.abort(), 3000);
+
+await csc.countries.list(undefined, { signal: controller.signal, timeout: 5000 });
+```
+
+## Response Metadata
+
+```typescript
+const { data, meta } = await csc.countries.list();
+
+meta.requestId;    // string | undefined
+meta.rateLimit;    // { dailyUsed, dailyLimit, monthlyUsed, monthlyLimit } | undefined
+meta.dataVersion;  // string | undefined
+meta.cache;        // 'HIT' | 'MISS' | 'DYNAMIC' | undefined
+meta.pagination;   // { total, limit, offset, hasMore } | undefined
+meta.retryCount;   // number of retries this call needed
+```
+
+<Tip>
+  `meta.dataVersion` is the SDK-side way to read the same value documented on [Get Data Version](/api/endpoints/get-data-version). When the response includes the data-version header, no extra request is needed.
+</Tip>
+
+`csc.getLastResponseMeta()` returns the metadata from the most recent successful request on that client instance — useful for surfacing usage in a UI without an extra call.
+
+## Browser Usage
+
+```typescript
+import { createCSCClient } from '@countrystatecity/sdk';
+
+const csc = createCSCClient({ apiKey: PUBLISHABLE_RESTRICTED_KEY });
+const { data } = await csc.countries.list();
+```
+
+<Warning>
+  **A key embedded in browser JavaScript is public** — visible in your bundle and every outgoing request. Never use an unrestricted/server key here. Instead, create a key in your CSC dashboard that's **restricted to specific allowed origins** (your site's domain(s)); requests from any other origin are rejected server-side. The SDK adds no protection on top of this — origin restriction is an account/dashboard setting, not something the client enforces.
+</Warning>
+
+## Node.js and Next.js
+
+Use the SDK directly in any Node.js 18+ script or backend service. In Next.js, keep it **server-side** — in a Route Handler, Server Component, or Server Action — so your API key never reaches the client bundle.
+
+## Bundle Size
+
+~6.9KB gzipped (ESM build), against a 20KB budget enforced in CI — zero runtime dependencies.
+
+## Migrating from the Local Packages
+
+If you're already using [`@countrystatecity/countries`](/api/sdks/npm) and want live, quota-aware data instead of the weekly-updated bundled snapshot:
+
+```typescript
+// Before — @countrystatecity/countries
+import { getCountries, getStatesOfCountry, getCitiesOfState } from '@countrystatecity/countries';
+
+const countries = await getCountries();
+const states = await getStatesOfCountry('US');
+const cities = await getCitiesOfState('US', 'CA');
+```
+
+```typescript
+// After — @countrystatecity/sdk
+import { createCSCClient } from '@countrystatecity/sdk';
+
+const csc = createCSCClient({ apiKey: process.env.CSC_API_KEY! });
+
+const { data: countries } = await csc.countries.list();
+const { data: states } = await csc.states.list({ country: 'US' });
+const { data: cities } = await csc.cities.list({ country: 'US', state: 'CA' });
+```
+
+### Why migrate
+
+- You need data more current than the weekly-updated local snapshot.
+- You need `search` or `usage` — neither has a local-package equivalent.
+- You're already calling the live API elsewhere and want one typed client instead of hand-rolled `fetch` calls.
+
+### Why not to migrate
+
+If you don't need any of the above, staying on the local package is usually the better choice — it's free, has no network latency, and isn't subject to plan quotas.
+
+### What changes
+
+- **An API key is required.** The local package needs none.
+- **Every call is async and can fail with a network-shaped error** (`RateLimitError`, `NetworkError`, `TimeoutError`, and others) in addition to the local package's simpler failure modes.
+- **Results are quota-limited** per your plan (`RateLimitError`), not just rate-limited by your own code.
+- **The shape is `{ data, meta }`**, not the bare array/object the local package returns — destructure `data` at the call site.
+
+<Tip>
+  You don't have to choose one. Keep `@countrystatecity/countries` for offline/bundled lookups and add `@countrystatecity/sdk` only for what it uniquely provides — `search`, `usage`, and guaranteed-current data. They don't conflict.
+</Tip>
+
+## TypeScript Types
+
+```typescript
+import type {
+  CSCClientOptions,
+  CSCResponse,
+  CSCResponseMeta,
+  ICountry,
+  IState,
+  ICity,
+  IRegion,
+  ISubregion,
+  ICurrency,
+  IPhonecode,
+  ITimezone,
+  IConvertedTime,
+  ISearchResult,
+  IUsageSnapshot,
+} from '@countrystatecity/sdk';
+```
+
+## Source
+
+<CardGroup cols={2}>
+  <Card title="GitHub Repository" icon="github" href="https://github.com/dr5hn/countrystatecity-npm/tree/main/packages/sdk">
+    View the SDK source, open issues, or contribute.
+  </Card>
+  <Card title="npm Package" icon="npm" href="https://www.npmjs.com/package/@countrystatecity/sdk">
+    View published versions and changelog.
+  </Card>
+</CardGroup>

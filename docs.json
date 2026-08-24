@@ -30,6 +30,7 @@
               "api/introduction",
               "api/authentication",
               "api/field-filtering-and-sorting",
+              "api/errors",
               "api/faq"
             ]
           },
@@ -99,7 +100,14 @@
           {
             "group": "Search Endpoints",
             "pages": [
-              "api/endpoints/fuzzy-search"
+              "api/endpoints/fuzzy-search",
+              "api/endpoints/get-search-autocomplete"
+            ]
+          },
+          {
+            "group": "Meta Endpoints",
+            "pages": [
+              "api/endpoints/get-data-version"
             ]
           },
           {
@@ -108,6 +116,7 @@
               "api/sdks",
               "api/sdks/npm",
               "api/sdks/python",
+              "api/sdks/typescript",
               "api/sdks/cli",
               "api/examples"
             ]
