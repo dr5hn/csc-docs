@@ -30,6 +30,7 @@
               "api/introduction",
               "api/authentication",
               "api/field-filtering-and-sorting",
+              "api/errors",
               "api/faq"
             ]
           },
@@ -104,11 +105,18 @@
             ]
           },
           {
+            "group": "Meta Endpoints",
+            "pages": [
+              "api/endpoints/get-data-version"
+            ]
+          },
+          {
             "group": "SDKs & Examples",
             "pages": [
               "api/sdks",
               "api/sdks/npm",
               "api/sdks/python",
+              "api/sdks/typescript",
               "api/examples"
             ]
           },

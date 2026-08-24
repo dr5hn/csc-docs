@@ -7,7 +7,7 @@
     "sync-changelog": "node scripts/sync-changelog.js",
     "update-database-stats": "node scripts/update-database-stats.js",
     "dev": "npx mintlify dev",
-    "build": "npx mintlify build"
+    "build": "npx mintlify validate"
   },
   "keywords": ["documentation", "geography", "api", "countries", "states", "cities"],
   "author": "Country State City Team",

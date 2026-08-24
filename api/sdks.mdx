@@ -6,14 +6,20 @@ icon: "code"
 
 ## Official Packages
 
-The Country State City ecosystem provides official packages for JavaScript/TypeScript and Python. These packages embed the geographical data directly, so you can query countries, states, and cities without making HTTP requests or managing an API key.
+The Country State City ecosystem provides live REST API clients for TypeScript and Python, plus offline data packages for JavaScript/TypeScript and Python. Use a live client when you need managed, current data, server-side search, or plan-aware errors. Use an offline package when your application must run without an API key or network access.
 
 <CardGroup cols={2}>
   <Card title="npm Packages" icon="npm" href="/api/sdks/npm">
-    Five packages for Node.js and browser environments — countries, timezones, currencies, and translations.
+    Six packages for Node.js and browser environments, including the API-backed CLI.
   </Card>
   <Card title="Python Packages" icon="python" href="/api/sdks/python">
-    Type-safe Python packages built with Pydantic, with lazy loading and zero external dependencies.
+    Live sync and async API client, plus type-safe offline data packages.
+  </Card>
+  <Card title="TypeScript SDK" icon="js" color="#f7df1e" href="/api/sdks/typescript">
+    Live REST API client for Node.js and browser — search, usage tracking, and always-current data over HTTP.
+  </Card>
+  <Card title="Python API SDK" icon="python" color="#3776ab" href="/api/sdks/python#live-api-sdk">
+    Official typed REST API client with synchronous and asynchronous interfaces.
   </Card>
 </CardGroup>
 
@@ -24,12 +30,6 @@ The Country State City ecosystem provides official packages for JavaScript/TypeS
 We're currently developing official SDKs for the following languages and platforms:
 
 <CardGroup cols={2}>
-  <Card title="JavaScript/TypeScript" icon="js" color="#f7df1e">
-    Node.js and browser-compatible SDK with full TypeScript support
-  </Card>
-  <Card title="Python" icon="python" color="#3776ab">
-    Pythonic client library with async support
-  </Card>
   <Card title="PHP" icon="php" color="#777bb4">
     Modern PHP SDK with PSR compliance
   </Card>
@@ -52,11 +52,11 @@ We're currently developing official SDKs for the following languages and platfor
 
 ## Get Notified
 
-Want to be notified when SDKs are available? [Contact our support team](mailto:api@countrystatecity.in) to join the early access list.
+Want to be notified when another language SDK is available? [Contact our support team](mailto:api@countrystatecity.in) to join the early access list.
 
 ## In the Meantime
 
-While we work on official SDKs, you can integrate with our API using:
+For languages without an official SDK, you can integrate with our API using:
 
 <Steps>
   <Step title="Direct HTTP Requests">
