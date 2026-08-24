@@ -101,7 +101,8 @@
             "group": "Search Endpoints",
             "pages": [
               "api/endpoints/fuzzy-search",
-              "api/endpoints/get-search-autocomplete"
+              "api/endpoints/get-search-autocomplete",
+              "api/endpoints/get-search-nearby"
             ]
           },
           {

@@ -1,0 +1,201 @@
+---
+title: "Nearby Search"
+api: "GET https://api.countrystatecity.in/v1/search/nearby"
+authMethod: "key"
+description: "Find countries, states, and cities near a coordinate, ranked by straight-line distance"
+---
+
+Find countries, states, or cities near a `lat`/`lng` coordinate. Results are ordered from nearest to farthest.
+
+<Warning>
+  **This is not address search.** It does not:
+  - Find a street address
+  - Check whether a point is inside a country or state border
+  - Return country/state map shapes
+  - Calculate travel time or road distance
+
+  It measures straight-line distance to the stored coordinate for a city, state, or country.
+</Warning>
+
+<Note>**Availability:** Professional and Business plans. Other plans receive `403`. [Compare plans](https://countrystatecity.in/pricing?source=playground&campaign=nearby_search), or see **Trying it without a paid plan** below.</Note>
+
+## Authentication
+
+<ParamField header="X-CSCAPI-KEY" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="lat" type="number" required>
+  Latitude of the search origin. `-90` to `90`.
+</ParamField>
+
+<ParamField query="lng" type="number" required>
+  Longitude of the search origin. `-180` to `180`.
+</ParamField>
+
+<ParamField query="type" type="string" default="city">
+  What to search. One of `city`, `state`, or `country`.
+</ParamField>
+
+<ParamField query="country" type="string">
+  Only return results from this country. Use a two-letter country code such as `IN` or `US`. Do not use this with `type=country`.
+</ParamField>
+
+<ParamField query="state" type="string">
+  Only return cities from this state. This works only with `type=city` and requires `country`.
+</ParamField>
+
+<ParamField query="kind" type="string">
+  Only return this kind of city. This works only with `type=city`. Choose `settlement`, `administrative`, `section`, or `unknown`. See [City Types](/database/city-types).
+</ParamField>
+
+<ParamField query="min_population" type="integer">
+  Only return results with at least this population. Use a whole number of `0` or more.
+</ParamField>
+
+<ParamField query="radius" type="number" default="25">
+  Search radius in kilometers. `1`–`500`.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="20">
+  Maximum number of results to return. `1`–`100`.
+</ParamField>
+
+## Response
+
+Returns an array, nearest-first. Each item carries the standard fields for the entity at your plan's data-access level, plus:
+
+<ResponseField name="distance_km" type="number">
+  Straight-line distance from your coordinate, in kilometers, rounded to two decimal places.
+</ResponseField>
+
+<ResponseField name="kind" type="string">
+  The city kind. Included only in city results.
+</ResponseField>
+
+<Note>
+  State and city results always include `country_name` (and, for cities, `state_name`), regardless of your plan's data-access level — useful for display without a second lookup. This differs from [Autocomplete](/api/endpoints/get-search-autocomplete), which instead always includes `country_code`/`state_code` on city results; nearby search doesn't force those two.
+</Note>
+
+<RequestExample>
+```bash cURL (cities near Mumbai)
+curl -X GET 'https://api.countrystatecity.in/v1/search/nearby?lat=19.0760&lng=72.8777&radius=25&kind=settlement' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (states within 300km, minimum population)
+curl -X GET 'https://api.countrystatecity.in/v1/search/nearby?lat=19.0760&lng=72.8777&type=state&radius=300&min_population=1000000' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (cities within a specific state)
+curl -X GET 'https://api.countrystatecity.in/v1/search/nearby?lat=19.0760&lng=72.8777&country=IN&state=MH&limit=5' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```javascript JavaScript
+const params = new URLSearchParams({ lat: '19.0760', lng: '72.8777', radius: '25' });
+const response = await fetch(
+  `https://api.countrystatecity.in/v1/search/nearby?${params}`,
+  { headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' } }
+);
+
+const results = await response.json();
+results.forEach((r) => console.log(`${r.name} — ${r.distance_km} km`));
+```
+
+```python Python
+import requests
+
+response = requests.get(
+  'https://api.countrystatecity.in/v1/search/nearby',
+  params={'lat': 19.0760, 'lng': 72.8777, 'radius': 25},
+  headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+)
+
+for result in response.json():
+    print(f"{result['name']} — {result['distance_km']} km")
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 - Cities near Mumbai (Professional / Business)
+[
+  {
+    "id": 57606,
+    "name": "Mumbai",
+    "kind": "settlement",
+    "state_id": 4008,
+    "state_code": "MH",
+    "country_id": 101,
+    "country_code": "IN",
+    "latitude": "19.07600000",
+    "longitude": "72.87770000",
+    "population": 12442373,
+    "timezone": "Asia/Kolkata",
+    "wikiDataId": "Q1156",
+    "country_name": "India",
+    "state_name": "Maharashtra",
+    "distance_km": 0
+  },
+  {
+    "id": 57612,
+    "name": "Thane",
+    "kind": "settlement",
+    "state_id": 4008,
+    "state_code": "MH",
+    "country_id": 101,
+    "country_code": "IN",
+    "latitude": "19.21830000",
+    "longitude": "72.97810000",
+    "population": 1841488,
+    "timezone": "Asia/Kolkata",
+    "wikiDataId": "Q210421",
+    "country_name": "India",
+    "state_name": "Maharashtra",
+    "distance_km": 17.36
+  }
+]
+```
+
+```json 400 - Latitude out of range
+{
+  "status": "error",
+  "message": "Invalid query parameters: lat: lat must be between -90 and 90"
+}
+```
+
+```json 400 - state without country
+{
+  "status": "error",
+  "message": "Invalid query parameters: state: country is required when filtering by state"
+}
+```
+
+```json 403 - Feature Restricted
+{
+  "status": "error",
+  "message": "This feature is not available on your current plan.",
+  "details": {
+    "feature": "nearbySearch",
+    "currentTier": "supporter",
+    "requiredTier": "professional",
+    "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  }
+}
+```
+</ResponseExample>
+
+## Trying it without a paid plan
+
+The interactive API documentation uses a shared **Playground** plan. It is only for trying the endpoint in the docs. For your own app, [choose a Professional or Business plan](https://countrystatecity.in/pricing?source=playground&campaign=nearby_search).
+
+## Related Endpoints
+
+- [Autocomplete](/api/endpoints/get-search-autocomplete) — type-ahead search by name, not location
+- [Fuzzy Search](/api/endpoints/fuzzy-search) — typo-tolerant search by name
+- [Get Cities by Country](/api/endpoints/get-cities-by-country) — list cities, filterable by `?q=`
+
+The [CLI](/api/sdks/cli) also provides a `csc nearby` command for this endpoint.
