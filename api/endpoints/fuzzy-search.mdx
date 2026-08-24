@@ -5,7 +5,7 @@ authMethod: "key"
 description: "Typo-tolerant search for cities, states, and countries using trigram similarity"
 ---
 
-Search cities, states, and countries by an approximate query that tolerates **misspellings, transliterations, and native-script variants**. Unlike the exact/substring [inline search](/api/endpoints/get-all-countries) (`?q=`), fuzzy search ranks results by how *similar* they are to your query, so `Banglore` still resolves to **Bangalore** and `Beijng` to **Beijing**.
+Search cities, states, and countries by an approximate query that tolerates **misspellings, transliterations, and native-script variants**. Unlike the exact/substring [inline search](/api/endpoints/get-all-countries) (`?q=`), fuzzy search ranks results by how *similar* they are to your query, so `Mumbay` still resolves to **Mumbai** and `Beijng` to **Beijing**.
 
 Matching uses PostgreSQL trigram similarity over both the English `name` and the `native` name, returning a `match_score` so you can decide how confident a hit is.
 
@@ -55,7 +55,7 @@ Returns an array sorted by `match_score` descending. Each item carries the stand
 
 <RequestExample>
 ```bash cURL (typo)
-curl -X GET 'https://api.countrystatecity.in/v1/search/fuzzy?q=Banglore&type=city&country=IN' \
+curl -X GET 'https://api.countrystatecity.in/v1/search/fuzzy?q=Mumbay&type=city&country=IN' \
   -H 'X-CSCAPI-KEY: YOUR_API_KEY'
 ```
 
@@ -70,7 +70,7 @@ curl -X GET 'https://api.countrystatecity.in/v1/search/fuzzy?q=Munchen&type=city
 ```
 
 ```javascript JavaScript
-const params = new URLSearchParams({ q: 'Banglore', type: 'city', country: 'IN' });
+const params = new URLSearchParams({ q: 'Mumbay', type: 'city', country: 'IN' });
 const response = await fetch(
   `https://api.countrystatecity.in/v1/search/fuzzy?${params}`,
   { headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' } }
@@ -85,7 +85,7 @@ import requests
 
 response = requests.get(
   'https://api.countrystatecity.in/v1/search/fuzzy',
-  params={'q': 'Banglore', 'type': 'city', 'country': 'IN'},
+  params={'q': 'Mumbay', 'type': 'city', 'country': 'IN'},
   headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
 )
 
@@ -98,16 +98,16 @@ for match in response.json():
 ```json 200 - City match (Professional / Business)
 [
   {
-    "id": 57885,
-    "name": "Bangalore",
-    "state_id": 4026,
-    "state_code": "KA",
+    "id": 132649,
+    "name": "Mumbai",
+    "state_id": 4008,
+    "state_code": "MH",
     "country_id": 101,
     "country_code": "IN",
-    "latitude": "12.97194000",
-    "longitude": "77.59369000",
+    "latitude": "19.07283000",
+    "longitude": "72.88261000",
     "timezone": "Asia/Kolkata",
-    "native": "ಬೆಂಗಳೂರು",
+    "native": "मुंबई",
     "match_score": 0.87,
     "matched_alias": null
   }
@@ -117,32 +117,39 @@ for match in response.json():
 ```json 200 - Native-script match
 [
   {
-    "id": 57885,
-    "name": "Bangalore",
-    "native": "ಬೆಂಗಳೂರು",
+    "id": 132649,
+    "name": "Mumbai",
+    "native": "मुंबई",
     "match_score": 1,
-    "matched_alias": "ಬೆಂಗಳೂರು"
+    "matched_alias": "मुंबई"
   }
 ]
 ```
 
 ```json 400 - Query too short
 {
-  "error": "Invalid query parameters: q: Search query must be at least 2 characters"
+  "status": "error",
+  "message": "Invalid query parameters: q: Search query must be at least 2 characters"
 }
 ```
 
 ```json 400 - country with type=country
 {
-  "error": "Invalid query parameters: country: country is not a valid filter when type=country"
+  "status": "error",
+  "message": "Invalid query parameters: country: country is not a valid filter when type=country"
 }
 ```
 
 ```json 403 - Feature Restricted
 {
-  "error": "This feature is not available on your current plan.",
-  "feature": "fuzzySearch",
-  "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  "status": "error",
+  "message": "This feature is not available on your current plan.",
+  "details": {
+    "feature": "fuzzySearch",
+    "currentTier": "supporter",
+    "requiredTier": "professional",
+    "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  }
 }
 ```
 </ResponseExample>

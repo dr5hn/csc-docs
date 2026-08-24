@@ -7,7 +7,7 @@ description: "Type-ahead search for cities, states, and countries with determini
 
 Search cities, states, and countries for a type-ahead / autocomplete UI. Unlike [Fuzzy Search](/api/endpoints/fuzzy-search) — which ranks purely by trigram similarity — autocomplete uses a stricter, deterministic order built for a dropdown: **exact matches first, then starts-with matches, then the closest remaining fuzzy matches**, with population and then record ID breaking any ties. The same query always returns the same order. Each result also carries a ready-to-display `label` (e.g. `"Mumbai, Maharashtra, India"`) so you don't have to assemble one yourself.
 
-<Note>**Availability:** Professional and Business plans. Returns `403` on Community, Starter, Supporter, and Legacy plans. See **Trying it without a paid plan** below.</Note>
+<Note>**Availability:** Professional and Business plans. Returns `403` on Community, Starter, Supporter, and Legacy plans. [Compare plans](https://countrystatecity.in/pricing?source=playground&campaign=autocomplete_api), or see **Trying it without a paid plan** below.</Note>
 
 <Info>Matching uses the same PostgreSQL trigram search as [Fuzzy Search](/api/endpoints/fuzzy-search), against both the English `name` and the `native` name. Responses are cached server-side for up to an hour, keyed by query, type, country/state filter, limit, and your plan's data-access level — so a lower-tier response can never leak into a higher-tier cache hit or vice versa.</Info>
 
@@ -32,7 +32,7 @@ Search cities, states, and countries for a type-ahead / autocomplete UI. Unlike 
 </ParamField>
 
 <ParamField query="state" type="string">
-  Restrict city results to a single state. Requires `country` to also be set — sending `state` without `country` returns `400`, since state codes aren't globally unique across countries.
+  Restrict city results to one state. This works only with `type=city` and requires `country`. Other combinations return `400` because state codes aren't unique across countries.
 </ParamField>
 
 <ParamField query="limit" type="integer" default="10">
@@ -175,6 +175,13 @@ for result in response.json():
 }
 ```
 
+```json 400 - state with a non-city type
+{
+  "status": "error",
+  "message": "Invalid query parameters: state: state is only a valid filter when type=city"
+}
+```
+
 ```json 403 - Feature Restricted
 {
   "status": "error",
@@ -191,7 +198,7 @@ for result in response.json():
 
 ## Trying it without a paid plan
 
-A separate **Playground** plan powers the interactive API documentation — a basic-tier field set on a shared rate limit sized for many concurrent visitors, not a per-visitor quota. It isn't something you can sign up for directly; it's provisioned for the docs playground itself. For your own integration, autocomplete requires a Professional or Business plan.
+A separate **Playground** plan powers the interactive API documentation — a basic-tier field set on a shared rate limit sized for many concurrent visitors, not a per-visitor quota. It isn't something you can sign up for directly; it is only for the docs playground. For your own integration, [choose a Professional or Business plan](https://countrystatecity.in/pricing?source=playground&campaign=autocomplete_api).
 
 ## Related Endpoints
 
