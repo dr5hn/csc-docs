@@ -63,6 +63,14 @@ Find countries, states, or cities near a `lat`/`lng` coordinate. Results are ord
   Maximum number of results to return. `1`–`100`.
 </ParamField>
 
+<ParamField query="locale" type="string">
+  Add `localized_name` and `matched_locale` to each result. Example: `ja` or `pt-BR`. Professional and Business plans only. See [Localized Place Names](/api/localization).
+</ParamField>
+
+<ParamField query="include_translations" type="boolean" default="false">
+  Include the full raw `translations` JSON string. Professional and Business plans only.
+</ParamField>
+
 ## Response
 
 Returns an array, nearest-first. Each item carries the standard fields for the entity at your plan's data-access level, plus:
@@ -73,6 +81,14 @@ Returns an array, nearest-first. Each item carries the standard fields for the e
 
 <ResponseField name="kind" type="string">
   The city kind. Included only in city results.
+</ResponseField>
+
+<ResponseField name="localized_name" type="string">
+  The display name for `locale`, when requested and available on your plan.
+</ResponseField>
+
+<ResponseField name="matched_locale" type="string">
+  The locale used for `localized_name`, including fallback values such as `native` or `en`.
 </ResponseField>
 
 <Note>

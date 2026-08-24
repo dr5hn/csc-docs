@@ -1,0 +1,111 @@
+---
+title: "Localized Place Names"
+description: "Display and search country, state, city, region, and subregion names in another language"
+icon: "language"
+---
+
+The API can return a place name in the language your user expects. You do not need to download and maintain a large translation file in your app.
+
+Use `locale` when you need one display name. Use `include_translations=true` only when you need every available translation.
+
+<Note>
+  **Available on Professional and Business plans.** [Compare plans](https://countrystatecity.in/pricing?source=docs&campaign=localized_place_names) to add localized names to your API key.
+</Note>
+
+## Get one localized name
+
+Add `locale` to a country, state, city, region, subregion, fuzzy search, autocomplete, or nearby search request.
+
+```bash
+curl 'https://api.countrystatecity.in/v1/countries/IN/states?locale=hi' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+Each result keeps its normal English `name` and stable `id`. The API adds:
+
+<ResponseField name="localized_name" type="string">
+  The best name for the requested language.
+</ResponseField>
+
+<ResponseField name="matched_locale" type="string">
+  The language that supplied the value, or `native`/`en` when the API used a fallback.
+</ResponseField>
+
+```json
+[
+  {
+    "id": 4008,
+    "name": "Maharashtra",
+    "localized_name": "महाराष्ट्र",
+    "matched_locale": "hi"
+  }
+]
+```
+
+### Fallback order
+
+When a translation is missing, the API checks these names in order:
+
+1. The exact locale, such as `pt-BR`
+2. The base language, such as `pt`
+3. The place's native name
+4. The English `name`
+
+The API never replaces `name` or `id`, so your stored references remain stable.
+
+## Get every translation
+
+Add `include_translations=true` when your app needs the complete stored value.
+
+```bash
+curl 'https://api.countrystatecity.in/v1/countries/IN?include_translations=true' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+The `translations` field is a JSON string. Parse it before reading a language value:
+
+```javascript
+const translations = JSON.parse(country.translations || '{}');
+console.log(translations.ja);
+```
+
+Translations are hidden by default because returning every language for every row makes large responses much bigger.
+
+<Info>
+  If you also use [`fields`](/api/field-filtering-and-sorting), list the fields you want. For example, `fields=name,translations` asks for the English name and the raw translations value.
+</Info>
+
+## Search using translated names
+
+[Fuzzy Search](/api/endpoints/fuzzy-search) and [Autocomplete](/api/endpoints/get-search-autocomplete) can find a place from a stored translation when the query has at least 3 characters. For example, the Japanese query `ムンバイ` can find Mumbai.
+
+```bash
+curl 'https://api.countrystatecity.in/v1/search/autocomplete?q=%E3%83%A0%E3%83%B3%E3%83%90%E3%82%A4&type=city&locale=ja' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+Autocomplete reports `matched_field: "translation"` for a translation-only match. A fuzzy-search translation match can have a low `match_score` because that score still compares the query with the English and native names.
+
+`locale` controls the name returned for display. It does not limit search to one language; translated search checks all stored translations.
+
+[Nearby Search](/api/endpoints/get-search-nearby) also accepts `locale` and `include_translations`, but it finds places from coordinates rather than translated text.
+
+## Validation and plan behavior
+
+- Use a locale such as `fr`, `hi`, `pt-BR`, or `zh-CN`. Invalid values return `400`.
+- `include_translations` accepts only `true` or `false`. Other values return `400`.
+- On regular geography routes, a lower plan still receives the normal response, without `localized_name`, `matched_locale`, or `translations`.
+- Fuzzy search, autocomplete, and nearby search have their own plan requirements and may return `403` before running the search.
+
+## Start using localized names
+
+Choose Professional or Business when you are ready to serve translated place names without hosting the translation data yourself.
+
+<CardGroup cols={2}>
+  <Card title="Compare API plans" icon="credit-card" href="https://countrystatecity.in/pricing?source=docs&campaign=localized_place_names">
+    See the request limits and features included with each plan.
+  </Card>
+  <Card title="Autocomplete" icon="magnifying-glass" href="/api/endpoints/get-search-autocomplete">
+    Build a search box with ready-to-display localized labels.
+  </Card>
+</CardGroup>
