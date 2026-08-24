@@ -75,7 +75,7 @@ Cities:
 - SEO optimization and comprehensive analytics integration
 
 ## Integration Patterns
-- Direct API consumption with official SDKs (JavaScript, Python, PHP, etc.)
+- Direct API consumption with official TypeScript/JavaScript and Python SDKs
 - Self-hosted database integration with multiple platform support
 - Community-driven data updates via Update Tool workflow
 - Flexible data exports in multiple formats (JSON, CSV, SQL, XML)
