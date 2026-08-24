@@ -5,13 +5,13 @@ authMethod: "key"
 description: "Typo-tolerant search for cities, states, and countries using trigram similarity"
 ---
 
-Search cities, states, and countries by an approximate query that tolerates **misspellings, transliterations, and native-script variants**. Unlike the exact/substring [inline search](/api/endpoints/get-all-countries) (`?q=`), fuzzy search ranks results by how *similar* they are to your query, so `Mumbay` still resolves to **Mumbai** and `Beijng` to **Beijing**.
+Search cities, states, and countries by an approximate query that tolerates **misspellings, transliterations, native-script variants, and stored translations**. Unlike the exact/substring [inline search](/api/endpoints/get-all-countries) (`?q=`), fuzzy search ranks results by how *similar* they are to your query, so `Mumbay` still resolves to **Mumbai** and `Beijng` to **Beijing**.
 
 Matching uses PostgreSQL trigram similarity over both the English `name` and the `native` name, returning a `match_score` so you can decide how confident a hit is.
 
 <Note>**Availability:** Professional plan and above. Returns `403` on Community, Starter, and Supporter plans.</Note>
 
-<Info>Each result is scored against both the English and native names; the higher of the two wins. Responses are cached server-side, keyed by query, type, country filter, limit, threshold, and your plan's data-access level.</Info>
+<Info>Each result is scored against the English and native names. Queries with at least 3 characters also check stored translations. Responses are cached separately by query, filters, plan, locale, and translation output.</Info>
 
 ## Authentication
 
@@ -41,6 +41,14 @@ Matching uses PostgreSQL trigram similarity over both the English `name` and the
   Minimum trigram similarity a row must reach to be returned. 0.1–1. Lower values are more permissive (more, looser matches); higher values are stricter. The default `0.3` is a good balance for typo tolerance.
 </ParamField>
 
+<ParamField query="locale" type="string">
+  Add `localized_name` and `matched_locale` to each result. Example: `ja` or `pt-BR`. Professional and Business plans only. See [Localized Place Names](/api/localization).
+</ParamField>
+
+<ParamField query="include_translations" type="boolean" default="false">
+  Include the full raw `translations` JSON string. Professional and Business plans only.
+</ParamField>
+
 ## Response
 
 Returns an array sorted by `match_score` descending. Each item carries the standard fields for the entity (`city`, `state`, or `country`) at your plan's data-access level — Professional and Business resolve to the **full** field set — plus two fuzzy-specific fields:
@@ -52,6 +60,18 @@ Returns an array sorted by `match_score` descending. Each item carries the stand
 <ResponseField name="matched_alias" type="string | null">
   The native name when it scored higher than the English name (e.g. a Devanagari or Han query that matched the local spelling). `null` when the English name was the better match.
 </ResponseField>
+
+<ResponseField name="localized_name" type="string">
+  The display name for `locale`, when requested and available on your plan.
+</ResponseField>
+
+<ResponseField name="matched_locale" type="string">
+  The locale used for `localized_name`, including fallback values such as `native` or `en`.
+</ResponseField>
+
+<Warning>
+  A result found only through a translation can have a low `match_score`. The score compares the query with the English and native names, not with the translation that matched.
+</Warning>
 
 <RequestExample>
 ```bash cURL (typo)

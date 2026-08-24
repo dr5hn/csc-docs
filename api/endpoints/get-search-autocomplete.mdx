@@ -9,7 +9,7 @@ Search cities, states, and countries for a type-ahead / autocomplete UI. Unlike 
 
 <Note>**Availability:** Professional and Business plans. Returns `403` on Community, Starter, Supporter, and Legacy plans. [Compare plans](https://countrystatecity.in/pricing?source=playground&campaign=autocomplete_api), or see **Trying it without a paid plan** below.</Note>
 
-<Info>Matching uses the same PostgreSQL trigram search as [Fuzzy Search](/api/endpoints/fuzzy-search), against both the English `name` and the `native` name. Responses are cached server-side for up to an hour, keyed by query, type, country/state filter, limit, and your plan's data-access level — so a lower-tier response can never leak into a higher-tier cache hit or vice versa.</Info>
+<Info>Matching checks the English name, native name, and stored translations. Translation matching starts at 3 characters. Responses are cached separately by query, filters, plan, locale, and translation output.</Info>
 
 ## Authentication
 
@@ -39,9 +39,13 @@ Search cities, states, and countries for a type-ahead / autocomplete UI. Unlike 
   Maximum number of results to return. 1–50.
 </ParamField>
 
-<Note>
-  `kind` (settlement/administrative/section/unknown filtering — see [City Types](/database/city-types)) and a `language` param for localized labels are both planned but not available on this endpoint yet.
-</Note>
+<ParamField query="locale" type="string">
+  Add `localized_name` and `matched_locale`, and use the localized name in `label`. Example: `ja` or `pt-BR`. Professional and Business plans only. See [Localized Place Names](/api/localization).
+</ParamField>
+
+<ParamField query="include_translations" type="boolean" default="false">
+  Include the full raw `translations` JSON string. Professional and Business plans only.
+</ParamField>
 
 ## Response
 
@@ -60,7 +64,15 @@ Returns an array. Each item carries the standard fields for the entity (`city`, 
 </ResponseField>
 
 <ResponseField name="matched_field" type="string">
-  Which name field actually matched: `name` or `native`.
+  Which name field matched: `name`, `native`, or `translation`.
+</ResponseField>
+
+<ResponseField name="localized_name" type="string">
+  The display name for `locale`, when requested and available on your plan.
+</ResponseField>
+
+<ResponseField name="matched_locale" type="string">
+  The locale used for `localized_name`, including fallback values such as `native` or `en`.
 </ResponseField>
 
 <Note>
