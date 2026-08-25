@@ -110,11 +110,17 @@ erDiagram
 
     postcodes {
         int id PK
-        string postcode
+        string code
+        int country_id FK
         string country_code FK
-        string type
-        string source
+        int state_id FK
+        string state_code
+        int city_id FK
         string locality_name
+        string type
+        decimal latitude
+        decimal longitude
+        string source
         string wikiDataId
         timestamp created_at
         timestamp updated_at
@@ -126,6 +132,8 @@ erDiagram
     countries ||--o{ states : contains
     states ||--o{ cities : contains
     countries ||--o{ postcodes : contains
+    states ||--o{ postcodes : links
+    cities ||--o{ postcodes : links
 ```
 </div>
 
@@ -567,18 +575,26 @@ Wikidata identifier for additional reference data
 
 ### 6. Postcodes Table
 
-844,248 postal codes across 125 countries with type classification and source tracking.
+844,248 postal codes across 125 countries with type classification and source tracking. The authoritative column and API property is `code` — not `postcode`.
 
 <ParamField path="id" type="integer" required>
 Unique identifier for the postcode record (Primary Key)
 </ParamField>
 
-<ParamField path="postcode" type="varchar(20)" required>
-The postal / ZIP code string (e.g., `90210`, `SW1A 1AA`, `110001`)
+<ParamField path="code" type="varchar(20)" required>
+The postal / ZIP code string, as stored (e.g., `90210`, `SW1A 1AA`, `110001`)
 </ParamField>
 
 <ParamField path="country_code" type="char(2)" required>
 ISO 3166-1 alpha-2 country code linking to the countries table
+</ParamField>
+
+<ParamField path="state_code" type="varchar(10)">
+State/province code, when the postcode is linked to one
+</ParamField>
+
+<ParamField path="locality_name" type="varchar(255)">
+Name of the locality or area associated with this postcode
 </ParamField>
 
 <ParamField path="type" type="enum">
@@ -587,14 +603,31 @@ Granularity of the postcode. One of:
 - `outward` — first part of a UK-style postcode identifying the postal district
 - `sector` — intermediate granularity within a district
 - `district` — broadest level, covering an entire postal district
+- `area` — a UK-style postal area code (letters only), or the general granularity used for countries without a full outward/sector/district hierarchy
 </ParamField>
 
-<ParamField path="source" type="varchar(255)">
-Data source attribution for the postcode record
+<ParamField path="country_id" type="integer" required>
+Foreign key reference to the parent country
 </ParamField>
 
-<ParamField path="locality_name" type="varchar(255)">
-Name of the locality or area associated with this postcode
+<ParamField path="state_id" type="integer">
+Foreign key reference to the linked state, when applicable
+</ParamField>
+
+<ParamField path="city_id" type="integer">
+Foreign key reference to the linked city, when applicable
+</ParamField>
+
+<ParamField path="latitude" type="decimal(10,8)">
+Geographical latitude coordinate of the postcode area
+</ParamField>
+
+<ParamField path="longitude" type="decimal(11,8)">
+Geographical longitude coordinate of the postcode area
+</ParamField>
+
+<ParamField path="source" type="varchar(64)">
+Data source attribution for the postcode record (e.g. `openplz`, `wikidata`, `census`)
 </ParamField>
 
 <ParamField path="wikiDataId" type="varchar(255)">
@@ -606,28 +639,44 @@ Wikidata identifier for cross-referencing
 [
   {
     "id": 1,
-    "postcode": "90210",
+    "code": "90210",
     "country_code": "US",
-    "type": "full",
-    "source": "GeoNames",
+    "state_code": "CA",
     "locality_name": "Beverly Hills",
+    "type": "full",
+    "country_id": 231,
+    "state_id": 1416,
+    "city_id": 111968,
+    "latitude": 34.09030000,
+    "longitude": -118.41250000,
+    "source": "GeoNames",
     "wikiDataId": null
   },
   {
     "id": 2,
-    "postcode": "SW1A 1AA",
+    "code": "SW1A 1AA",
     "country_code": "GB",
-    "type": "full",
-    "source": "GeoNames",
+    "state_code": "ENG",
     "locality_name": "London",
+    "type": "full",
+    "country_id": 77,
+    "state_id": 4021,
+    "city_id": 129881,
+    "latitude": 51.50101000,
+    "longitude": -0.14159000,
+    "source": "GeoNames",
     "wikiDataId": null
   }
 ]
 ```
 
 <Note>
-  The postcodes table is available in the self-hosted database exports. See the [postcodes reference](/database/postcodes) for coverage details and query examples.
+  The postcodes table is available in the self-hosted database exports and via the hosted API — see [Get Postcode by Code](/api/endpoints/get-postcode-by-code) and [Get Postcodes by Country](/api/endpoints/get-postcodes-by-country). See the [postcodes reference](/database/postcodes) for coverage details and self-hosted query examples.
 </Note>
+
+<Info>
+  **API access levels.** The hosted API tiers postcode fields the same way it tiers cities and countries: `id`, `code`, `country_code`, `state_code`, `locality_name`, and `type` are on every plan (**Basic**). `country_id`, `state_id`, `city_id`, `latitude`, and `longitude` require **Supporter+**. `source` and `wikiDataId` require **Professional+**. `created_at`, `updated_at`, and the internal normalized code used for matching are never exposed publicly. Self-hosted database exports are not access-tiered — all columns are present.
+</Info>
 
 ## Indexes and Performance
 
