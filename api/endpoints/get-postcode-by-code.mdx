@@ -5,7 +5,7 @@ authMethod: "key"
 description: "Look up every postcode record that matches an exact code within a country"
 ---
 
-Look up a postcode / ZIP code within a country and get back every matching record. Use this to confirm a user-supplied postcode exists — for example, validating a checkout address before you charge a card.
+Look up a postcode / ZIP code within a country and get back every matching record. Use this to confirm that a user-supplied postcode appears in the dataset — for example, catching an obvious typo in a checkout form before you accept it.
 
 <Note>
   **Free on every plan**, including Community. Exact lookup counts against your normal daily/monthly quota like any other request. Paginated listing and search use [Get Postcodes by Country](/api/endpoints/get-postcodes-by-country) and require a Supporter+ plan — exact lookup has no such gate.
@@ -153,7 +153,7 @@ A postcode is not always unique to one place. The same code can legitimately cov
 | **Coordinates** | Supporter | All Basic **+** `country_id`, `state_id`, `city_id`, `latitude`, `longitude` |
 | **Full** | Professional, Business | All Coordinates **+** `source`, `wikiDataId` |
 
-See [Pricing](https://app.countrystatecity.in/pricing) for plan details.
+See [Pricing](https://countrystatecity.in/pricing?source=docs&campaign=postcode_lookup) for plan details.
 
 ## Caching and conditional requests
 
