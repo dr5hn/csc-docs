@@ -39,8 +39,8 @@ A postcode is not always unique to one place. The same code can legitimately cov
   Every postcode record matching the code, in ascending `id` order.
 </ResponseField>
 
-<ResponseField name="data[].id" type="integer">
-  Unique identifier for the postcode record.
+<ResponseField name="data[].id" type="string">
+  Unique identifier for the postcode record, returned as a numeric string (not a JSON number) for 64-bit safety.
 </ResponseField>
 
 <ResponseField name="data[].code" type="string">
@@ -60,27 +60,27 @@ A postcode is not always unique to one place. The same code can legitimately cov
 </ResponseField>
 
 <ResponseField name="data[].type" type="string | null">
-  Granularity of the postcode. See [Postcode types](/database/postcodes#postcode-types).
+  A source-provided classification of the postcode, not a fixed enum — see [Postcode types](/database/postcodes#postcode-types) for the values currently in the dataset. Filtering on an unrecognized value just matches zero rows rather than erroring.
 </ResponseField>
 
-<ResponseField name="data[].country_id" type="integer">
-  Numeric country ID. **Requires Supporter+.**
+<ResponseField name="data[].country_id" type="string">
+  Country ID, as a numeric string. **Requires Supporter+.**
 </ResponseField>
 
-<ResponseField name="data[].state_id" type="integer | null">
-  Numeric state ID. **Requires Supporter+.**
+<ResponseField name="data[].state_id" type="string | null">
+  State ID, as a numeric string. **Requires Supporter+.**
 </ResponseField>
 
-<ResponseField name="data[].city_id" type="integer | null">
-  Numeric city ID, when the postcode is linked to a specific city. **Requires Supporter+.**
+<ResponseField name="data[].city_id" type="string | null">
+  City ID, as a numeric string, when the postcode is linked to a specific city. **Requires Supporter+.**
 </ResponseField>
 
-<ResponseField name="data[].latitude" type="number | null">
-  Latitude of the postcode area. **Requires Supporter+.**
+<ResponseField name="data[].latitude" type="string | null">
+  Latitude of the postcode area, as a decimal string. **Requires Supporter+.**
 </ResponseField>
 
-<ResponseField name="data[].longitude" type="number | null">
-  Longitude of the postcode area. **Requires Supporter+.**
+<ResponseField name="data[].longitude" type="string | null">
+  Longitude of the postcode area, as a decimal string. **Requires Supporter+.**
 </ResponseField>
 
 <ResponseField name="data[].source" type="string | null">
@@ -104,37 +104,37 @@ A postcode is not always unique to one place. The same code can legitimately cov
 </ResponseField>
 
 <Info>
-  Fields above **Basic** are stripped for lower plans, not just hidden — a Community or Starter key never receives `country_id`, `state_id`, `city_id`, `latitude`, or `longitude` in the response body. See **Tier-based field availability** below.
+  Fields above **Basic** are stripped for lower plans, not just hidden — a Community or Starter key never receives `country_id`, `state_id`, `city_id`, `latitude`, or `longitude` in the response body. See **Tier-based field availability** below. `id` and every foreign-key field are returned as numeric strings rather than JSON numbers — parse them as strings in your client.
 </Info>
 
 ```json 200 - Duplicate exact match (Supporter+)
 {
   "data": [
     {
-      "id": 45210,
+      "id": "45210",
       "code": "SW1A 1AA",
       "country_code": "GB",
       "state_code": "ENG",
       "locality_name": "Westminster",
       "type": "full",
-      "country_id": 77,
-      "state_id": 4021,
-      "city_id": 129881,
-      "latitude": 51.501010,
-      "longitude": -0.141590
+      "country_id": "77",
+      "state_id": "4021",
+      "city_id": "129881",
+      "latitude": "51.50101000",
+      "longitude": "-0.14159000"
     },
     {
-      "id": 45298,
+      "id": "45298",
       "code": "SW1A 1AA",
       "country_code": "GB",
       "state_code": "ENG",
       "locality_name": "St James's",
       "type": "full",
-      "country_id": 77,
-      "state_id": 4021,
-      "city_id": 129882,
-      "latitude": 51.502200,
-      "longitude": -0.140100
+      "country_id": "77",
+      "state_id": "4021",
+      "city_id": "129882",
+      "latitude": "51.50220000",
+      "longitude": "-0.14010000"
     }
   ],
   "meta": {
@@ -244,11 +244,11 @@ console.log(`${result.meta.match_count} match(es) for ${result.meta.query}`);
 ```json 400 - Invalid code
 {
   "status": "error",
-  "message": "code must be 1-20 characters after trimming outer whitespace."
+  "message": "postcode must be at most 20 characters"
 }
 ```
 
-`code` is also rejected for containing control characters, path separators (`/`, `\`), or `..` traversal segments.
+`code` is also rejected as empty, or for containing a `/`, `\`, or control character.
 
 See [Errors & Rate Limits](/api/errors) for the `401`/`429` shapes and usage headers common to every endpoint.
 

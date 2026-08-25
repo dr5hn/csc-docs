@@ -16,17 +16,23 @@ The postcodes table contains **844,248 records** covering **125 countries**. Eac
 |---|---|
 | Total postcodes | 844,248 |
 | Countries covered | 125 |
-| Granularity types | 5 (full, outward, sector, district, area) |
+| Distinct `type` values in the current dataset | 5 (`full`, `area`, `fsa`, `po_box`, `street`) |
+
+<Note>
+  `type` is a source-provided classification, not a fixed enum on either the database column or the API. It reflects whatever granularity each country's source data actually distinguishes, and can gain new values as more sources are imported — don't hardcode a switch over a closed list.
+</Note>
 
 ## Postcode Types
 
-| Type | Description | Example |
-|---|---|---|
-| `full` | Complete postcode identifying a specific delivery point or small area | `90210` (US), `110001` (IN) |
-| `outward` | First part of a UK-style postcode identifying the postal district | `SW1A` |
-| `sector` | Intermediate granularity within a district | `SW1A 1` |
-| `district` | Broadest level, covering an entire postal district | `SW1` |
-| `area` | A UK-style postal area code (letters only, e.g. `SW`), or the general granularity used for countries without a full outward/sector/district hierarchy | `SW` (UK area), `1234` (Netherlands) |
+The five values present in the current dataset, most to least common:
+
+| Type | Description | Countries | Example |
+|---|---|---|---|
+| `full` | Complete postcode identifying a specific delivery point or small area — the default for most countries | 113, e.g. Portugal, Mexico, Japan, US, Malta | `90210` (US) |
+| `area` | A broader geographic area code, used where the source data doesn't resolve to a specific delivery point | 11, e.g. Netherlands, Iran, UK, Isle of Man, Bermuda | `98714` (French Polynesia) |
+| `fsa` | Forward Sortation Area — the first 3 characters of a Canadian postal code, identifying a wide geographic area | Canada only | `A0A` |
+| `po_box` | Postal delivery via PO Box, distinct from a street-delivery code for the same area | South Africa only | `0001` (Pretoria) |
+| `street` | Street/physical-delivery code, distinct from a PO Box code for the same area | South Africa only | `0002` (Pretoria) |
 
 ## Query Examples
 
@@ -64,7 +70,7 @@ postcodes = page['data']
 </CodeGroup>
 
 <Tip>
-  This lists postcodes without a plan restriction. Searching by code prefix or locality (`?q=`) requires a Supporter+ plan — see [Get Postcodes by Country](/api/endpoints/get-postcodes-by-country) for full query parameters, pagination, and tier-based field availability. For a single known code, [Get Postcode by Code](/api/endpoints/get-postcode-by-code) is free on every plan.
+  This listing endpoint requires a Supporter+ plan — including a bare request with no `?q=` at all, to stop lower-tier keys from scraping the full dataset. See [Get Postcodes by Country](/api/endpoints/get-postcodes-by-country) for full query parameters, pagination, and tier-based field availability. For a single known code, [Get Postcode by Code](/api/endpoints/get-postcode-by-code) is free on every plan.
 </Tip>
 
 ### Validate a postcode format

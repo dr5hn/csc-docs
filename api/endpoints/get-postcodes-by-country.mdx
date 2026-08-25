@@ -7,6 +7,10 @@ description: "Page through or search a country's postcodes with cursor paginatio
 
 Page through a country's postcodes / ZIP codes, or narrow the list with a code/locality search, state, city, or type filter. Use this to build postcode discovery instead of downloading the full dataset.
 
+<Note>
+  **Requires a Supporter+ plan** — including a bare list request with no filters at all. This is intentional: it stops a Community or Starter key from paginating through and scraping the full hosted dataset. [Get Postcode by Code](/api/endpoints/get-postcode-by-code) (exact lookup) has no such gate and stays free on every plan.
+</Note>
+
 <Warning>
   This is informational postcode data, not an address verification or mail-deliverability service. Results confirm codes exist in the dataset — they do not confirm delivery points or standardize addresses.
 </Warning>
@@ -30,19 +34,19 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
 ## Query parameters
 
 <ParamField query="q" type="string">
-  Case-insensitive search: matches postcodes whose normalized code starts with `q`, or whose locality name contains it. 2-100 characters. **Requires Supporter+ plan.** Without this parameter, the endpoint just lists the country's postcodes — no plan restriction for the bare list.
+  Case-insensitive search: matches postcodes whose code starts with `q`, or whose locality name contains it. 2-100 characters. Optional — omit it to list the country's postcodes instead of searching. Every request to this endpoint requires Supporter+ regardless of whether `q` is present.
 </ParamField>
 
 <ParamField query="state_code" type="string">
-  Exact, case-insensitive filter on state/province code. 1-32 letters, digits, or hyphens.
+  Exact, case-insensitive filter on state/province code. 1-255 letters, digits, or hyphens.
 </ParamField>
 
-<ParamField query="city_id" type="integer">
-  Exact filter on the numeric city ID. Must be a positive integer.
+<ParamField query="city_id" type="string">
+  Exact filter on the city ID. A positive integer, passed as a query string (e.g. `?city_id=129881`).
 </ParamField>
 
 <ParamField query="type" type="string">
-  Exact filter on postcode granularity. One of `full`, `outward`, `sector`, `district`, `area`. See [Postcode types](/database/postcodes#postcode-types). Invalid values return a `400` error listing the accepted values.
+  Exact, case-insensitive filter on the postcode's source classification. See [Postcode types](/database/postcodes#postcode-types) for the values currently in the dataset — this is not a fixed enum, so a well-formed but unrecognized value (letters, digits, `_`, `-`, 1-32 characters) just matches zero rows instead of returning a `400`.
 </ParamField>
 
 <ParamField query="limit" type="integer" default="50">
@@ -59,8 +63,8 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
   Matching postcode records for this page, ordered by normalized code, then `id`.
 </ResponseField>
 
-<ResponseField name="data[].id" type="integer">
-  Unique identifier for the postcode record.
+<ResponseField name="data[].id" type="string">
+  Unique identifier for the postcode record, returned as a numeric string (not a JSON number) for 64-bit safety.
 </ResponseField>
 
 <ResponseField name="data[].code" type="string">
@@ -80,27 +84,27 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
 </ResponseField>
 
 <ResponseField name="data[].type" type="string | null">
-  Granularity of the postcode.
+  A source-provided classification of the postcode, not a fixed enum. See [Postcode types](/database/postcodes#postcode-types).
 </ResponseField>
 
-<ResponseField name="data[].country_id" type="integer">
-  Numeric country ID. **Requires Supporter+.**
+<ResponseField name="data[].country_id" type="string">
+  Country ID, as a numeric string.
 </ResponseField>
 
-<ResponseField name="data[].state_id" type="integer | null">
-  Numeric state ID. **Requires Supporter+.**
+<ResponseField name="data[].state_id" type="string | null">
+  State ID, as a numeric string.
 </ResponseField>
 
-<ResponseField name="data[].city_id" type="integer | null">
-  Numeric city ID, when linked to a specific city. **Requires Supporter+.**
+<ResponseField name="data[].city_id" type="string | null">
+  City ID, as a numeric string, when linked to a specific city.
 </ResponseField>
 
-<ResponseField name="data[].latitude" type="number | null">
-  Latitude of the postcode area. **Requires Supporter+.**
+<ResponseField name="data[].latitude" type="string | null">
+  Latitude of the postcode area, as a decimal string.
 </ResponseField>
 
-<ResponseField name="data[].longitude" type="number | null">
-  Longitude of the postcode area. **Requires Supporter+.**
+<ResponseField name="data[].longitude" type="string | null">
+  Longitude of the postcode area, as a decimal string.
 </ResponseField>
 
 <ResponseField name="data[].source" type="string | null">
@@ -131,17 +135,17 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
 {
   "data": [
     {
-      "id": 45210,
+      "id": "45210",
       "code": "SW1A 1AA",
       "country_code": "GB",
       "state_code": "ENG",
       "locality_name": "Westminster",
       "type": "full",
-      "country_id": 77,
-      "state_id": 4021,
-      "city_id": 129881,
-      "latitude": 51.501010,
-      "longitude": -0.141590
+      "country_id": "77",
+      "state_id": "4021",
+      "city_id": "129881",
+      "latitude": "51.50101000",
+      "longitude": "-0.14159000"
     }
   ],
   "pagination": {
@@ -154,17 +158,19 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
 
 ## Tier-based field availability
 
+Every plan that can reach this endpoint at all already has at least **Coordinates** access — Community, Starter, and Legacy lack the `searchEndpoint` feature this endpoint requires, so the **Basic** row below is unreachable here (it only applies to [Get Postcode by Code](/api/endpoints/get-postcode-by-code)).
+
 | Tier | Plans | Fields |
 |------|-------|--------|
-| **Basic** | Community, Starter, Legacy | `id`, `code`, `country_code`, `state_code`, `locality_name`, `type` |
-| **Coordinates** | Supporter | All Basic **+** `country_id`, `state_id`, `city_id`, `latitude`, `longitude` |
+| ~~Basic~~ | ~~Community, Starter, Legacy~~ | Not reachable — these plans get a `403` on this endpoint before field access matters |
+| **Coordinates** | Supporter | `id`, `code`, `country_code`, `state_code`, `locality_name`, `type`, `country_id`, `state_id`, `city_id`, `latitude`, `longitude` |
 | **Full** | Professional, Business | All Coordinates **+** `source`, `wikiDataId` |
 
 See [Pricing](https://countrystatecity.in/pricing?source=docs&campaign=postcode_search) for plan details.
 
 ## Caching and conditional requests
 
-Every response sets `ETag`, `Cache-Control`, and `X-Cache` (`HIT`/`MISS`). Send the last `ETag` back as `If-None-Match` to get a bodyless `304` when nothing changed instead of re-downloading the page:
+Every response sets `ETag`, `Cache-Control` (`public, max-age=3600`), and `X-Cache` (`HIT`/`MISS`), cached for 1 hour regardless of whether `q` is present. Send the last `ETag` back as `If-None-Match` to get a bodyless `304` when nothing changed instead of re-downloading the page:
 
 ```javascript
 const response = await fetch(url, {
@@ -248,18 +254,20 @@ for await (const postcode of allPostcodes('GB', { state_code: 'ENG' })) {
 ```json 400 - Invalid country code
 {
   "status": "error",
-  "message": "Invalid country code. Must be a 2-letter ISO 3166-1 alpha-2 code (e.g., US, GB)."
+  "message": "countryCode must be a 2-letter ISO code"
 }
 ```
 
-```json 400 - Cursor from a different request
+```json 400 - Cursor filters don't match this request
 {
   "status": "error",
-  "message": "cursor and query filters disagree. Either omit the filter params and paginate with cursor alone, or resend the exact same filters as the first request."
+  "message": "cursor filters do not match this request."
 }
 ```
 
-```json 403 - Search requires Supporter+
+A cursor also `400`s as `"cursor belongs to a different country."` when reused across countries, `"cursor is invalid or has been tampered with."` when it's malformed or its signature doesn't verify, and `"cursor has expired. Start again without a cursor."` after 24 hours.
+
+```json 403 - Requires Supporter+
 {
   "status": "error",
   "message": "This feature is not available on your current plan.",
@@ -272,7 +280,7 @@ for await (const postcode of allPostcodes('GB', { state_code: 'ENG' })) {
 }
 ```
 
-This `403` fires only when you send `q`. A Community or Starter key can still list a country's postcodes with `state_code`, `city_id`, `type`, and pagination — none of those require `searchEndpoint`.
+This `403` fires on **every** request to this endpoint from a Community, Starter, or Legacy key — including a bare list with no `q`, `state_code`, `city_id`, or `type` at all. Only exact lookup ([Get Postcode by Code](/api/endpoints/get-postcode-by-code)) is free on those plans.
 
 ```json 200 - Country with no postcode coverage
 {
@@ -290,7 +298,7 @@ A country that exists but has no postcodes, or a filter that matches nothing, re
 See [Errors & Rate Limits](/api/errors) for the `401`/`429` shapes and usage headers common to every endpoint.
 
 <Note>
-  Search requires a Supporter+ plan. [Compare plans](https://countrystatecity.in/pricing?source=docs&campaign=postcode_search) to add search to your API key.
+  This endpoint requires a Supporter+ plan, for listing as well as searching. [Compare plans](https://countrystatecity.in/pricing?source=docs&campaign=postcode_search) to add it to your API key.
 </Note>
 
 ## Related

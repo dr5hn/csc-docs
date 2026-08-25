@@ -597,13 +597,8 @@ State/province code, when the postcode is linked to one
 Name of the locality or area associated with this postcode
 </ParamField>
 
-<ParamField path="type" type="enum">
-Granularity of the postcode. One of:
-- `full` — complete postcode identifying a specific delivery point or small area
-- `outward` — first part of a UK-style postcode identifying the postal district
-- `sector` — intermediate granularity within a district
-- `district` — broadest level, covering an entire postal district
-- `area` — a UK-style postal area code (letters only), or the general granularity used for countries without a full outward/sector/district hierarchy
+<ParamField path="type" type="varchar(32)">
+A source-provided classification, not a fixed database enum — new values can appear as more sources are imported. The current dataset uses `full` (complete postcode, most countries), `area` (broader geographic area, e.g. Netherlands, Iran, UK), `fsa` (Canadian Forward Sortation Area), `po_box`, and `street` (South Africa's distinct PO Box vs. street-delivery codes). See [Postcode Types](/database/postcodes#postcode-types) for the full breakdown.
 </ParamField>
 
 <ParamField path="country_id" type="integer" required>
