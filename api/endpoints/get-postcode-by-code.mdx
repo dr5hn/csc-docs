@@ -75,12 +75,12 @@ A postcode is not always unique to one place. The same code can legitimately cov
   City ID, as a numeric string, when the postcode is linked to a specific city. **Requires Supporter+.**
 </ResponseField>
 
-<ResponseField name="data[].latitude" type="string | null">
-  Latitude of the postcode area, as a decimal string. **Requires Supporter+.**
+<ResponseField name="data[].latitude" type="number | null">
+  Latitude of the postcode area. **Requires Supporter+.**
 </ResponseField>
 
-<ResponseField name="data[].longitude" type="string | null">
-  Longitude of the postcode area, as a decimal string. **Requires Supporter+.**
+<ResponseField name="data[].longitude" type="number | null">
+  Longitude of the postcode area. **Requires Supporter+.**
 </ResponseField>
 
 <ResponseField name="data[].source" type="string | null">
@@ -96,7 +96,7 @@ A postcode is not always unique to one place. The same code can legitimately cov
 </ResponseField>
 
 <ResponseField name="meta.query" type="string">
-  The `code` you sent, as received (before normalization).
+  The normalized `code` used for matching (trimmed, uppercased, with repeated spaces collapsed).
 </ResponseField>
 
 <ResponseField name="meta.match_count" type="integer">
@@ -120,8 +120,8 @@ A postcode is not always unique to one place. The same code can legitimately cov
       "country_id": "77",
       "state_id": "4021",
       "city_id": "129881",
-      "latitude": "51.50101000",
-      "longitude": "-0.14159000"
+      "latitude": 51.50101,
+      "longitude": -0.14159
     },
     {
       "id": "45298",
@@ -133,8 +133,8 @@ A postcode is not always unique to one place. The same code can legitimately cov
       "country_id": "77",
       "state_id": "4021",
       "city_id": "129882",
-      "latitude": "51.50220000",
-      "longitude": "-0.14010000"
+      "latitude": 51.5022,
+      "longitude": -0.1401
     }
   ],
   "meta": {

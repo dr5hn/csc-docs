@@ -99,12 +99,12 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
   City ID, as a numeric string, when linked to a specific city.
 </ResponseField>
 
-<ResponseField name="data[].latitude" type="string | null">
-  Latitude of the postcode area, as a decimal string.
+<ResponseField name="data[].latitude" type="number | null">
+  Latitude of the postcode area.
 </ResponseField>
 
-<ResponseField name="data[].longitude" type="string | null">
-  Longitude of the postcode area, as a decimal string.
+<ResponseField name="data[].longitude" type="number | null">
+  Longitude of the postcode area.
 </ResponseField>
 
 <ResponseField name="data[].source" type="string | null">
@@ -144,8 +144,8 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
       "country_id": "77",
       "state_id": "4021",
       "city_id": "129881",
-      "latitude": "51.50101000",
-      "longitude": "-0.14159000"
+      "latitude": 51.50101,
+      "longitude": -0.14159
     }
   ],
   "pagination": {
