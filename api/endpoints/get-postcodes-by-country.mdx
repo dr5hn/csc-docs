@@ -22,7 +22,7 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
 </ParamField>
 
 <Tip>
-  **Trim results:** Add `?fields=` to limit the columns returned. Requires **Supporter+**. There is no `?sort=` on this endpoint — results are always ordered by normalized code, then `id`, so cursor pagination stays stable. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for `?fields=` syntax.
+  **Trim results:** Add `?fields=` to limit the columns returned. Requires **Supporter+**. There is no `?sort=` on this endpoint — results are always ordered by code, then `id`, so cursor pagination stays stable. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for `?fields=` syntax.
 </Tip>
 
 ## Authentication
@@ -60,7 +60,7 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
 ## Response
 
 <ResponseField name="data" type="array">
-  Matching postcode records for this page, ordered by normalized code, then `id`.
+  Matching postcode records for this page, ordered by code, then `id`.
 </ResponseField>
 
 <ResponseField name="data[].id" type="string">
@@ -275,7 +275,7 @@ A cursor also `400`s as `"cursor belongs to a different country."` when reused a
     "feature": "searchEndpoint",
     "currentTier": "starter",
     "requiredTier": "supporter",
-    "upgradeUrl": "https://app.countrystatecity.in/pricing"
+    "upgradeUrl": "https://countrystatecity.in/pricing"
   }
 }
 ```

@@ -589,7 +589,7 @@ The postal / ZIP code string, as stored (e.g., `90210`, `SW1A 1AA`, `110001`)
 ISO 3166-1 alpha-2 country code linking to the countries table
 </ParamField>
 
-<ParamField path="state_code" type="varchar(10)">
+<ParamField path="state_code" type="varchar(255)">
 State/province code, when the postcode is linked to one
 </ParamField>
 
@@ -670,7 +670,7 @@ Wikidata identifier for cross-referencing
 </Note>
 
 <Info>
-  **API access levels.** The hosted API tiers postcode fields the same way it tiers cities and countries: `id`, `code`, `country_code`, `state_code`, `locality_name`, and `type` are on every plan (**Basic**). `country_id`, `state_id`, `city_id`, `latitude`, and `longitude` require **Supporter+**. `source` and `wikiDataId` require **Professional+**. `created_at`, `updated_at`, and the internal normalized code used for matching are never exposed publicly. Self-hosted database exports are not access-tiered — all columns are present.
+  **API access levels.** The hosted API tiers postcode fields the same way it tiers cities and countries: `id`, `code`, `country_code`, `state_code`, `locality_name`, and `type` are on every plan (**Basic**). `country_id`, `state_id`, `city_id`, `latitude`, and `longitude` require **Supporter+**. `source` and `wikiDataId` require **Professional+**. `created_at`, `updated_at`, and `flag` are not exposed publicly. Self-hosted database exports are not access-tiered — all columns are present.
 </Info>
 
 ## Indexes and Performance
