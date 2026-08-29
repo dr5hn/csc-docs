@@ -11,6 +11,7 @@ const path = require('path');
 
 const GITHUB_README_URL = 'https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/README.md';
 const OVERVIEW_FILE = path.join(__dirname, '../database/overview.mdx');
+const POSTCODES_FILE = path.join(__dirname, '../database/postcodes.mdx');
 
 /**
  * Fetch content from GitHub README
@@ -46,7 +47,9 @@ function parseStatistics(readmeContent) {
     subregions: null,
     countries: null,
     states: null,
-    cities: null
+    cities: null,
+    postcodes: null,
+    postcodeCountries: null
   };
 
   // The GitHub README has statistics in the "Insights" section with this format:
@@ -55,13 +58,15 @@ function parseStatistics(readmeContent) {
   // Total Countries : 250 <br>
   // Total States/Regions/Municipalities : 5,299 <br>
   // Total Cities/Towns/Districts : 153,765 <br>
+  // Total Postcodes : 844248 (125 countries) <br>
 
   const patterns = [
     /Total\s+Regions?\s*:\s*(\d+(?:,\d+)*)/i,
     /Total\s+Sub\s+Regions?\s*:\s*(\d+(?:,\d+)*)/i,
     /Total\s+Countries?\s*:\s*(\d+(?:,\d+)*)/i,
     /Total\s+States?(?:\/Regions?\/Municipalities?)?\s*:\s*(\d+(?:,\d+)*)/i,
-    /Total\s+Cities?(?:\/Towns?\/Districts?)?\s*:\s*(\d+(?:,\d+)*)/i
+    /Total\s+Cities?(?:\/Towns?\/Districts?)?\s*:\s*(\d+(?:,\d+)*)/i,
+    /Total\s+Postcodes?\s*:\s*(\d+(?:,\d+)*)\s*\(\s*(\d+(?:,\d+)*)\s*countries?\s*\)/i
   ];
 
   // Parse each statistic
@@ -70,12 +75,17 @@ function parseStatistics(readmeContent) {
   const countryMatch = readmeContent.match(patterns[2]);
   const stateMatch = readmeContent.match(patterns[3]);
   const cityMatch = readmeContent.match(patterns[4]);
-  
+  const postcodeMatch = readmeContent.match(patterns[5]);
+
   if (regionMatch) stats.regions = parseInt(regionMatch[1].replace(/,/g, ''));
   if (subregionMatch) stats.subregions = parseInt(subregionMatch[1].replace(/,/g, ''));
   if (countryMatch) stats.countries = parseInt(countryMatch[1].replace(/,/g, ''));
   if (stateMatch) stats.states = parseInt(stateMatch[1].replace(/,/g, ''));
   if (cityMatch) stats.cities = parseInt(cityMatch[1].replace(/,/g, ''));
+  if (postcodeMatch) {
+    stats.postcodes = parseInt(postcodeMatch[1].replace(/,/g, ''));
+    stats.postcodeCountries = parseInt(postcodeMatch[2].replace(/,/g, ''));
+  }
 
   return stats;
 }
@@ -184,6 +194,47 @@ async function updateOverviewFile(stats) {
 }
 
 /**
+ * Update the postcodes.mdx file with the latest postcode count / country coverage.
+ * Keeps the hardcoded "844,248 records across 125 countries" figures from
+ * going stale between manual doc edits.
+ */
+async function updatePostcodesFile(stats) {
+  if (stats.postcodes === null || stats.postcodeCountries === null) {
+    return false;
+  }
+
+  try {
+    let content = await fs.readFile(POSTCODES_FILE, 'utf8');
+    const postcodes = formatNumber(stats.postcodes);
+    const countries = formatNumber(stats.postcodeCountries);
+
+    content = content
+      .replace(
+        /description: "[\d,]+ postal codes across [\d,]+ countries with type classification, source tracking, and query examples"/,
+        `description: "${postcodes} postal codes across ${countries} countries with type classification, source tracking, and query examples"`
+      )
+      .replace(
+        /The postcodes table contains \*\*[\d,]+ records\*\* covering \*\*[\d,]+ countries\*\*\./,
+        `The postcodes table contains **${postcodes} records** covering **${countries} countries**.`
+      )
+      .replace(
+        /\| Total postcodes \| [\d,]+ \|/,
+        `| Total postcodes | ${postcodes} |`
+      )
+      .replace(
+        /\| Countries covered \| [\d,]+ \|/,
+        `| Countries covered | ${countries} |`
+      );
+
+    await fs.writeFile(POSTCODES_FILE, content, 'utf8');
+    console.log('✅ Successfully updated postcodes.mdx with new statistics');
+    return true;
+  } catch (error) {
+    throw new Error(`Failed to update postcodes file: ${error.message}`);
+  }
+}
+
+/**
  * Main execution function
  */
 async function main() {
@@ -200,7 +251,8 @@ async function main() {
     console.log(`   Countries: ${stats.countries || 'Not found'}`);
     console.log(`   States: ${stats.states || 'Not found'}`);
     console.log(`   Cities: ${stats.cities || 'Not found'}`);
-    
+    console.log(`   Postcodes: ${stats.postcodes || 'Not found'}${stats.postcodeCountries ? ` (${stats.postcodeCountries} countries)` : ''}`);
+
     // Check if we found any statistics
     const foundStats = Object.values(stats).filter(v => v !== null).length;
     if (foundStats === 0) {
@@ -209,17 +261,20 @@ async function main() {
       console.log(readmeContent.substring(0, 500) + '...');
       return;
     }
-    
+
     console.log(`\n📝 Updating overview.mdx file...`);
-    const updated = await updateOverviewFile(stats);
-    
-    if (updated) {
+    const overviewUpdated = await updateOverviewFile(stats);
+
+    console.log(`\n📝 Updating postcodes.mdx file...`);
+    const postcodesUpdated = await updatePostcodesFile(stats);
+
+    if (overviewUpdated || postcodesUpdated) {
       console.log(`\n🎉 Successfully updated database statistics!`);
       console.log(`📅 Updated date: ${getCurrentDate()}`);
     } else {
       console.log('\n⚠️  No updates were made to the file');
     }
-    
+
   } catch (error) {
     console.error('❌ Error:', error.message);
     process.exit(1);
@@ -231,4 +286,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { fetchGitHubReadme, parseStatistics, updateOverviewFile };
+module.exports = { fetchGitHubReadme, parseStatistics, updateOverviewFile, updatePostcodesFile };

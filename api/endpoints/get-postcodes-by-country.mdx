@@ -1,0 +1,313 @@
+---
+title: "Get Postcodes by Country"
+api: "GET https://api.countrystatecity.in/v1/countries/{countryCode}/postcodes"
+authMethod: "key"
+description: "Page through or search a country's postcodes with cursor pagination"
+---
+
+Page through a country's postcodes / ZIP codes, or narrow the list with a code/locality search, state, city, or type filter. Use this to build postcode discovery instead of downloading the full dataset.
+
+<Note>
+  **Requires a Supporter+ plan** — including a bare list request with no filters at all. This is intentional: it stops a Community or Starter key from paginating through and scraping the full hosted dataset. [Get Postcode by Code](/api/endpoints/get-postcode-by-code) (exact lookup) has no such gate and stays free on every plan.
+</Note>
+
+<Warning>
+  This is informational postcode data, not an address verification or mail-deliverability service. Results confirm codes exist in the dataset — they do not confirm delivery points or standardize addresses.
+</Warning>
+
+## Path parameters
+
+<ParamField path="countryCode" type="string" required>
+  ISO 3166-1 alpha-2 country code, case-insensitive (e.g., `US`, `GB`, `IN`). Numeric country IDs and ISO3 codes are not accepted on this endpoint.
+</ParamField>
+
+<Tip>
+  **Trim results:** Add `?fields=` to limit the columns returned. Requires **Supporter+**. There is no `?sort=` on this endpoint — results are always ordered by code, then `id`, so cursor pagination stays stable. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for `?fields=` syntax.
+</Tip>
+
+## Authentication
+
+<ParamField header="X-CSCAPI-KEY" type="string" required>
+  Your API key.
+</ParamField>
+
+## Query parameters
+
+<ParamField query="q" type="string">
+  Case-insensitive search: matches postcodes whose code starts with `q`, or whose locality name contains it. 2-100 characters. Optional — omit it to list the country's postcodes instead of searching. Every request to this endpoint requires Supporter+ regardless of whether `q` is present.
+</ParamField>
+
+<ParamField query="state_code" type="string">
+  Exact, case-insensitive filter on state/province code. 1-255 letters, digits, or hyphens.
+</ParamField>
+
+<ParamField query="city_id" type="string">
+  Exact filter on the city ID. A positive integer, passed as a query string (e.g. `?city_id=129881`).
+</ParamField>
+
+<ParamField query="type" type="string">
+  Exact, case-insensitive filter on the postcode's source classification. See [Postcode types](/database/postcodes#postcode-types) for the values currently in the dataset — this is not a fixed enum, so a well-formed but unrecognized value (letters, digits, `_`, `-`, 1-32 characters) just matches zero rows instead of returning a `400`.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  Maximum records per page. Use a value from `1` to `100`.
+</ParamField>
+
+<ParamField query="cursor" type="string">
+  Opaque pagination token from a previous response's `pagination.next_cursor`. Treat it as opaque — do not parse or construct it yourself. A cursor is tied to the filters it was issued with: resend the exact same `state_code`/`city_id`/`type`/`q`, or omit them entirely and paginate with the cursor alone.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="array">
+  Matching postcode records for this page, ordered by code, then `id`.
+</ResponseField>
+
+<ResponseField name="data[].id" type="string">
+  Unique identifier for the postcode record, returned as a numeric string (not a JSON number) for 64-bit safety.
+</ResponseField>
+
+<ResponseField name="data[].code" type="string">
+  The postcode as stored, with original spacing and casing preserved.
+</ResponseField>
+
+<ResponseField name="data[].country_code" type="string">
+  ISO2 country code.
+</ResponseField>
+
+<ResponseField name="data[].state_code" type="string | null">
+  State/province code, when linked to one.
+</ResponseField>
+
+<ResponseField name="data[].locality_name" type="string | null">
+  Human-readable place name associated with the postcode.
+</ResponseField>
+
+<ResponseField name="data[].type" type="string | null">
+  A source-provided classification of the postcode, not a fixed enum. See [Postcode types](/database/postcodes#postcode-types).
+</ResponseField>
+
+<ResponseField name="data[].country_id" type="string">
+  Country ID, as a numeric string.
+</ResponseField>
+
+<ResponseField name="data[].state_id" type="string | null">
+  State ID, as a numeric string.
+</ResponseField>
+
+<ResponseField name="data[].city_id" type="string | null">
+  City ID, as a numeric string, when linked to a specific city.
+</ResponseField>
+
+<ResponseField name="data[].latitude" type="number | null">
+  Latitude of the postcode area.
+</ResponseField>
+
+<ResponseField name="data[].longitude" type="number | null">
+  Longitude of the postcode area.
+</ResponseField>
+
+<ResponseField name="data[].source" type="string | null">
+  Originating data source, for attribution and license tracking. **Requires Professional+.**
+</ResponseField>
+
+<ResponseField name="data[].wikiDataId" type="string | null">
+  Wikidata Q-ID for cross-referencing. **Requires Professional+.**
+</ResponseField>
+
+<ResponseField name="pagination.limit" type="integer">
+  The `limit` used for this page.
+</ResponseField>
+
+<ResponseField name="pagination.next_cursor" type="string | null">
+  Token for the next page, or `null` when this is the last page.
+</ResponseField>
+
+<ResponseField name="pagination.has_more" type="boolean">
+  Whether another page is available.
+</ResponseField>
+
+<Info>
+  There is no total-count field. Counting every match up front would mean a second expensive query on top of a 844k-row table, so check `has_more` and keep paging instead of expecting a total.
+</Info>
+
+```json 200 - Search with q (Supporter+)
+{
+  "data": [
+    {
+      "id": "131878",
+      "code": "110001",
+      "country_code": "IN",
+      "state_code": "DL",
+      "locality_name": "Sansad Marg",
+      "type": "full",
+      "country_id": "101",
+      "state_id": "4021",
+      "city_id": null,
+      "latitude": null,
+      "longitude": null
+    }
+  ],
+  "pagination": {
+    "limit": 50,
+    "next_cursor": null,
+    "has_more": false
+  }
+}
+```
+
+## Tier-based field availability
+
+Every plan that can reach this endpoint at all already has at least **Coordinates** access — Community, Starter, and Legacy lack the `searchEndpoint` feature this endpoint requires, so the **Basic** row below is unreachable here (it only applies to [Get Postcode by Code](/api/endpoints/get-postcode-by-code)).
+
+| Tier | Plans | Fields |
+|------|-------|--------|
+| ~~Basic~~ | ~~Community, Starter, Legacy~~ | Not reachable — these plans get a `403` on this endpoint before field access matters |
+| **Coordinates** | Supporter | `id`, `code`, `country_code`, `state_code`, `locality_name`, `type`, `country_id`, `state_id`, `city_id`, `latitude`, `longitude` |
+| **Full** | Professional, Business | All Coordinates **+** `source`, `wikiDataId` |
+
+See [Pricing](https://countrystatecity.in/pricing?source=docs&campaign=postcode_search) for plan details.
+
+## Caching and conditional requests
+
+Every response sets `ETag`, `Cache-Control` (`public, max-age=3600`), and `X-Cache` (`HIT`/`MISS`), cached for 1 hour regardless of whether `q` is present. Send the last `ETag` back as `If-None-Match` to get a bodyless `304` when nothing changed instead of re-downloading the page:
+
+```javascript
+const response = await fetch(url, {
+  headers: {
+    'X-CSCAPI-KEY': 'YOUR_API_KEY',
+    'If-None-Match': savedEtag
+  }
+});
+
+if (response.status === 304) {
+  // Nothing changed — reuse your cached copy.
+} else {
+  savedEtag = response.headers.get('ETag');
+}
+```
+
+<RequestExample>
+```bash cURL
+curl 'https://api.countrystatecity.in/v1/countries/IN/postcodes?limit=20' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (search)
+curl 'https://api.countrystatecity.in/v1/countries/IN/postcodes?q=110001&type=full' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```python Python
+import requests
+
+def search_postcodes(country_code, **params):
+    response = requests.get(
+        f'https://api.countrystatecity.in/v1/countries/{country_code}/postcodes',
+        params=params,
+        headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+    )
+    response.raise_for_status()
+    return response.json()
+
+page = search_postcodes('IN', q='110001', type='full')
+```
+
+```javascript JavaScript
+const searchPostcodes = async (countryCode, params = {}) => {
+  const url = new URL(`https://api.countrystatecity.in/v1/countries/${countryCode}/postcodes`);
+  for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value);
+
+  const response = await fetch(url, { headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' } });
+  if (!response.ok) throw new Error(await response.text());
+  return response.json();
+};
+
+const page = await searchPostcodes('IN', { q: '110001', type: 'full' });
+```
+
+```javascript JavaScript (page through every result)
+async function* allPostcodes(countryCode, params = {}) {
+  let cursor;
+  do {
+    const url = new URL(`https://api.countrystatecity.in/v1/countries/${countryCode}/postcodes`);
+    for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value);
+    if (cursor) url.searchParams.set('cursor', cursor);
+
+    const response = await fetch(url, { headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' } });
+    if (!response.ok) throw new Error(await response.text());
+    const page = await response.json();
+
+    yield* page.data;
+    cursor = page.pagination.has_more ? page.pagination.next_cursor : null;
+  } while (cursor);
+}
+
+for await (const postcode of allPostcodes('IN', { state_code: 'DL' })) {
+  console.log(postcode.code, postcode.locality_name);
+}
+```
+</RequestExample>
+
+## Errors
+
+```json 400 - Invalid country code
+{
+  "status": "error",
+  "message": "countryCode must be a 2-letter ISO code"
+}
+```
+
+```json 400 - Cursor filters don't match this request
+{
+  "status": "error",
+  "message": "cursor filters do not match this request."
+}
+```
+
+A cursor also `400`s as `"cursor belongs to a different country."` when reused across countries, `"cursor is invalid or has been tampered with."` when it's malformed or its signature doesn't verify, and `"cursor has expired. Start again without a cursor."` after 24 hours.
+
+```json 403 - Requires Supporter+
+{
+  "status": "error",
+  "message": "This feature is not available on your current plan.",
+  "details": {
+    "feature": "searchEndpoint",
+    "currentTier": "starter",
+    "requiredTier": "supporter",
+    "upgradeUrl": "https://countrystatecity.in/pricing"
+  }
+}
+```
+
+This `403` fires on **every** request to this endpoint from a Community, Starter, or Legacy key — including a bare list with no `q`, `state_code`, `city_id`, or `type` at all. Only exact lookup ([Get Postcode by Code](/api/endpoints/get-postcode-by-code)) is free on those plans.
+
+```json 200 - Country with no postcode coverage
+{
+  "data": [],
+  "pagination": {
+    "limit": 50,
+    "next_cursor": null,
+    "has_more": false
+  }
+}
+```
+
+A country that exists but has no postcodes, or a filter that matches nothing, returns `200` with an empty `data` array — not a `404`. The `404` cases (`country_not_found`) match [Get Postcode by Code](/api/endpoints/get-postcode-by-code#errors) for an unknown country.
+
+See [Errors & Rate Limits](/api/errors) for the `401`/`429` shapes and usage headers common to every endpoint.
+
+<Note>
+  This endpoint requires a Supporter+ plan, for listing as well as searching. [Compare plans](https://countrystatecity.in/pricing?source=docs&campaign=postcode_search) to add it to your API key.
+</Note>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Get Postcode by Code" icon="location-dot" href="/api/endpoints/get-postcode-by-code">
+    Exact lookup, free on every plan — start here before adding search.
+  </Card>
+  <Card title="Postcodes Reference" icon="mailbox" href="/database/postcodes">
+    Coverage stats, postcode types, and self-hosted query examples.
+  </Card>
+</CardGroup>

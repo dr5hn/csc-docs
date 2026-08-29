@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-08-29
+
+### Added
+
+- **Postcode Endpoints** group: exact postcode lookup (`GET /v1/countries/{cc}/postcodes/{code}`, free on every plan) and paginated listing/search (`GET /v1/countries/{cc}/postcodes`, requires Supporter+ even for a bare list with no filters) — documents duplicate-match handling, cursor pagination (including expiry and tamper detection), `q`/`state_code`/`city_id`/`type` filters, conditional-request (`ETag`/`If-None-Match`) support, and tier-based field availability
+- Non-deliverability disclaimer on postcode documentation: this is informational data, not an address verification or mail-deliverability service
+
+### Fixed
+
+- Corrected the postcodes table's field name from `postcode` to the authoritative `code` throughout `database/postcodes.mdx` and `database/schema.mdx` (query examples, ER diagram, field reference, sample data)
+- Corrected `database/postcodes.mdx`'s export-format claim: the postcodes table **is** included in the CSV and YAML exports; only the GeoJSON export excludes it
+- Replaced the postcode type reference's fictional `full`/`outward`/`sector`/`district`/`area` list with the 5 values actually present in the current 844,248-row dataset (`full`, `area`, `fsa`, `po_box`, `street`), verified directly against the source data
+- Completed the postcodes table field reference in `database/schema.mdx` with the previously undocumented `country_id`, `state_id`, `state_code`, `city_id`, `latitude`, and `longitude` fields and their API access-level requirements
+
 ## [1.3.0] - 2026-05-28
 
 ### Added

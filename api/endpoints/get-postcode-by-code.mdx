@@ -1,0 +1,277 @@
+---
+title: "Get Postcode by Code"
+api: "GET https://api.countrystatecity.in/v1/countries/{countryCode}/postcodes/{code}"
+authMethod: "key"
+description: "Look up every postcode record that matches an exact code within a country"
+---
+
+Look up a postcode / ZIP code within a country and get back every matching record. Use this to confirm that a user-supplied postcode appears in the dataset.
+
+<Note>
+  **Free on every plan**, including Community. Exact lookup counts against your normal daily/monthly quota like any other request. Paginated listing and search use [Get Postcodes by Country](/api/endpoints/get-postcodes-by-country) and require a Supporter+ plan — exact lookup has no such gate.
+</Note>
+
+<Warning>
+  This is informational postcode data, not an address verification or mail-deliverability service. A match confirms the code exists in the dataset — it does not confirm a delivery point, standardize an address, or guarantee mail will arrive.
+</Warning>
+
+## Path parameters
+
+<ParamField path="countryCode" type="string" required>
+  ISO 3166-1 alpha-2 country code, case-insensitive (e.g., `US`, `GB`, `IN`). Numeric country IDs and ISO3 codes are not accepted on this endpoint.
+</ParamField>
+
+<ParamField path="code" type="string" required>
+  The postcode to look up (e.g., `110001`, `GY1 1AA`, `11104`). 1-20 characters after trimming outer whitespace. Matching is case-insensitive and tolerant of repeated internal spaces — `gy1  1aa` matches `GY1 1AA` — but the code returned in the response preserves its original spacing and casing.
+</ParamField>
+
+## Authentication
+
+<ParamField header="X-CSCAPI-KEY" type="string" required>
+  Your API key.
+</ParamField>
+
+## Why the response is an array
+
+A postcode is not always unique to one place. The same code can legitimately cover more than one locality, so this endpoint returns **every** matching record instead of picking one — an empty result is a `404`, never an empty success.
+
+<ResponseField name="data" type="array">
+  Every postcode record matching the code, in ascending `id` order.
+</ResponseField>
+
+<ResponseField name="data[].id" type="string">
+  Unique identifier for the postcode record, returned as a numeric string (not a JSON number) for 64-bit safety.
+</ResponseField>
+
+<ResponseField name="data[].code" type="string">
+  The postcode as stored, with original spacing and casing preserved.
+</ResponseField>
+
+<ResponseField name="data[].country_code" type="string">
+  ISO2 country code.
+</ResponseField>
+
+<ResponseField name="data[].state_code" type="string | null">
+  State/province code, when the postcode is linked to one.
+</ResponseField>
+
+<ResponseField name="data[].locality_name" type="string | null">
+  Human-readable place name associated with the postcode.
+</ResponseField>
+
+<ResponseField name="data[].type" type="string | null">
+  A source-provided classification of the postcode, not a fixed enum — see [Postcode types](/database/postcodes#postcode-types) for the values currently in the dataset. Filtering on an unrecognized value just matches zero rows rather than erroring.
+</ResponseField>
+
+<ResponseField name="data[].country_id" type="string">
+  Country ID, as a numeric string. **Requires Supporter+.**
+</ResponseField>
+
+<ResponseField name="data[].state_id" type="string | null">
+  State ID, as a numeric string. **Requires Supporter+.**
+</ResponseField>
+
+<ResponseField name="data[].city_id" type="string | null">
+  City ID, as a numeric string, when the postcode is linked to a specific city. **Requires Supporter+.**
+</ResponseField>
+
+<ResponseField name="data[].latitude" type="number | null">
+  Latitude of the postcode area. **Requires Supporter+.**
+</ResponseField>
+
+<ResponseField name="data[].longitude" type="number | null">
+  Longitude of the postcode area. **Requires Supporter+.**
+</ResponseField>
+
+<ResponseField name="data[].source" type="string | null">
+  Originating data source, for attribution and license tracking. **Requires Professional+.**
+</ResponseField>
+
+<ResponseField name="data[].wikiDataId" type="string | null">
+  Wikidata Q-ID for cross-referencing. **Requires Professional+.**
+</ResponseField>
+
+<ResponseField name="meta.country_code" type="string">
+  The country code you queried, uppercased.
+</ResponseField>
+
+<ResponseField name="meta.query" type="string">
+  The normalized `code` used for matching (trimmed, uppercased, with repeated spaces collapsed).
+</ResponseField>
+
+<ResponseField name="meta.match_count" type="integer">
+  Number of records in `data`.
+</ResponseField>
+
+<Info>
+  Fields above **Basic** are stripped for lower plans, not just hidden — a Community or Starter key never receives `country_id`, `state_id`, `city_id`, `latitude`, or `longitude` in the response body. See **Tier-based field availability** below. `id` and every foreign-key field are returned as numeric strings rather than JSON numbers — parse them as strings in your client.
+</Info>
+
+```json 200 - Duplicate exact match (Supporter+)
+{
+  "data": [
+    {
+      "id": "670115",
+      "code": "11104",
+      "country_code": "LK",
+      "state_code": "12",
+      "locality_name": "Mabola",
+      "type": "full",
+      "country_id": "208",
+      "state_id": "2804",
+      "city_id": null,
+      "latitude": 7.0062833,
+      "longitude": 79.8924828
+    },
+    {
+      "id": "670116",
+      "code": "11104",
+      "country_code": "LK",
+      "state_code": "12",
+      "locality_name": "Watinapaha",
+      "type": "full",
+      "country_id": "208",
+      "state_id": "2804",
+      "city_id": null,
+      "latitude": 7.1853118,
+      "longitude": 80.0003875
+    },
+    {
+      "id": "670117",
+      "code": "11104",
+      "country_code": "LK",
+      "state_code": "12",
+      "locality_name": "Wattala",
+      "type": "full",
+      "country_id": "208",
+      "state_id": "2804",
+      "city_id": null,
+      "latitude": 6.9906677,
+      "longitude": 79.8931709
+    }
+  ],
+  "meta": {
+    "country_code": "LK",
+    "query": "11104",
+    "match_count": 3
+  }
+}
+```
+
+## Tier-based field availability
+
+| Tier | Plans | Fields |
+|------|-------|--------|
+| **Basic** | Community, Starter, Legacy | `id`, `code`, `country_code`, `state_code`, `locality_name`, `type` |
+| **Coordinates** | Supporter | All Basic **+** `country_id`, `state_id`, `city_id`, `latitude`, `longitude` |
+| **Full** | Professional, Business | All Coordinates **+** `source`, `wikiDataId` |
+
+See [Pricing](https://countrystatecity.in/pricing?source=docs&campaign=postcode_lookup) for plan details.
+
+## Caching and conditional requests
+
+Every response sets `ETag`, `Cache-Control`, and `X-Cache` (`HIT`/`MISS`), cached for 24 hours. Send the last `ETag` back as `If-None-Match` to get a bodyless `304` when nothing changed instead of re-downloading the result:
+
+```javascript
+const response = await fetch(url, {
+  headers: {
+    'X-CSCAPI-KEY': 'YOUR_API_KEY',
+    'If-None-Match': savedEtag
+  }
+});
+
+if (response.status === 304) {
+  // Nothing changed — reuse your cached copy.
+} else {
+  savedEtag = response.headers.get('ETag');
+}
+```
+
+<RequestExample>
+```bash cURL
+curl 'https://api.countrystatecity.in/v1/countries/LK/postcodes/11104' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```python Python
+import requests
+
+def get_postcode(country_code, code):
+    response = requests.get(
+        f'https://api.countrystatecity.in/v1/countries/{country_code}/postcodes/{code}',
+        headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'}
+    )
+    response.raise_for_status()
+    return response.json()
+
+result = get_postcode('LK', '11104')
+print(f"{result['meta']['match_count']} match(es) for {result['meta']['query']}")
+```
+
+```javascript JavaScript
+const getPostcode = async (countryCode, code) => {
+  const response = await fetch(
+    `https://api.countrystatecity.in/v1/countries/${countryCode}/postcodes/${encodeURIComponent(code)}`,
+    { headers: { 'X-CSCAPI-KEY': 'YOUR_API_KEY' } }
+  );
+
+  if (!response.ok) throw new Error(await response.text());
+  return response.json();
+};
+
+const result = await getPostcode('LK', '11104');
+console.log(`${result.meta.match_count} match(es) for ${result.meta.query}`);
+```
+</RequestExample>
+
+## Errors
+
+<ResponseField name="details.reason" type="string">
+  Distinguishes the three `404` cases below. Check this instead of parsing `message`.
+</ResponseField>
+
+```json 404 - Unknown country
+{
+  "status": "error",
+  "message": "Country not found.",
+  "details": { "reason": "country_not_found" }
+}
+```
+
+```json 404 - No coverage for this country
+{
+  "status": "error",
+  "message": "No postcode coverage is available for this country.",
+  "details": { "reason": "postcode_coverage_unavailable" }
+}
+```
+
+```json 404 - Code has no match
+{
+  "status": "error",
+  "message": "No postcode matches the given code.",
+  "details": { "reason": "postcode_not_found" }
+}
+```
+
+```json 400 - Invalid code
+{
+  "status": "error",
+  "message": "postcode must be at most 20 characters"
+}
+```
+
+`code` is also rejected as empty, or for containing a `/`, `\`, or control character.
+
+See [Errors & Rate Limits](/api/errors) for the `401`/`429` shapes and usage headers common to every endpoint.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Get Postcodes by Country" icon="magnifying-glass" href="/api/endpoints/get-postcodes-by-country">
+    Page through or search a country's postcodes. Requires Supporter+.
+  </Card>
+  <Card title="Postcodes Reference" icon="mailbox" href="/database/postcodes">
+    Coverage stats, postcode types, and self-hosted query examples.
+  </Card>
+</CardGroup>

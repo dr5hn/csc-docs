@@ -113,6 +113,13 @@
             ]
           },
           {
+            "group": "Postcode Endpoints",
+            "pages": [
+              "api/endpoints/get-postcode-by-code",
+              "api/endpoints/get-postcodes-by-country"
+            ]
+          },
+          {
             "group": "Meta Endpoints",
             "pages": [
               "api/endpoints/get-data-version"
