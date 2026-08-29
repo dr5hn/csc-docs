@@ -135,17 +135,17 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
 {
   "data": [
     {
-      "id": "45210",
-      "code": "SW1A 1AA",
-      "country_code": "GB",
-      "state_code": "ENG",
-      "locality_name": "Westminster",
+      "id": "131878",
+      "code": "110001",
+      "country_code": "IN",
+      "state_code": "DL",
+      "locality_name": "Sansad Marg",
       "type": "full",
-      "country_id": "77",
+      "country_id": "101",
       "state_id": "4021",
-      "city_id": "129881",
-      "latitude": 51.50101,
-      "longitude": -0.14159
+      "city_id": null,
+      "latitude": null,
+      "longitude": null
     }
   ],
   "pagination": {
@@ -189,12 +189,12 @@ if (response.status === 304) {
 
 <RequestExample>
 ```bash cURL
-curl 'https://api.countrystatecity.in/v1/countries/GB/postcodes?limit=20' \
+curl 'https://api.countrystatecity.in/v1/countries/IN/postcodes?limit=20' \
   -H 'X-CSCAPI-KEY: YOUR_API_KEY'
 ```
 
 ```bash cURL (search)
-curl 'https://api.countrystatecity.in/v1/countries/GB/postcodes?q=SW1A&type=full' \
+curl 'https://api.countrystatecity.in/v1/countries/IN/postcodes?q=110001&type=full' \
   -H 'X-CSCAPI-KEY: YOUR_API_KEY'
 ```
 
@@ -210,7 +210,7 @@ def search_postcodes(country_code, **params):
     response.raise_for_status()
     return response.json()
 
-page = search_postcodes('GB', q='SW1A', type='full')
+page = search_postcodes('IN', q='110001', type='full')
 ```
 
 ```javascript JavaScript
@@ -223,7 +223,7 @@ const searchPostcodes = async (countryCode, params = {}) => {
   return response.json();
 };
 
-const page = await searchPostcodes('GB', { q: 'SW1A', type: 'full' });
+const page = await searchPostcodes('IN', { q: '110001', type: 'full' });
 ```
 
 ```javascript JavaScript (page through every result)
@@ -243,7 +243,7 @@ async function* allPostcodes(countryCode, params = {}) {
   } while (cursor);
 }
 
-for await (const postcode of allPostcodes('GB', { state_code: 'ENG' })) {
+for await (const postcode of allPostcodes('IN', { state_code: 'DL' })) {
   console.log(postcode.code, postcode.locality_name);
 }
 ```

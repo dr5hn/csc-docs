@@ -22,7 +22,7 @@ Look up a postcode / ZIP code within a country and get back every matching recor
 </ParamField>
 
 <ParamField path="code" type="string" required>
-  The postcode to look up (e.g., `90210`, `SW1A 1AA`, `110001`). 1-20 characters after trimming outer whitespace. Matching is case-insensitive and tolerant of repeated internal spaces — `sw1a  1aa` matches `SW1A 1AA` — but the code returned in the response preserves its original spacing and casing.
+  The postcode to look up (e.g., `110001`, `GY1 1AA`, `11104`). 1-20 characters after trimming outer whitespace. Matching is case-insensitive and tolerant of repeated internal spaces — `gy1  1aa` matches `GY1 1AA` — but the code returned in the response preserves its original spacing and casing.
 </ParamField>
 
 ## Authentication
@@ -111,36 +111,49 @@ A postcode is not always unique to one place. The same code can legitimately cov
 {
   "data": [
     {
-      "id": "45210",
-      "code": "SW1A 1AA",
-      "country_code": "GB",
-      "state_code": "ENG",
-      "locality_name": "Westminster",
+      "id": "670115",
+      "code": "11104",
+      "country_code": "LK",
+      "state_code": "12",
+      "locality_name": "Mabola",
       "type": "full",
-      "country_id": "77",
-      "state_id": "4021",
-      "city_id": "129881",
-      "latitude": 51.50101,
-      "longitude": -0.14159
+      "country_id": "208",
+      "state_id": "2804",
+      "city_id": null,
+      "latitude": 7.0062833,
+      "longitude": 79.8924828
     },
     {
-      "id": "45298",
-      "code": "SW1A 1AA",
-      "country_code": "GB",
-      "state_code": "ENG",
-      "locality_name": "St James's",
+      "id": "670116",
+      "code": "11104",
+      "country_code": "LK",
+      "state_code": "12",
+      "locality_name": "Watinapaha",
       "type": "full",
-      "country_id": "77",
-      "state_id": "4021",
-      "city_id": "129882",
-      "latitude": 51.5022,
-      "longitude": -0.1401
+      "country_id": "208",
+      "state_id": "2804",
+      "city_id": null,
+      "latitude": 7.1853118,
+      "longitude": 80.0003875
+    },
+    {
+      "id": "670117",
+      "code": "11104",
+      "country_code": "LK",
+      "state_code": "12",
+      "locality_name": "Wattala",
+      "type": "full",
+      "country_id": "208",
+      "state_id": "2804",
+      "city_id": null,
+      "latitude": 6.9906677,
+      "longitude": 79.8931709
     }
   ],
   "meta": {
-    "country_code": "GB",
-    "query": "SW1A 1AA",
-    "match_count": 2
+    "country_code": "LK",
+    "query": "11104",
+    "match_count": 3
   }
 }
 ```
@@ -176,7 +189,7 @@ if (response.status === 304) {
 
 <RequestExample>
 ```bash cURL
-curl 'https://api.countrystatecity.in/v1/countries/GB/postcodes/SW1A%201AA' \
+curl 'https://api.countrystatecity.in/v1/countries/LK/postcodes/11104' \
   -H 'X-CSCAPI-KEY: YOUR_API_KEY'
 ```
 
@@ -191,7 +204,7 @@ def get_postcode(country_code, code):
     response.raise_for_status()
     return response.json()
 
-result = get_postcode('GB', 'SW1A 1AA')
+result = get_postcode('LK', '11104')
 print(f"{result['meta']['match_count']} match(es) for {result['meta']['query']}")
 ```
 
@@ -206,7 +219,7 @@ const getPostcode = async (countryCode, code) => {
   return response.json();
 };
 
-const result = await getPostcode('GB', 'SW1A 1AA');
+const result = await getPostcode('LK', '11104');
 console.log(`${result.meta.match_count} match(es) for ${result.meta.query}`);
 ```
 </RequestExample>
