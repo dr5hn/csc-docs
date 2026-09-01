@@ -21,6 +21,7 @@ This comprehensive Mintlify documentation site covers the complete Country State
 - Multiple database platform support: MySQL, PostgreSQL, SQLite, MongoDB, SQL Server, DuckDB
 - Comprehensive installation guides and optimization recommendations
 - Schema documentation with relationship mappings
+- Self-hosting guidance for custom records, safe snapshot updates, and ODbL separation
 - Data freshness tracking and version management
 - Performance tuning guides for each platform
 

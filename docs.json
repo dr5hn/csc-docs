@@ -184,6 +184,7 @@
             "pages": [
               "database/overview",
               "database/schema",
+              "database/self-hosting-and-custom-data",
               "database/postcodes",
               "database/city-types",
               "database/territories"
