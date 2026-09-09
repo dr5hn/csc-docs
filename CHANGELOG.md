@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-08-31
+
+### Added
+
+- **GraphQL API** guide (`api/graphql.mdx`): documents the new `POST /v1/graphql` endpoint (Professional+), covering authentication, the GraphiQL explorer, nested/DataLoader-batched queries, the per-plan field-access behavior, the full query list including the GraphQL-only `city(id)` lookup, the 5-level query depth limit, and the GraphQL vs. REST-style error shapes
+
 ## [1.4.0] - 2026-08-29
 
 ### Added

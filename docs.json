@@ -126,6 +126,12 @@
             ]
           },
           {
+            "group": "GraphQL API",
+            "pages": [
+              "api/graphql"
+            ]
+          },
+          {
             "group": "SDKs & Examples",
             "pages": [
               "api/sdks",
