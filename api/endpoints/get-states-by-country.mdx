@@ -16,7 +16,7 @@ Retrieve all states, provinces, regions, and territories for a specific country 
 </ParamField>
 
 <Tip>
-**Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
+**Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Starter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
 </Tip>
 
 ## Authentication
@@ -28,7 +28,7 @@ Retrieve all states, provinces, regions, and territories for a specific country 
 ## Query Parameters
 
 <ParamField query="q" type="string">
-  Search filter on name. Case-insensitive match on `name` and `native` fields. Minimum 2 characters. **Requires Supporter+ plan.** Without this parameter, all results are returned (no plan restriction for search).
+  Search filter on name. Case-insensitive match on `name` and `native` fields. Minimum 2 characters. **Requires Starter+ plan.** Without this parameter, all results are returned (no plan restriction for search).
 </ParamField>
 
 ## Response
@@ -267,7 +267,7 @@ states = get_states_by_country('IN')
 ]
 ```
 
-```json 200 - Coordinates tier (Supporter) — basic plus
+```json 200 - Full tier (Supporter, Professional, Business)
 [
   {
     "id": 4008,
@@ -284,7 +284,9 @@ states = get_states_by_country('IN')
     "level": 1,
     "parent_id": null,
     "native": "महाराष्ट्र",
-    "population": 112374333
+    "population": 112374333,
+    "translations": "{\"kr\":\"마하라슈트라\",\"de\":\"Maharashtra\",\"fr\":\"Maharashtra\",\"cn\":\"马哈拉施特拉邦\"}",
+    "wikiDataId": "Q1191"
   }
 ]
 ```
@@ -352,7 +354,6 @@ Cache states by country as they rarely change. Use this endpoint instead of filt
 | Tier | Plans | Fields |
 |------|-------|--------|
 | **Basic** | Community, Starter, Legacy | `id`, `name`, `iso2`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone` |
-| **Coordinates** | Supporter | All Basic **+** `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population` |
-| **Full** | Professional, Business | All Coordinates **+** `translations`, `wikiDataId` |
+| **Full** | Supporter, Professional, Business | All Basic **+** `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population`, `translations`, `wikiDataId` |
 
 See [Pricing](https://app.countrystatecity.in/pricing) for plan details.

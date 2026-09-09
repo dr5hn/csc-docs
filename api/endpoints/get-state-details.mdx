@@ -20,7 +20,7 @@ Retrieve detailed information for a specific state or province using the country
 </ParamField>
 
 <Tip>
-**Trim response columns:** Add `?fields=name,iso2,...` to receive only the columns you need. Available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax.
+**Trim response columns:** Add `?fields=name,iso2,...` to receive only the columns you need. Available on **Starter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax.
 </Tip>
 
 ## Authentication
@@ -64,7 +64,7 @@ Retrieve detailed information for a specific state or province using the country
 </ResponseField>
 
 <ResponseField name="type" type="string">
-  Administrative division type (e.g., `"state"`, `"province"`, `"region"`). **Coordinates tier and above.**
+  Administrative division type (e.g., `"state"`, `"province"`, `"region"`). **Full access level only.**
 </ResponseField>
 
 <Info>Additional fields like `fips_code`, `iso3166_2`, `level`, `parent_id`, `native`, `population`, `translations`, and `wikiDataId` are returned on higher tiers. See **Tier-Based Field Availability** below.</Info>
@@ -266,7 +266,7 @@ state = get_state_details('IN', 'MH')
 }
 ```
 
-```json 200 - Coordinates tier (Supporter) — basic plus
+```json 200 - Full tier (Supporter, Professional, Business)
 {
   "id": 4008,
   "name": "Maharashtra",
@@ -282,7 +282,9 @@ state = get_state_details('IN', 'MH')
   "level": 1,
   "parent_id": null,
   "native": "महाराष्ट्र",
-  "population": 112374333
+  "population": 112374333,
+  "translations": "{\"kr\":\"마하라슈트라\",\"de\":\"Maharashtra\",\"fr\":\"Maharashtra\",\"cn\":\"马哈拉施特拉邦\"}",
+  "wikiDataId": "Q1191"
 }
 ```
 
@@ -351,7 +353,6 @@ Use this endpoint when you need precise geographical coordinates or want to vali
 | Tier | Plans | Fields |
 |------|-------|--------|
 | **Basic** | Community, Starter, Legacy | `id`, `name`, `iso2`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone` |
-| **Coordinates** | Supporter | All Basic **+** `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population` |
-| **Full** | Professional, Business | All Coordinates **+** `translations`, `wikiDataId` |
+| **Full** | Supporter, Professional, Business | All Basic **+** `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population`, `translations`, `wikiDataId` |
 
 See [Pricing](https://app.countrystatecity.in/pricing) for plan details.

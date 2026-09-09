@@ -9,7 +9,7 @@ Search cities, states, and countries by an approximate query that tolerates **mi
 
 Matching uses PostgreSQL trigram similarity over both the English `name` and the `native` name, returning a `match_score` so you can decide how confident a hit is.
 
-<Note>**Availability:** Professional plan and above. Returns `403` on Community, Starter, and Supporter plans.</Note>
+<Note>**Availability:** Supporter plan and above. Returns `403` on Community and Starter plans.</Note>
 
 <Info>Each result is scored against the English and native names. Queries with at least 3 characters also check stored translations. Responses are cached separately by query, filters, plan, locale, and translation output.</Info>
 
@@ -42,16 +42,16 @@ Matching uses PostgreSQL trigram similarity over both the English `name` and the
 </ParamField>
 
 <ParamField query="locale" type="string">
-  Add `localized_name` and `matched_locale` to each result. Example: `ja` or `pt-BR`. Professional and Business plans only. See [Localized Place Names](/api/localization).
+  Add `localized_name` and `matched_locale` to each result. Example: `ja` or `pt-BR`. Requires full data access (Supporter plan and above). See [Localized Place Names](/api/localization).
 </ParamField>
 
 <ParamField query="include_translations" type="boolean" default="false">
-  Include the full raw `translations` JSON string. Professional and Business plans only.
+  Include the full raw `translations` JSON string. Requires full data access (Supporter plan and above).
 </ParamField>
 
 ## Response
 
-Returns an array sorted by `match_score` descending. Each item carries the standard fields for the entity (`city`, `state`, or `country`) at your plan's data-access level — Professional and Business resolve to the **full** field set — plus two fuzzy-specific fields:
+Returns an array sorted by `match_score` descending. Each item carries the standard fields for the entity (`city`, `state`, or `country`) at your plan's data-access level — every plan with fuzzy search access (Supporter, Professional, Business) resolves to the **full** field set — plus two fuzzy-specific fields:
 
 <ResponseField name="match_score" type="number">
   Trigram similarity of the best-matching name (English or native), from `0` to `1`, rounded to 2 decimals. Higher means a closer match.
@@ -115,7 +115,7 @@ for match in response.json():
 </RequestExample>
 
 <ResponseExample>
-```json 200 - City match (Professional / Business)
+```json 200 - City match (Supporter, Professional, Business)
 [
   {
     "id": 132649,
@@ -166,8 +166,8 @@ for match in response.json():
   "message": "This feature is not available on your current plan.",
   "details": {
     "feature": "fuzzySearch",
-    "currentTier": "supporter",
-    "requiredTier": "professional",
+    "currentTier": "starter",
+    "requiredTier": "supporter",
     "upgradeUrl": "https://app.countrystatecity.in/pricing"
   }
 }

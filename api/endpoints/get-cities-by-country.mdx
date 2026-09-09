@@ -14,7 +14,7 @@ Retrieve all cities within a specific country using the country's ISO2 code. Thi
 </ParamField>
 
 <Tip>
-**Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
+**Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Starter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
 </Tip>
 
 ## Authentication
@@ -26,7 +26,7 @@ Retrieve all cities within a specific country using the country's ISO2 code. Thi
 ## Query Parameters
 
 <ParamField query="q" type="string">
-  Search filter on name. Case-insensitive match on `name` and `native` fields. Minimum 2 characters. **Requires Supporter+ plan.** Without this parameter, all results are returned (no plan restriction for search).
+  Search filter on name. Case-insensitive match on `name` and `native` fields. Minimum 2 characters. **Requires Starter+ plan.** Without this parameter, all results are returned (no plan restriction for search).
 </ParamField>
 
 <ParamField query="kind" type="string">
@@ -34,7 +34,7 @@ Retrieve all cities within a specific country using the country's ISO2 code. Thi
 </ParamField>
 
 <ParamField query="type" type="string">
-  Filter by the raw source `type` value. Comma-separated list of one or more values from the [City Types](/database/city-types) reference (e.g. `?type=city,adm2`). **Requires Supporter+ plan** — matches the same tier gate as the `type` response field. On a lower plan the request is rejected with a `400` error rather than being ignored. Unrecognized values simply match zero rows rather than erroring.
+  Filter by the raw source `type` value. Comma-separated list of one or more values from the [City Types](/database/city-types) reference (e.g. `?type=city,adm2`). **Requires Supporter+ plan** — matches the same tier gate as the `type` response field (full data access). On a lower plan the request is rejected with a `400` error rather than being ignored. Unrecognized values simply match zero rows rather than erroring.
 </ParamField>
 
 ## Response
@@ -51,9 +51,9 @@ Retrieve all cities within a specific country using the country's ISO2 code. Thi
   Derived classification of the place: one of `settlement`, `administrative`, `section`, or `unknown`. Computed from `type` — available on every tier, including **Basic**. See [City Types](/database/city-types) for the full mapping.
 </ResponseField>
 
-<Info>City responses on the **Basic** tier return `id`, `name`, and `kind`. Upgrading to **Supporter+** unlocks `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, and `native`. **Professional+** adds `translations` and `wikiDataId`. See **Tier-Based Field Availability** below.</Info>
+<Info>City responses on the **Basic** tier return `id`, `name`, and `kind`. Upgrading to **Supporter+** unlocks the full field set: `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, `native`, `translations`, and `wikiDataId`. See **Tier-Based Field Availability** below.</Info>
 
-<Note>**Availability:** `/countries/{iso2}/cities` (all cities in a country) requires **Supporter+**. Community/Starter users must use [Get Cities by State](/api/endpoints/get-cities-by-state) instead.</Note>
+<Note>**Availability:** `/countries/{iso2}/cities` (all cities in a country) requires **Starter+**. Community users must use [Get Cities by State](/api/endpoints/get-cities-by-state) instead.</Note>
 
 <RequestExample>
 ```bash cURL
@@ -287,7 +287,7 @@ cities = get_cities_by_country('IN')
 </RequestExample>
 
 <ResponseExample>
-```json 200 - Supporter tier (Coordinates)
+```json 200 - Full tier (Supporter, Professional, Business)
 [
   {
     "id": 133024,
@@ -304,17 +304,7 @@ cities = get_cities_by_country('IN')
     "type": "adm1",
     "level": null,
     "parent_id": null,
-    "native": "मुंबई"
-  }
-]
-```
-
-```json 200 - Professional / Business (Full) — coordinates plus
-[
-  {
-    "id": 133024,
-    "name": "Mumbai",
-    "...": "...all coordinates fields above...",
+    "native": "मुंबई",
     "translations": "{\"de\":\"Mumbai\",\"fr\":\"Bombay\",\"ja\":\"ムンバイ\",\"cn\":\"孟买\"}",
     "wikiDataId": "Q1156"
   }
@@ -398,7 +388,6 @@ For better user experience, consider loading cities by state instead of by count
 | Tier | Plans | Fields |
 |------|-------|--------|
 | **Basic** | Community, Starter, Legacy | `id`, `name`, `kind` |
-| **Coordinates** | Supporter | All Basic **+** `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, `native` |
-| **Full** | Professional, Business | All Coordinates **+** `translations`, `wikiDataId` |
+| **Full** | Supporter, Professional, Business | All Basic **+** `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, `native`, `translations`, `wikiDataId` |
 
 See [Pricing](https://app.countrystatecity.in/pricing) for plan details.
