@@ -7,10 +7,10 @@ description: "Retrieve a list of geographic regions"
 
 Retrieve all geographic regions (Africa, Americas, Asia, Europe, Oceania, Polar). Supports optional search filtering.
 
-<Note>**Availability:** Supporter plan and above. Returns `403` on lower tiers.</Note>
+<Note>**Availability:** Starter plan and above. Returns `403` on lower tiers.</Note>
 
 <Tip>
-**Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
+**Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Starter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
 </Tip>
 
 ## Authentication
@@ -22,7 +22,7 @@ Retrieve all geographic regions (Africa, Americas, Asia, Europe, Oceania, Polar)
 ## Query Parameters
 
 <ParamField query="q" type="string">
-  Search filter on region name. Case-insensitive, minimum 2 characters. Requires Supporter+ plan.
+  Search filter on region name. Case-insensitive, minimum 2 characters. Requires Starter+ plan.
 </ParamField>
 
 ## Response
@@ -40,7 +40,7 @@ Retrieve all geographic regions (Africa, Americas, Asia, Europe, Oceania, Polar)
 </ResponseField>
 
 <ResponseField name="wikiDataId" type="string">
-  Wikidata item identifier. **Coordinates tier and above.**
+  Wikidata item identifier. **Full access level only.**
 </ResponseField>
 
 <RequestExample>

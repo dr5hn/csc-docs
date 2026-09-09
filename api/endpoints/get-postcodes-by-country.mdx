@@ -8,7 +8,7 @@ description: "Page through or search a country's postcodes with cursor paginatio
 Page through a country's postcodes / ZIP codes, or narrow the list with a code/locality search, state, city, or type filter. Use this to build postcode discovery instead of downloading the full dataset.
 
 <Note>
-  **Requires a Supporter+ plan** — including a bare list request with no filters at all. This is intentional: it stops a Community or Starter key from paginating through and scraping the full hosted dataset. [Get Postcode by Code](/api/endpoints/get-postcode-by-code) (exact lookup) has no such gate and stays free on every plan.
+  **Requires a Starter+ plan** — including a bare list request with no filters at all. This is intentional: it stops a Community or Legacy key from paginating through and scraping the full hosted dataset. [Get Postcode by Code](/api/endpoints/get-postcode-by-code) (exact lookup) has no such gate and stays free on every plan.
 </Note>
 
 <Warning>
@@ -22,7 +22,7 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
 </ParamField>
 
 <Tip>
-  **Trim results:** Add `?fields=` to limit the columns returned. Requires **Supporter+**. There is no `?sort=` on this endpoint — results are always ordered by code, then `id`, so cursor pagination stays stable. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for `?fields=` syntax.
+  **Trim results:** Add `?fields=` to limit the columns returned. Requires **Starter+**. There is no `?sort=` on this endpoint — results are always ordered by code, then `id`, so cursor pagination stays stable. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for `?fields=` syntax.
 </Tip>
 
 ## Authentication
@@ -34,7 +34,7 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
 ## Query parameters
 
 <ParamField query="q" type="string">
-  Case-insensitive search: matches postcodes whose code starts with `q`, or whose locality name contains it. 2-100 characters. Optional — omit it to list the country's postcodes instead of searching. Every request to this endpoint requires Supporter+ regardless of whether `q` is present.
+  Case-insensitive search: matches postcodes whose code starts with `q`, or whose locality name contains it. 2-100 characters. Optional — omit it to list the country's postcodes instead of searching. Every request to this endpoint requires Starter+ regardless of whether `q` is present.
 </ParamField>
 
 <ParamField query="state_code" type="string">
@@ -108,11 +108,11 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
 </ResponseField>
 
 <ResponseField name="data[].source" type="string | null">
-  Originating data source, for attribution and license tracking. **Requires Professional+.**
+  Originating data source, for attribution and license tracking. **Requires Supporter+.**
 </ResponseField>
 
 <ResponseField name="data[].wikiDataId" type="string | null">
-  Wikidata Q-ID for cross-referencing. **Requires Professional+.**
+  Wikidata Q-ID for cross-referencing. **Requires Supporter+.**
 </ResponseField>
 
 <ResponseField name="pagination.limit" type="integer">
@@ -131,7 +131,27 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
   There is no total-count field. Counting every match up front would mean a second expensive query on top of a 844k-row table, so check `has_more` and keep paging instead of expecting a total.
 </Info>
 
-```json 200 - Search with q (Supporter+)
+```json 200 - Search with q, Basic tier (Starter)
+{
+  "data": [
+    {
+      "id": "131878",
+      "code": "110001",
+      "country_code": "IN",
+      "state_code": "DL",
+      "locality_name": "Sansad Marg",
+      "type": "full"
+    }
+  ],
+  "pagination": {
+    "limit": 50,
+    "next_cursor": null,
+    "has_more": false
+  }
+}
+```
+
+```json 200 - Search with q, Full tier (Supporter, Professional, Business)
 {
   "data": [
     {
@@ -145,7 +165,9 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
       "state_id": "4021",
       "city_id": null,
       "latitude": null,
-      "longitude": null
+      "longitude": null,
+      "source": "geonames",
+      "wikiDataId": null
     }
   ],
   "pagination": {
@@ -158,13 +180,12 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
 
 ## Tier-based field availability
 
-Every plan that can reach this endpoint at all already has at least **Coordinates** access — Community, Starter, and Legacy lack the `searchEndpoint` feature this endpoint requires, so the **Basic** row below is unreachable here (it only applies to [Get Postcode by Code](/api/endpoints/get-postcode-by-code)).
+Community and Legacy lack the `searchEndpoint` feature this endpoint requires, so the **Basic** row below is only reachable on **Starter** — Community and Legacy get a `403` on this endpoint before field access matters.
 
 | Tier | Plans | Fields |
 |------|-------|--------|
-| ~~Basic~~ | ~~Community, Starter, Legacy~~ | Not reachable — these plans get a `403` on this endpoint before field access matters |
-| **Coordinates** | Supporter | `id`, `code`, `country_code`, `state_code`, `locality_name`, `type`, `country_id`, `state_id`, `city_id`, `latitude`, `longitude` |
-| **Full** | Professional, Business | All Coordinates **+** `source`, `wikiDataId` |
+| **Basic** | Starter | `id`, `code`, `country_code`, `state_code`, `locality_name`, `type` |
+| **Full** | Supporter, Professional, Business | All Basic **+** `country_id`, `state_id`, `city_id`, `latitude`, `longitude`, `source`, `wikiDataId` |
 
 See [Pricing](https://countrystatecity.in/pricing?source=docs&campaign=postcode_search) for plan details.
 
@@ -267,20 +288,20 @@ for await (const postcode of allPostcodes('IN', { state_code: 'DL' })) {
 
 A cursor also `400`s as `"cursor belongs to a different country."` when reused across countries, `"cursor is invalid or has been tampered with."` when it's malformed or its signature doesn't verify, and `"cursor has expired. Start again without a cursor."` after 24 hours.
 
-```json 403 - Requires Supporter+
+```json 403 - Requires Starter+
 {
   "status": "error",
   "message": "This feature is not available on your current plan.",
   "details": {
     "feature": "searchEndpoint",
-    "currentTier": "starter",
-    "requiredTier": "supporter",
+    "currentTier": "community",
+    "requiredTier": "starter",
     "upgradeUrl": "https://countrystatecity.in/pricing"
   }
 }
 ```
 
-This `403` fires on **every** request to this endpoint from a Community, Starter, or Legacy key — including a bare list with no `q`, `state_code`, `city_id`, or `type` at all. Only exact lookup ([Get Postcode by Code](/api/endpoints/get-postcode-by-code)) is free on those plans.
+This `403` fires on **every** request to this endpoint from a Community or Legacy key — including a bare list with no `q`, `state_code`, `city_id`, or `type` at all. Only exact lookup ([Get Postcode by Code](/api/endpoints/get-postcode-by-code)) is free on those plans.
 
 ```json 200 - Country with no postcode coverage
 {
@@ -298,7 +319,7 @@ A country that exists but has no postcodes, or a filter that matches nothing, re
 See [Errors & Rate Limits](/api/errors) for the `401`/`429` shapes and usage headers common to every endpoint.
 
 <Note>
-  This endpoint requires a Supporter+ plan, for listing as well as searching. [Compare plans](https://countrystatecity.in/pricing?source=docs&campaign=postcode_search) to add it to your API key.
+  This endpoint requires a Starter+ plan, for listing as well as searching. [Compare plans](https://countrystatecity.in/pricing?source=docs&campaign=postcode_search) to add it to your API key.
 </Note>
 
 ## Related

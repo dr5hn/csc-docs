@@ -7,10 +7,10 @@ description: "Retrieve countries belonging to a specific subregion"
 
 Retrieve all countries within a subregion. For example, subregion "Southern Asia" contains India, Pakistan, Bangladesh, etc.
 
-<Note>**Availability:** Supporter plan and above.</Note>
+<Note>**Availability:** Starter plan and above. Returns `403` on Community and Legacy plans. The fields returned vary by tier — see **Tier-Based Field Availability** below.</Note>
 
 <Tip>
-**Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
+**Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Starter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
 </Tip>
 
 ## Authentication
@@ -28,7 +28,7 @@ Retrieve all countries within a subregion. For example, subregion "Southern Asia
 ## Query Parameters
 
 <ParamField query="q" type="string">
-  Search filter on country name. Min 2 characters. Requires Supporter+ plan.
+  Search filter on country name. Min 2 characters. Requires Starter+ plan.
 </ParamField>
 
 ## Response
@@ -52,7 +52,30 @@ console.log(countries);
 </RequestExample>
 
 <ResponseExample>
-```json 200 - Supporter tier (Coordinates) — abridged
+```json 200 - Basic tier (Starter) — abridged
+[
+  {
+    "id": 101,
+    "name": "India",
+    "iso2": "IN",
+    "iso3": "IND",
+    "phonecode": "91",
+    "capital": "New Delhi",
+    "currency": "INR",
+    "native": "भारत",
+    "emoji": "🇮🇳",
+    "latitude": "20.00000000",
+    "longitude": "77.00000000",
+    "region": "Asia",
+    "region_id": 3,
+    "subregion": "Southern Asia",
+    "subregion_id": 14,
+    "timezones": "[{\"zoneName\":\"Asia/Kolkata\",\"gmtOffset\":19800,\"gmtOffsetName\":\"UTC+05:30\",\"abbreviation\":\"IST\",\"tzName\":\"Indian Standard Time\"}]"
+  }
+]
+```
+
+```json 200 - Full tier (Supporter, Professional, Business) — abridged
 [
   {
     "id": 101,
@@ -81,7 +104,9 @@ console.log(countries);
     "area_sq_km": 3287263,
     "postal_code_format": "######",
     "postal_code_regex": "^(\\d{6})$",
-    "numeric_code": "356"
+    "numeric_code": "356",
+    "translations": "{\"kr\":\"인도\",\"de\":\"Indien\",\"es\":\"India\",\"fr\":\"Inde\",\"ja\":\"インド\"}",
+    "wikiDataId": "Q668"
   }
 ]
 ```
@@ -97,11 +122,11 @@ console.log(countries);
 
 ## Tier-Based Field Availability
 
-This endpoint requires **Supporter+**, so the **Basic** tier never applies. Returned country fields match [Get Country Details](/api/endpoints/get-country-details):
+This endpoint requires **Starter+**, so Community and Legacy accounts never reach field access at all — they get a `403` first. Returned country fields match [Get Country Details](/api/endpoints/get-country-details):
 
 | Tier | Plans | Fields |
 |------|-------|--------|
-| **Coordinates** | Supporter | `id`, `name`, `iso2`, `iso3`, `phonecode`, `capital`, `currency`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `native`, `emoji`, `emojiU`, `latitude`, `longitude`, `region`, `region_id`, `subregion`, `subregion_id`, `timezones`, `numeric_code`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex` |
-| **Full** | Professional, Business | All Coordinates **+** `translations`, `wikiDataId` |
+| **Basic** | Starter | `id`, `name`, `iso2`, `iso3`, `phonecode`, `capital`, `currency`, `native`, `emoji`, `latitude`, `longitude`, `region`, `region_id`, `subregion`, `subregion_id`, `timezones` |
+| **Full** | Supporter, Professional, Business | All Basic **+** `numeric_code`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex`, `emojiU`, `translations`, `wikiDataId` |
 
 See [Pricing](https://app.countrystatecity.in/pricing) for plan details.

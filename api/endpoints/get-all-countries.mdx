@@ -10,7 +10,7 @@ Retrieve a complete list of all countries with basic information including ISO c
 <Note>**Availability:** All plans (Community and above). The fields returned vary by tier — see **Tier-Based Field Availability** below.</Note>
 
 <Tip>
-**Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
+**Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Starter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
 </Tip>
 
 ## Authentication
@@ -22,7 +22,7 @@ Retrieve a complete list of all countries with basic information including ISO c
 ## Query Parameters
 
 <ParamField query="q" type="string">
-  Search filter on name. Case-insensitive match on `name` and `native` fields. Minimum 2 characters. **Requires Supporter+ plan.** Without this parameter, all results are returned (no plan restriction for search).
+  Search filter on name. Case-insensitive match on `name` and `native` fields. Minimum 2 characters. **Requires Starter+ plan.** Without this parameter, all results are returned (no plan restriction for search).
 </ParamField>
 
 ## Response
@@ -231,12 +231,25 @@ puts JSON.pretty_generate(countries)
 ]
 ```
 
-```json 200 - Coordinates tier (Supporter) — basic plus
+```json 200 - Full tier (Supporter, Professional, Business)
 [
   {
     "id": 101,
     "name": "India",
-    "...": "...all basic fields above...",
+    "iso2": "IN",
+    "iso3": "IND",
+    "phonecode": "91",
+    "capital": "New Delhi",
+    "currency": "INR",
+    "native": "भारत",
+    "emoji": "🇮🇳",
+    "latitude": "20.00000000",
+    "longitude": "77.00000000",
+    "region": "Asia",
+    "region_id": 3,
+    "subregion": "Southern Asia",
+    "subregion_id": 14,
+    "timezones": "[{\"zoneName\":\"Asia/Kolkata\",\"gmtOffset\":19800,\"gmtOffsetName\":\"UTC+05:30\",\"abbreviation\":\"IST\",\"tzName\":\"Indian Standard Time\"}]",
     "numeric_code": "356",
     "currency_name": "Indian rupee",
     "currency_symbol": "₹",
@@ -247,17 +260,7 @@ puts JSON.pretty_generate(countries)
     "area_sq_km": 3287263,
     "postal_code_format": "######",
     "postal_code_regex": "^(\\d{6})$",
-    "emojiU": "U+1F1EE U+1F1F3"
-  }
-]
-```
-
-```json 200 - Full tier (Professional, Business) — coordinates plus
-[
-  {
-    "id": 101,
-    "name": "India",
-    "...": "...all coordinates fields above...",
+    "emojiU": "U+1F1EE U+1F1F3",
     "translations": "{\"kr\":\"인도\",\"de\":\"Indien\",\"es\":\"India\",\"fr\":\"Inde\",\"ja\":\"インド\"}",
     "wikiDataId": "Q668"
   }
@@ -278,8 +281,7 @@ The fields returned depend on your plan's data access level.
 | Tier | Plans | Fields |
 |------|-------|--------|
 | **Basic** | Community, Starter, Legacy | `id`, `name`, `iso2`, `iso3`, `phonecode`, `capital`, `currency`, `native`, `emoji`, `latitude`, `longitude`, `region`, `region_id`, `subregion`, `subregion_id`, `timezones` |
-| **Coordinates** | Supporter | All Basic **+** `numeric_code`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex`, `emojiU` |
-| **Full** | Professional, Business | All Coordinates **+** `translations`, `wikiDataId` |
+| **Full** | Supporter, Professional, Business | All Basic **+** `numeric_code`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex`, `emojiU`, `translations`, `wikiDataId` |
 
 See [Pricing](https://app.countrystatecity.in/pricing) for plan details.
 

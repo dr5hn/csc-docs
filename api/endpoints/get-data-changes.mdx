@@ -8,7 +8,7 @@ description: "Keep your copy of Country State City data current without download
 If your app stores Country State City data in its own database, a full download is wasteful when only a few places changed. The change feed returns the countries, states, and cities that were added, removed, or updated so you can apply only those changes.
 
 <Note>
-  **Available on the Business plan.** [Compare plans](https://countrystatecity.in/pricing?source=docs&campaign=data_change_feed) to add the change feed to your API key.
+  **Available on Professional and Business plans.** Returns `403` on Community, Starter, Supporter, and Legacy plans. [Compare plans](https://countrystatecity.in/pricing?source=docs&campaign=data_change_feed) to add the change feed to your API key.
 </Note>
 
 ## When to use it
@@ -197,14 +197,14 @@ If a token expires, is changed, or is invalid, start again with `start_date` and
 
 Lower plans receive a plan-gate response:
 
-```json 403 - Business plan required
+```json 403 - Professional plan required
 {
   "status": "error",
   "message": "This feature is not available on your current plan.",
   "details": {
     "feature": "dataChangeFeed",
-    "currentTier": "professional",
-    "requiredTier": "business",
+    "currentTier": "supporter",
+    "requiredTier": "professional",
     "upgradeUrl": "https://app.countrystatecity.in/pricing"
   }
 }
@@ -214,7 +214,7 @@ Lower plans receive a plan-gate response:
 
 <CardGroup cols={2}>
   <Card title="Compare API plans" icon="credit-card" href="https://countrystatecity.in/pricing?source=docs&campaign=data_change_feed">
-    Choose Business to keep your database current with small incremental requests.
+    Choose Professional or Business to keep your database current with small incremental requests.
   </Card>
   <Card title="Get Data Version" icon="clock-rotate-left" href="/api/endpoints/get-data-version">
     Check which dataset release your API responses use.

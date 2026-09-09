@@ -9,7 +9,7 @@ Given a phone number in E.164 format (`+` followed by country code and national 
 
 The matcher walks 3-digit → 2-digit → 1-digit ITU prefixes, so longer-prefix countries (like `+972` Israel) win over shorter-prefix ones that share the leading digit. For NANP `+1` numbers, the area code is matched against known territory area codes — `+1-246-555-1234` resolves to Barbados (`BB`), not the US.
 
-<Note>**Availability:** Supporter plan and above. Returns `403` on lower tiers.</Note>
+<Note>**Availability:** Starter plan and above. Returns `403` on lower tiers.</Note>
 
 <Warning>
 **The response echoes the phone number** (`e164` and `national_number`), so it's PII. The endpoint returns `Cache-Control: no-store` and emits no `ETag` — Cloudflare, browsers, and intermediate proxies will not retain the response. Do not change this if you're proxying through additional caching layers; the `Cache-Control` is intentional.

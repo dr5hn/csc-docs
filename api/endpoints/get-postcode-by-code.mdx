@@ -8,7 +8,7 @@ description: "Look up every postcode record that matches an exact code within a 
 Look up a postcode / ZIP code within a country and get back every matching record. Use this to confirm that a user-supplied postcode appears in the dataset.
 
 <Note>
-  **Free on every plan**, including Community. Exact lookup counts against your normal daily/monthly quota like any other request. Paginated listing and search use [Get Postcodes by Country](/api/endpoints/get-postcodes-by-country) and require a Supporter+ plan — exact lookup has no such gate.
+  **Free on every plan**, including Community. Exact lookup counts against your normal daily/monthly quota like any other request. Paginated listing and search use [Get Postcodes by Country](/api/endpoints/get-postcodes-by-country) and require a Starter+ plan — exact lookup has no such gate.
 </Note>
 
 <Warning>
@@ -64,31 +64,31 @@ A postcode is not always unique to one place. The same code can legitimately cov
 </ResponseField>
 
 <ResponseField name="data[].country_id" type="string">
-  Country ID, as a numeric string. **Requires Supporter+.**
+  Country ID, as a numeric string. **Full access level only.**
 </ResponseField>
 
 <ResponseField name="data[].state_id" type="string | null">
-  State ID, as a numeric string. **Requires Supporter+.**
+  State ID, as a numeric string. **Full access level only.**
 </ResponseField>
 
 <ResponseField name="data[].city_id" type="string | null">
-  City ID, as a numeric string, when the postcode is linked to a specific city. **Requires Supporter+.**
+  City ID, as a numeric string, when the postcode is linked to a specific city. **Full access level only.**
 </ResponseField>
 
 <ResponseField name="data[].latitude" type="number | null">
-  Latitude of the postcode area. **Requires Supporter+.**
+  Latitude of the postcode area. **Full access level only.**
 </ResponseField>
 
 <ResponseField name="data[].longitude" type="number | null">
-  Longitude of the postcode area. **Requires Supporter+.**
+  Longitude of the postcode area. **Full access level only.**
 </ResponseField>
 
 <ResponseField name="data[].source" type="string | null">
-  Originating data source, for attribution and license tracking. **Requires Professional+.**
+  Originating data source, for attribution and license tracking. **Full access level only.**
 </ResponseField>
 
 <ResponseField name="data[].wikiDataId" type="string | null">
-  Wikidata Q-ID for cross-referencing. **Requires Professional+.**
+  Wikidata Q-ID for cross-referencing. **Full access level only.**
 </ResponseField>
 
 <ResponseField name="meta.country_code" type="string">
@@ -107,7 +107,43 @@ A postcode is not always unique to one place. The same code can legitimately cov
   Fields above **Basic** are stripped for lower plans, not just hidden — a Community or Starter key never receives `country_id`, `state_id`, `city_id`, `latitude`, or `longitude` in the response body. See **Tier-based field availability** below. `id` and every foreign-key field are returned as numeric strings rather than JSON numbers — parse them as strings in your client.
 </Info>
 
-```json 200 - Duplicate exact match (Supporter+)
+```json 200 - Duplicate exact match, Basic tier (Community, Starter, Legacy)
+{
+  "data": [
+    {
+      "id": "670115",
+      "code": "11104",
+      "country_code": "LK",
+      "state_code": "12",
+      "locality_name": "Mabola",
+      "type": "full"
+    },
+    {
+      "id": "670116",
+      "code": "11104",
+      "country_code": "LK",
+      "state_code": "12",
+      "locality_name": "Watinapaha",
+      "type": "full"
+    },
+    {
+      "id": "670117",
+      "code": "11104",
+      "country_code": "LK",
+      "state_code": "12",
+      "locality_name": "Wattala",
+      "type": "full"
+    }
+  ],
+  "meta": {
+    "country_code": "LK",
+    "query": "11104",
+    "match_count": 3
+  }
+}
+```
+
+```json 200 - Duplicate exact match, Full tier (Supporter, Professional, Business)
 {
   "data": [
     {
@@ -121,7 +157,9 @@ A postcode is not always unique to one place. The same code can legitimately cov
       "state_id": "2804",
       "city_id": null,
       "latitude": 7.0062833,
-      "longitude": 79.8924828
+      "longitude": 79.8924828,
+      "source": "geonames",
+      "wikiDataId": null
     },
     {
       "id": "670116",
@@ -134,7 +172,9 @@ A postcode is not always unique to one place. The same code can legitimately cov
       "state_id": "2804",
       "city_id": null,
       "latitude": 7.1853118,
-      "longitude": 80.0003875
+      "longitude": 80.0003875,
+      "source": "geonames",
+      "wikiDataId": null
     },
     {
       "id": "670117",
@@ -147,7 +187,9 @@ A postcode is not always unique to one place. The same code can legitimately cov
       "state_id": "2804",
       "city_id": null,
       "latitude": 6.9906677,
-      "longitude": 79.8931709
+      "longitude": 79.8931709,
+      "source": "geonames",
+      "wikiDataId": null
     }
   ],
   "meta": {
@@ -163,8 +205,7 @@ A postcode is not always unique to one place. The same code can legitimately cov
 | Tier | Plans | Fields |
 |------|-------|--------|
 | **Basic** | Community, Starter, Legacy | `id`, `code`, `country_code`, `state_code`, `locality_name`, `type` |
-| **Coordinates** | Supporter | All Basic **+** `country_id`, `state_id`, `city_id`, `latitude`, `longitude` |
-| **Full** | Professional, Business | All Coordinates **+** `source`, `wikiDataId` |
+| **Full** | Supporter, Professional, Business | All Basic **+** `country_id`, `state_id`, `city_id`, `latitude`, `longitude`, `source`, `wikiDataId` |
 
 See [Pricing](https://countrystatecity.in/pricing?source=docs&campaign=postcode_lookup) for plan details.
 
@@ -269,7 +310,7 @@ See [Errors & Rate Limits](/api/errors) for the `401`/`429` shapes and usage hea
 
 <CardGroup cols={2}>
   <Card title="Get Postcodes by Country" icon="magnifying-glass" href="/api/endpoints/get-postcodes-by-country">
-    Page through or search a country's postcodes. Requires Supporter+.
+    Page through or search a country's postcodes. Requires Starter+.
   </Card>
   <Card title="Postcodes Reference" icon="mailbox" href="/database/postcodes">
     Coverage stats, postcode types, and self-hosted query examples.
