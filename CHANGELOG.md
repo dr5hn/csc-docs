@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Update Professional usage to 2,100/day and 60,000/month, and Business to 3,300/day and 100,000/month. Custom usage is negotiated rather than universally unlimited.
+- Update Professional usage to 2,100/day and 63,000/month, and Business to 3,300/day and 100,000/month. Custom usage is negotiated rather than universally unlimited.
 
 ## [1.4.0] - 2026-08-29
 
