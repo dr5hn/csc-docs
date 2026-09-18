@@ -1,7 +1,6 @@
 ---
 title: "Get Dial Code by Country"
-api: "GET https://api.countrystatecity.in/v1/phone/{ciso}"
-authMethod: "key"
+openapi: "GET /phone/{ciso}"
 description: "Retrieve the international dial code for a single country by ISO2, ISO3, or numeric ID"
 ---
 
@@ -15,41 +14,9 @@ Get the dial code for one country. The path parameter accepts **three forms** �
 
 <Info>Responses are cached server-side for 24 hours. Numeric IDs `1` and `001` resolve to the same cache slot; letter codes are case-insensitive.</Info>
 
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Path Parameters
-
-<ParamField path="ciso" type="string" required>
-  ISO2 code, ISO3 code, or numeric country ID. Case-insensitive for ISO codes.
-</ParamField>
-
 ## Response
 
 A single phone entry (object, **not** an array — unlike the list endpoint).
-
-<ResponseField name="country" type="string">
-  ISO 3166-1 alpha-2 code of the country (e.g. `"US"`). Convenience field equal to `iso2`.
-</ResponseField>
-
-<ResponseField name="dial_code" type="string">
-  Dial code with leading `+` (e.g. `"+91"`).
-</ResponseField>
-
-<ResponseField name="area_code" type="string">
-  Present only for NANP entries with a fixed area-code prefix in the underlying data (e.g. `"246"` for Barbados). Omitted when not applicable — do not assume the field exists.
-</ResponseField>
-
-<ResponseField name="iso2" type="string">
-  ISO 3166-1 alpha-2 code.
-</ResponseField>
-
-<ResponseField name="iso3" type="string">
-  ISO 3166-1 alpha-3 code.
-</ResponseField>
 
 <RequestExample>
 ```bash cURL (ISO2)

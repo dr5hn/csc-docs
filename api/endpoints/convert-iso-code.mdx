@@ -1,7 +1,6 @@
 ---
 title: "Convert ISO Code"
-api: "GET https://api.countrystatecity.in/v1/iso/country/convert"
-authMethod: "key"
+openapi: "GET /iso/country/convert"
 description: "Translate a country code between ISO 3166-1 alpha-2, alpha-3, and numeric formats"
 ---
 
@@ -20,50 +19,6 @@ Useful when an upstream system gives you one format and a downstream service exp
 
 Numeric inputs `4` and `004` resolve to the same cache slot.
 </Info>
-
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Query Parameters
-
-<ParamField query="from" type="string" required>
-  Source format. One of `iso2`, `iso3`, `numeric`.
-</ParamField>
-
-<ParamField query="to" type="string" required>
-  Target format. One of `iso2`, `iso3`, `numeric`. Must differ from `from`.
-</ParamField>
-
-<ParamField query="value" type="string" required>
-  The code to convert. Must match the format named in `from`:
-
-  - `from=iso2` → 2 letters (e.g. `US`)
-  - `from=iso3` → 3 letters (e.g. `USA`)
-  - `from=numeric` → 1–3 digits, non-zero (e.g. `840` or `4`)
-
-  Letter codes are auto-uppercased.
-</ParamField>
-
-## Response
-
-<ResponseField name="from" type="string">
-  Echo of the source format you requested.
-</ResponseField>
-
-<ResponseField name="to" type="string">
-  Echo of the target format you requested.
-</ResponseField>
-
-<ResponseField name="input" type="string">
-  Echo of the `value` you sent — useful for matching responses to requests when batching.
-</ResponseField>
-
-<ResponseField name="result" type="string">
-  The converted code. For `to=numeric`, returned zero-padded to 3 digits (e.g. `"840"`).
-</ResponseField>
 
 <RequestExample>
 ```bash cURL (alpha-2 → alpha-3)

@@ -1,7 +1,6 @@
 ---
 title: "Get State Details"
-api: "GET https://api.countrystatecity.in/v1/countries/{country_iso2}/states/{state_iso2}"
-authMethod: "key"
+openapi: "GET /countries/{ciso}/states/{siso}"
 description: "Retrieve detailed information for a specific state using country and state ISO2 codes"
 ---
 
@@ -9,63 +8,9 @@ Retrieve detailed information for a specific state or province using the country
 
 <Note>**Availability:** All plans (Community and above). The fields returned vary by tier — see **Tier-Based Field Availability** below.</Note>
 
-## Path Parameters
-
-<ParamField path="country_iso2" type="string" required>
-  ISO2 code of the country (e.g., "IN", "US")
-</ParamField>
-
-<ParamField path="state_iso2" type="string" required>
-  ISO2 code of the state/province (e.g., "MH" for Maharashtra, "CA" for California)
-</ParamField>
-
 <Tip>
 **Trim response columns:** Add `?fields=name,iso2,...` to receive only the columns you need. Available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax.
 </Tip>
-
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Response
-
-<ResponseField name="id" type="integer">
-  Unique identifier for the state/province
-</ResponseField>
-
-<ResponseField name="name" type="string">
-  Official name of the state/province
-</ResponseField>
-
-<ResponseField name="country_id" type="integer">
-  Unique identifier of the parent country
-</ResponseField>
-
-<ResponseField name="country_code" type="string">
-  ISO2 code of the parent country
-</ResponseField>
-
-<ResponseField name="iso2" type="string">
-  ISO2 code for the state/province
-</ResponseField>
-
-<ResponseField name="latitude" type="string">
-  Approximate latitude coordinate of the state/province center
-</ResponseField>
-
-<ResponseField name="longitude" type="string">
-  Approximate longitude coordinate of the state/province center
-</ResponseField>
-
-<ResponseField name="timezone" type="string">
-  IANA timezone identifier (e.g., `"Asia/Kolkata"`)
-</ResponseField>
-
-<ResponseField name="type" type="string">
-  Administrative division type (e.g., `"state"`, `"province"`, `"region"`). **Coordinates tier and above.**
-</ResponseField>
 
 <Info>Additional fields like `fips_code`, `iso3166_2`, `level`, `parent_id`, `native`, `population`, `translations`, and `wikiDataId` are returned on higher tiers. See **Tier-Based Field Availability** below.</Info>
 

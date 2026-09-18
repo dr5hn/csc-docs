@@ -1,7 +1,6 @@
 ---
 title: "Get Countries by Subregion"
-api: "GET https://api.countrystatecity.in/v1/subregions/{id}/countries"
-authMethod: "key"
+openapi: "GET /subregions/{id}/countries"
 description: "Retrieve countries belonging to a specific subregion"
 ---
 
@@ -12,24 +11,6 @@ Retrieve all countries within a subregion. For example, subregion "Southern Asia
 <Tip>
 **Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
 </Tip>
-
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Path Parameters
-
-<ParamField path="id" type="integer" required>
-  Numeric subregion ID (e.g., `14` for Southern Asia)
-</ParamField>
-
-## Query Parameters
-
-<ParamField query="q" type="string">
-  Search filter on country name. Min 2 characters. Requires Supporter+ plan.
-</ParamField>
 
 ## Response
 

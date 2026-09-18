@@ -1,0 +1,89 @@
+---
+title: "Changelog"
+description: "New endpoints, fixes and improvements to the Country State City documentation and API"
+icon: "clock-rotate-left"
+rss: true
+---
+
+Follow along with what has changed across the CSC API docs. For changes to the geographical data itself, use the [Data Changes endpoint](/api/endpoints/get-data-changes).
+
+<Update label="2026-08-29" description="v1.4.0" tags={["Added", "Fixed"]}>
+#### Added
+
+- **Postcode Endpoints** group: exact postcode lookup (`GET /v1/countries/{cc}/postcodes/{code}`, free on every plan) and paginated listing/search (`GET /v1/countries/{cc}/postcodes`, requires Supporter+ even for a bare list with no filters) — documents duplicate-match handling, cursor pagination (including expiry and tamper detection), `q`/`state_code`/`city_id`/`type` filters, conditional-request (`ETag`/`If-None-Match`) support, and tier-based field availability
+- Non-deliverability disclaimer on postcode documentation: this is informational data, not an address verification or mail-deliverability service
+
+#### Fixed
+
+- Corrected the postcodes table's field name from `postcode` to the authoritative `code` throughout `database/postcodes.mdx` and `database/schema.mdx` (query examples, ER diagram, field reference, sample data)
+- Corrected `database/postcodes.mdx`'s export-format claim: the postcodes table **is** included in the CSV and YAML exports; only the GeoJSON export excludes it
+- Replaced the postcode type reference's fictional `full`/`outward`/`sector`/`district`/`area` list with the 5 values actually present in the current 844,248-row dataset (`full`, `area`, `fsa`, `po_box`, `street`), verified directly against the source data
+- Completed the postcodes table field reference in `database/schema.mdx` with the previously undocumented `country_id`, `state_id`, `state_code`, `city_id`, `latitude`, and `longitude` fields and their API access-level requirements
+</Update>
+
+<Update label="2026-05-28" description="v1.3.0" tags={["Added", "Changed"]}>
+#### Added
+
+- **Search Endpoints** group: fuzzy / typo-tolerant search (`GET /v1/search/fuzzy`) for cities, states, and countries using trigram similarity — documents `q`, `type`, `country`, `limit`, `threshold` parameters, the `match_score` / `matched_alias` response fields, native-script matching, and Professional+ tier gating
+
+#### Changed
+
+- Updated `llms.txt` to surface the fuzzy search capability for AI assistants
+</Update>
+
+<Update label="2026-05-20" description="v1.2.0" tags={["Added", "Changed"]}>
+#### Added
+
+- **Field Filtering & Sorting** cross-cutting guide — documents `?fields=` and `?sort=` syntax, tier gating (Supporter+), per-entity sortable fields, behaviour rules, and error responses
+- **ISO Code Endpoints** group: lookup country by alpha-2/alpha-3/numeric, lookup state by ISO 3166-2 subdivision code, convert between ISO formats
+- **Phone Endpoints** group: list dial codes with reverse lookup, get dial code by country, parse E.164 phone number into country + national parts
+- **Timezone Endpoints** group: timezone by country, state, and city — with DST-aware response (IANA name, abbreviation, std/DST offsets, current-DST flag)
+- Per-endpoint `?fields=` / `?sort=` callout on every geographic list and detail page (12 endpoints) linking back to the cross-cutting guide
+
+#### Changed
+
+- Updated `llms.txt` to surface the new endpoint groups for AI assistants
+- Standardised the "Related Endpoints" footer pattern across the new endpoint pages
+</Update>
+
+<Update label="2026-04-03" description="v1.1.0" tags={["Added", "Changed"]}>
+#### Added
+
+- Regions API documentation: 3 new endpoint pages (regions, subregions, countries by subregion)
+- Inline search filtering (`?q=`) parameter documented on list endpoints
+- Regions Endpoints navigation group
+
+#### Changed
+
+- Updated endpoint descriptions to mention search filtering availability (Supporter+)
+</Update>
+
+<Update label="2026-03-28" description="v1.0.0" tags={["Added", "Changed", "Fixed"]}>
+#### Added
+
+- API documentation covering endpoints, authentication, and usage
+- Changelog, donation, and database documentation pages
+- API FAQs section with key request instructions
+- Home link to the documentation navbar
+- Analytics integration for documentation site
+- Custom icons and metadata configuration
+- Mintlify-powered documentation site with dev and build scripts
+
+#### Changed
+
+- Updated free tier limits from 150 to 100 requests/day and 4,500 to 3,000 requests/month
+- Updated API request limits and trial credits across documentation
+- Updated export pricing documentation
+- Removed rate limit details from public documentation for clarity
+- Updated portal links to the new API key management site
+- Updated API key request instructions in FAQ
+- Improved overall documentation structure and content clarity
+- Removed welcome section from index page for cleaner layout
+
+#### Fixed
+
+- Corrected documentation URLs and broken links
+- Resolved miscellaneous documentation issues and formatting errors
+
+[1.0.0]: https://github.com/dr5hn/docs/releases/tag/v1.0.0
+</Update>

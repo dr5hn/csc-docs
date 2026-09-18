@@ -1,7 +1,6 @@
 ---
 title: "Data Change Feed"
-api: "GET https://api.countrystatecity.in/v1/changes"
-authMethod: "key"
+openapi: "GET /changes"
 description: "Keep your copy of Country State City data current without downloading the full dataset again"
 ---
 
@@ -16,38 +15,6 @@ If your app stores Country State City data in its own database, a full download 
 Use the feed to keep a local search index, checkout form, analytics database, or cached copy up to date. Every change has a stable `change_id`, the affected `place_id`, and the `data_version` that produced it.
 
 Changes are available for **90 days**. Run your sync regularly and save the `change_id` values you have applied so retrying a page cannot create duplicates.
-
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key.
-</ParamField>
-
-## Query parameters
-
-<ParamField query="start_date" type="string">
-  Return changes at or after this ISO 8601 time, for example `2026-08-01T00:00:00Z`. Omit it to start with the oldest retained change.
-</ParamField>
-
-<ParamField query="place_type" type="string">
-  Return only `country`, `state`, or `city` changes.
-</ParamField>
-
-<ParamField query="country_code" type="string">
-  Return changes for one country and its states and cities. Use a two-letter code such as `IN` or `US`.
-</ParamField>
-
-<ParamField query="change_type" type="string">
-  Return only one [change type](#change-types).
-</ParamField>
-
-<ParamField query="limit" type="integer" default="50">
-  Number of records per page. Use a value from `1` to `100`.
-</ParamField>
-
-<ParamField query="next_page_token" type="string">
-  Opaque token returned by the previous page. Tokens expire after 24 hours.
-</ParamField>
 
 ## Change types
 
@@ -66,46 +33,6 @@ When several fields change in one release, the record has one main `change_type`
 ## Response
 
 The API returns changes from oldest to newest.
-
-<ResponseField name="results" type="array">
-  Change records for this page.
-</ResponseField>
-
-<ResponseField name="results[].change_id" type="string">
-  Unique UUID for the change. Save it to make retries safe.
-</ResponseField>
-
-<ResponseField name="results[].data_version" type="string">
-  Dataset version that produced the change. It matches [Get Data Version](/api/endpoints/get-data-version).
-</ResponseField>
-
-<ResponseField name="results[].changed_at" type="string">
-  ISO 8601 time when the release was recorded.
-</ResponseField>
-
-<ResponseField name="results[].place_type" type="string">
-  `country`, `state`, or `city`.
-</ResponseField>
-
-<ResponseField name="results[].place_id" type="string">
-  Stable ID of the affected place. IDs in this feed are strings.
-</ResponseField>
-
-<ResponseField name="results[].change_type" type="string">
-  What changed.
-</ResponseField>
-
-<ResponseField name="results[].old_values" type="object | null">
-  Values before the change. It is `null` for `added`. An update contains only changed fields; `removed` contains the full caller-visible record.
-</ResponseField>
-
-<ResponseField name="results[].new_values" type="object | null">
-  Values after the change. It is `null` for `removed`. An update contains only changed fields; `added` contains the full caller-visible record.
-</ResponseField>
-
-<ResponseField name="next_page_token" type="string | null">
-  Token for the next page, or `null` when the fixed result set is complete.
-</ResponseField>
 
 ```json 200 - Renamed city
 {

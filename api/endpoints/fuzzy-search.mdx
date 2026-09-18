@@ -1,7 +1,6 @@
 ---
 title: "Fuzzy Search"
-api: "GET https://api.countrystatecity.in/v1/search/fuzzy"
-authMethod: "key"
+openapi: "GET /search/fuzzy"
 description: "Typo-tolerant search for cities, states, and countries using trigram similarity"
 ---
 
@@ -13,61 +12,9 @@ Matching uses PostgreSQL trigram similarity over both the English `name` and the
 
 <Info>Each result is scored against the English and native names. Queries with at least 3 characters also check stored translations. Responses are cached separately by query, filters, plan, locale, and translation output.</Info>
 
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Query Parameters
-
-<ParamField query="q" type="string" required>
-  The search text. 2–100 characters. Matched case-insensitively against the English and native names.
-</ParamField>
-
-<ParamField query="type" type="string" default="city">
-  What to search. One of `city`, `state`, or `country`.
-</ParamField>
-
-<ParamField query="country" type="string">
-  Restrict results to a single country by ISO 3166-1 alpha-2 code, e.g. `IN`, `US`. Case-insensitive (auto-uppercased). Applies to `type=city` and `type=state` only — sending it with `type=country` returns `400`.
-</ParamField>
-
-<ParamField query="limit" type="integer" default="10">
-  Maximum number of results to return. 1–50.
-</ParamField>
-
-<ParamField query="threshold" type="number" default="0.3">
-  Minimum trigram similarity a row must reach to be returned. 0.1–1. Lower values are more permissive (more, looser matches); higher values are stricter. The default `0.3` is a good balance for typo tolerance.
-</ParamField>
-
-<ParamField query="locale" type="string">
-  Add `localized_name` and `matched_locale` to each result. Example: `ja` or `pt-BR`. Professional and Business plans only. See [Localized Place Names](/api/localization).
-</ParamField>
-
-<ParamField query="include_translations" type="boolean" default="false">
-  Include the full raw `translations` JSON string. Professional and Business plans only.
-</ParamField>
-
 ## Response
 
 Returns an array sorted by `match_score` descending. Each item carries the standard fields for the entity (`city`, `state`, or `country`) at your plan's data-access level — Professional and Business resolve to the **full** field set — plus two fuzzy-specific fields:
-
-<ResponseField name="match_score" type="number">
-  Trigram similarity of the best-matching name (English or native), from `0` to `1`, rounded to 2 decimals. Higher means a closer match.
-</ResponseField>
-
-<ResponseField name="matched_alias" type="string | null">
-  The native name when it scored higher than the English name (e.g. a Devanagari or Han query that matched the local spelling). `null` when the English name was the better match.
-</ResponseField>
-
-<ResponseField name="localized_name" type="string">
-  The display name for `locale`, when requested and available on your plan.
-</ResponseField>
-
-<ResponseField name="matched_locale" type="string">
-  The locale used for `localized_name`, including fallback values such as `native` or `en`.
-</ResponseField>
 
 <Warning>
   A result found only through a translation can have a low `match_score`. The score compares the query with the English and native names, not with the translation that matched.

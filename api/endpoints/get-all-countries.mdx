@@ -1,7 +1,6 @@
 ---
 title: "Get All Countries"
-api: "GET https://api.countrystatecity.in/v1/countries"
-authMethod: "key"
+openapi: "GET /countries"
 description: "Retrieve a complete list of all countries with basic information"
 ---
 
@@ -12,84 +11,6 @@ Retrieve a complete list of all countries with basic information including ISO c
 <Tip>
 **Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
 </Tip>
-
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Query Parameters
-
-<ParamField query="q" type="string">
-  Search filter on name. Case-insensitive match on `name` and `native` fields. Minimum 2 characters. **Requires Supporter+ plan.** Without this parameter, all results are returned (no plan restriction for search).
-</ParamField>
-
-## Response
-
-<ResponseField name="id" type="integer">
-  Unique identifier for the country
-</ResponseField>
-
-<ResponseField name="name" type="string">
-  Official country name in English
-</ResponseField>
-
-<ResponseField name="iso2" type="string">
-  Two-letter ISO 3166-1 alpha-2 country code
-</ResponseField>
-
-<ResponseField name="iso3" type="string">
-  Three-letter ISO 3166-1 alpha-3 country code
-</ResponseField>
-
-<ResponseField name="phonecode" type="string">
-  International dialing code for the country
-</ResponseField>
-
-<ResponseField name="capital" type="string">
-  Capital city of the country
-</ResponseField>
-
-<ResponseField name="currency" type="string">
-  Three-letter ISO 4217 currency code
-</ResponseField>
-
-<ResponseField name="native" type="string">
-  Country name in the native language
-</ResponseField>
-
-<ResponseField name="emoji" type="string">
-  Flag emoji representation
-</ResponseField>
-
-<ResponseField name="latitude" type="string">
-  Country's approximate latitude
-</ResponseField>
-
-<ResponseField name="longitude" type="string">
-  Country's approximate longitude
-</ResponseField>
-
-<ResponseField name="region" type="string">
-  Geographic region name (e.g., Asia, Europe)
-</ResponseField>
-
-<ResponseField name="region_id" type="integer">
-  Geographic region ID (foreign key into `/regions`)
-</ResponseField>
-
-<ResponseField name="subregion" type="string">
-  Geographic subregion name (e.g., Southern Asia)
-</ResponseField>
-
-<ResponseField name="subregion_id" type="integer">
-  Geographic subregion ID (foreign key into `/subregions`)
-</ResponseField>
-
-<ResponseField name="timezones" type="string">
-  JSON string of timezones (array of `{zoneName, gmtOffset, gmtOffsetName, abbreviation, tzName}`)
-</ResponseField>
 
 <Info>Additional fields like `numeric_code`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex`, `emojiU`, `translations`, and `wikiDataId` are returned on higher tiers. See the **Tier-Based Field Availability** section below.</Info>
 
