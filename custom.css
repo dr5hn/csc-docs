@@ -3,6 +3,10 @@
    !important overrides here can never win against it (unlayered !important
    always loses to layered !important, regardless of specificity). Style the
    banner via its own theme instead of fighting that; only add the icon here. */
+#banner a {
+  text-decoration: none;
+}
+
 #banner a:hover {
   opacity: 0.75;
 }
