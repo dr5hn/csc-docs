@@ -1,7 +1,6 @@
 ---
 title: "Get Timezone by Country"
-api: "GET https://api.countrystatecity.in/v1/timezone/{ciso}"
-authMethod: "key"
+openapi: "GET /timezone/{ciso}"
 description: "Retrieve the canonical timezone for a country including current DST state"
 ---
 
@@ -19,40 +18,6 @@ Resolution order:
 <Warning>
 **Known DST sampling limitation:** standard and DST offsets are determined by sampling Jan 1 and Jul 1 of the current year, which is correct for almost every populated IANA zone. A small number of zones with non-standard DST windows (most notably `Africa/Casablanca` with Ramadan-based transitions) can report incorrect `offset_utc` / `dst_offset_utc` / `is_dst_now` values during their actual DST window. Use a dedicated timezone library if you need exact DST behaviour for those edge cases.
 </Warning>
-
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Path Parameters
-
-<ParamField path="ciso" type="string" required>
-  ISO 3166-1 alpha-2 code (e.g. `US`), alpha-3 code (e.g. `USA`), or numeric CSC country ID (e.g. `233`). Case-insensitive for ISO codes.
-</ParamField>
-
-## Response
-
-<ResponseField name="iana" type="string">
-  Canonical IANA timezone name (e.g. `"America/New_York"`). Use this with any standards-compliant date/time library — JavaScript `Intl`, Python `zoneinfo`, Java `ZoneId`, etc.
-</ResponseField>
-
-<ResponseField name="abbreviation" type="string">
-  Locale-aware short name at request time (e.g. `"EST"` in winter, `"EDT"` in summer). Display-only — not stable enough to use as an identifier.
-</ResponseField>
-
-<ResponseField name="offset_utc" type="string">
-  Standard (non-DST) UTC offset in `±HH:MM` form (e.g. `"-05:00"` for US Eastern).
-</ResponseField>
-
-<ResponseField name="dst_offset_utc" type="string">
-  DST UTC offset in `±HH:MM` form (e.g. `"-04:00"` for US Eastern Daylight). Equal to `offset_utc` for zones that don't observe DST.
-</ResponseField>
-
-<ResponseField name="is_dst_now" type="boolean">
-  Whether DST is in effect for this zone at request time. `false` when the zone doesn't observe DST.
-</ResponseField>
 
 <RequestExample>
 ```bash cURL (ISO2)

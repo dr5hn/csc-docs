@@ -1,7 +1,6 @@
 ---
 title: "Get Country Details"
-api: "GET https://api.countrystatecity.in/v1/countries/{iso2}"
-authMethod: "key"
+openapi: "GET /countries/{ciso}"
 description: "Retrieve detailed information for a specific country using its ISO2 code"
 ---
 
@@ -9,139 +8,9 @@ Retrieve detailed information for a specific country using its ISO2 code, includ
 
 <Note>**Availability:** All plans (Community and above). The fields returned vary by tier — see **Tier-Based Field Availability** below.</Note>
 
-## Path Parameters
-
-<ParamField path="iso2" type="string" required>
-  ISO2 code of the country (e.g., "IN" for India, "US" for United States)
-</ParamField>
-
 <Tip>
 **Trim response columns:** Add `?fields=name,iso2,...` to receive only the columns you need. Available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax.
 </Tip>
-
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Response
-
-<ResponseField name="id" type="integer">
-  Unique identifier for the country
-</ResponseField>
-
-<ResponseField name="name" type="string">
-  Official country name in English
-</ResponseField>
-
-<ResponseField name="iso2" type="string">
-  Two-letter ISO 3166-1 alpha-2 country code
-</ResponseField>
-
-<ResponseField name="iso3" type="string">
-  Three-letter ISO 3166-1 alpha-3 country code
-</ResponseField>
-
-<ResponseField name="numeric_code" type="string">
-  Three-digit numeric country code
-</ResponseField>
-
-<ResponseField name="phonecode" type="string">
-  International dialing code for the country
-</ResponseField>
-
-<ResponseField name="capital" type="string">
-  Capital city of the country
-</ResponseField>
-
-<ResponseField name="currency" type="string">
-  Three-letter ISO 4217 currency code
-</ResponseField>
-
-<ResponseField name="currency_name" type="string">
-  Full name of the currency
-</ResponseField>
-
-<ResponseField name="currency_symbol" type="string">
-  Currency symbol (e.g., $, €, ₹)
-</ResponseField>
-
-<ResponseField name="tld" type="string">
-  Top-level domain for the country
-</ResponseField>
-
-<ResponseField name="native" type="string">
-  Country name in the native language
-</ResponseField>
-
-<ResponseField name="region" type="string">
-  Geographic region (e.g., Asia, Europe, Americas)
-</ResponseField>
-
-<ResponseField name="subregion" type="string">
-  Geographic subregion (e.g., Southern Asia, Western Europe)
-</ResponseField>
-
-<ResponseField name="nationality" type="string">
-  Demonym for the country's residents
-</ResponseField>
-
-<ResponseField name="timezones" type="string">
-  JSON string containing timezone information
-</ResponseField>
-
-<ResponseField name="translations" type="string">
-  JSON string containing country name translations
-</ResponseField>
-
-<ResponseField name="latitude" type="string">
-  Country's approximate latitude coordinate
-</ResponseField>
-
-<ResponseField name="longitude" type="string">
-  Country's approximate longitude coordinate
-</ResponseField>
-
-<ResponseField name="emoji" type="string">
-  Flag emoji representation
-</ResponseField>
-
-<ResponseField name="emojiU" type="string">
-  Unicode representation of the flag emoji. **Coordinates tier and above.**
-</ResponseField>
-
-<ResponseField name="region_id" type="integer">
-  Geographic region ID (foreign key into `/regions`). **Basic tier.**
-</ResponseField>
-
-<ResponseField name="subregion_id" type="integer">
-  Geographic subregion ID (foreign key into `/subregions`). **Basic tier.**
-</ResponseField>
-
-<ResponseField name="population" type="integer">
-  Population estimate. **Coordinates tier and above.**
-</ResponseField>
-
-<ResponseField name="gdp" type="integer">
-  Nominal GDP in USD. **Coordinates tier and above.**
-</ResponseField>
-
-<ResponseField name="area_sq_km" type="integer">
-  Surface area in square kilometres. **Coordinates tier and above.**
-</ResponseField>
-
-<ResponseField name="postal_code_format" type="string">
-  Display template for postal codes (`#` = digit, `@` = letter). **Coordinates tier and above.**
-</ResponseField>
-
-<ResponseField name="postal_code_regex" type="string">
-  Regex for postal-code validation. **Coordinates tier and above.**
-</ResponseField>
-
-<ResponseField name="wikiDataId" type="string">
-  Wikidata item identifier. **Full tier only.**
-</ResponseField>
 
 <RequestExample>
 ```bash cURL

@@ -1,7 +1,6 @@
 ---
 title: "Get Subregions by Region"
-api: "GET https://api.countrystatecity.in/v1/regions/{id}/subregions"
-authMethod: "key"
+openapi: "GET /regions/{id}/subregions"
 description: "Retrieve subregions within a geographic region"
 ---
 
@@ -12,38 +11,6 @@ Retrieve all subregions belonging to a specific region. For example, region "Asi
 <Tip>
 **Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
 </Tip>
-
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Path Parameters
-
-<ParamField path="id" type="integer" required>
-  Numeric region ID (e.g., `3` for Asia)
-</ParamField>
-
-## Query Parameters
-
-<ParamField query="q" type="string">
-  Search filter on subregion name. Min 2 characters. Requires Supporter+ plan.
-</ParamField>
-
-## Response
-
-<ResponseField name="id" type="integer">
-  Unique identifier for the subregion
-</ResponseField>
-
-<ResponseField name="name" type="string">
-  Subregion name
-</ResponseField>
-
-<ResponseField name="region_id" type="integer">
-  Parent region ID
-</ResponseField>
 
 <RequestExample>
 ```bash cURL

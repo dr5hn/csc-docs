@@ -1,7 +1,6 @@
 ---
 title: "List Dial Codes"
-api: "GET https://api.countrystatecity.in/v1/phone"
-authMethod: "key"
+openapi: "GET /phone"
 description: "List every country's international dial code, with optional reverse lookup by dial code"
 ---
 
@@ -13,48 +12,9 @@ Dial codes follow ITU-T E.164 and are returned with a leading `+`. For NANP coun
 
 <Info>Responses are cached server-side for 24 hours. Equivalent dial-code inputs (`+91`, `91`, `091`, `0091`) all resolve to the same cache slot.</Info>
 
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Query Parameters
-
-<ParamField query="code" type="string">
-  Optional. Restrict the response to countries with the given dial code. Accepts:
-
-  - With or without leading `+` (`+91` or `91`)
-  - 1–4 digits
-  - Leading zeros are stripped (so `01`, `001`, `1` all match `+1`)
-  - NANP area-code variants — `?code=+1` returns the US, Canada, and every NANP territory in one response
-
-  Without this parameter, every country with a dial code is returned (sorted by ISO2 code).
-</ParamField>
-
 ## Response
 
 The response is **an array of phone entries**, even when the result is a single country.
-
-<ResponseField name="country" type="string">
-  ISO 3166-1 alpha-2 code of the country (e.g. `"US"`). Convenience field equal to `iso2`.
-</ResponseField>
-
-<ResponseField name="dial_code" type="string">
-  Dial code with leading `+` (e.g. `"+91"`).
-</ResponseField>
-
-<ResponseField name="area_code" type="string">
-  Present only for NANP entries with a fixed area-code prefix in the underlying data (e.g. `"246"` for Barbados). Omitted when not applicable — do not assume the field exists.
-</ResponseField>
-
-<ResponseField name="iso2" type="string">
-  ISO 3166-1 alpha-2 code (e.g. `"US"`).
-</ResponseField>
-
-<ResponseField name="iso3" type="string">
-  ISO 3166-1 alpha-3 code (e.g. `"USA"`).
-</ResponseField>
 
 <RequestExample>
 ```bash cURL (all countries)

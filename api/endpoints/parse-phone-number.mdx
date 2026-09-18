@@ -1,7 +1,6 @@
 ---
 title: "Parse Phone Number"
-api: "GET https://api.countrystatecity.in/v1/phone/parse"
-authMethod: "key"
+openapi: "GET /phone/parse"
 description: "Parse an E.164 phone number into its country and national parts"
 ---
 
@@ -16,50 +15,6 @@ The matcher walks 3-digit → 2-digit → 1-digit ITU prefixes, so longer-prefix
 
 The **internal phone-prefix index** is cached server-side for 24 hours. The `X-Parse-Index-Cache: HIT|MISS` header reports whether that internal lookup was a cache hit — it does **not** describe the response body.
 </Warning>
-
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Query Parameters
-
-<ParamField query="number" type="string" required>
-  E.164-formatted phone number starting with `+` followed by 5–15 digits.
-
-  Both `+14155552671` and the URL-decoded form ` 14155552671` (with a leading space, which is how some HTTP clients deliver an unencoded `+`) are accepted.
-</ParamField>
-
-## Response
-
-<ResponseField name="country" type="string">
-  ISO 3166-1 alpha-2 code of the matched country (e.g. `"BB"`). Convenience field equal to `iso2`.
-</ResponseField>
-
-<ResponseField name="dial_code" type="string">
-  Country dial code with leading `+` (e.g. `"+1"`).
-</ResponseField>
-
-<ResponseField name="area_code" type="string">
-  Present only for NANP matches with a fixed area-code prefix (e.g. `"246"` for Barbados). Omitted when not applicable.
-</ResponseField>
-
-<ResponseField name="iso2" type="string">
-  ISO 3166-1 alpha-2 code.
-</ResponseField>
-
-<ResponseField name="iso3" type="string">
-  ISO 3166-1 alpha-3 code.
-</ResponseField>
-
-<ResponseField name="national_number" type="string">
-  Digits remaining after stripping the country dial code (no `+`, no separators). For NANP numbers this **includes** the area code — the area code is part of the national format.
-</ResponseField>
-
-<ResponseField name="e164" type="string">
-  Echo of the normalized input (always starts with `+`).
-</ResponseField>
 
 <RequestExample>
 ```bash cURL (US number)

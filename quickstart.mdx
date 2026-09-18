@@ -1,0 +1,111 @@
+---
+title: "Quickstart"
+description: "Make your first request and build a country, state and city picker in under five minutes"
+icon: "rocket"
+---
+
+This guide takes you from zero to a working cascading location picker, the most common way developers use the CSC API.
+
+<Steps>
+<Step title="Get your API key">
+  Sign up at [app.countrystatecity.in](https://app.countrystatecity.in) and copy your key from the dashboard. The free Community plan is enough for this guide.
+
+  <Warning>Keep your key on the server. See [Authentication](/api/authentication) for safe usage patterns.</Warning>
+</Step>
+
+<Step title="Make your first request">
+  Every request needs the `X-CSCAPI-KEY` header.
+
+  ```bash
+  curl 'https://api.countrystatecity.in/v1/countries' \
+    -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+  ```
+
+  You will get back an array of countries, each with an `iso2` code such as `IN` or `US`.
+</Step>
+
+<Step title="Load states for the selected country">
+  Pass the country's `iso2` code in the path.
+
+  ```bash
+  curl 'https://api.countrystatecity.in/v1/countries/IN/states' \
+    -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+  ```
+</Step>
+
+<Step title="Load cities for the selected state">
+  Pass both the country and state `iso2` codes.
+
+  ```bash
+  curl 'https://api.countrystatecity.in/v1/countries/IN/states/MH/cities' \
+    -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+  ```
+</Step>
+</Steps>
+
+## Put it together
+
+<CodeGroup>
+```javascript Node.js
+const BASE = 'https://api.countrystatecity.in/v1';
+const headers = { 'X-CSCAPI-KEY': process.env.CSC_API_KEY };
+
+const get = (path) => fetch(`${BASE}${path}`, { headers }).then((r) => r.json());
+
+const countries = await get('/countries');
+const states = await get('/countries/IN/states');
+const cities = await get('/countries/IN/states/MH/cities');
+
+console.log(countries.length, states.length, cities.length);
+```
+
+```python Python
+import os
+import requests
+
+BASE = "https://api.countrystatecity.in/v1"
+HEADERS = {"X-CSCAPI-KEY": os.environ["CSC_API_KEY"]}
+
+def get(path):
+    return requests.get(f"{BASE}{path}", headers=HEADERS).json()
+
+countries = get("/countries")
+states = get("/countries/IN/states")
+cities = get("/countries/IN/states/MH/cities")
+
+print(len(countries), len(states), len(cities))
+```
+
+```php PHP
+<?php
+$base = 'https://api.countrystatecity.in/v1';
+$ctx = stream_context_create(['http' => [
+    'header' => 'X-CSCAPI-KEY: ' . getenv('CSC_API_KEY'),
+]]);
+
+$get = fn ($path) => json_decode(file_get_contents($base . $path, false, $ctx), true);
+
+$countries = $get('/countries');
+$states = $get('/countries/IN/states');
+$cities = $get('/countries/IN/states/MH/cities');
+```
+</CodeGroup>
+
+<Tip>Country, state and city lists change rarely. Cache responses for at least 24 hours to stay well within your plan's rate limits. See [Errors and Rate Limits](/api/errors).</Tip>
+
+## Next steps
+
+<CardGroup cols={2}>
+<Card title="Try it in the playground" icon="play" href="/api/endpoints/get-all-countries">
+  Send live requests from any endpoint page with your own key.
+</Card>
+<Card title="Use an SDK" icon="cube" href="/api/sdks">
+  Official npm, Python and TypeScript packages.
+</Card>
+<Card title="Trim responses" icon="filter" href="/api/field-filtering-and-sorting">
+  Return only the fields you need and sort results.
+</Card>
+<Card title="Self-host the data" icon="database" href="/database/overview">
+  Prefer no API calls? Download the full database.
+</Card>
+</CardGroup>

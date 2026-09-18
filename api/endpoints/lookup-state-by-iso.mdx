@@ -1,7 +1,6 @@
 ---
 title: "Lookup State by ISO Code"
-api: "GET https://api.countrystatecity.in/v1/iso/state"
-authMethod: "key"
+openapi: "GET /iso/state"
 description: "Find a state or province by ISO 3166-2 subdivision code"
 ---
 
@@ -12,46 +11,6 @@ The match prefers the canonical `iso3166_2` column. When that column is `NULL` f
 <Note>**Availability:** Starter plan and above. Returns `403` on Community plan.</Note>
 
 <Info>Responses are cached server-side for 1 hour. The lookup key is the full ISO 3166-2 code, so `US-CA` and `us-ca` collapse to the same cache slot (input is auto-uppercased).</Info>
-
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Query Parameters
-
-<ParamField query="iso" type="string" required>
-  ISO 3166-2 subdivision code in the form `XX-YYY` — 2-letter country code, hyphen, then 1–3 alphanumeric characters for the subdivision. Case-insensitive (auto-uppercased).
-
-  Examples: `US-CA`, `IN-MH`, `DE-BY`, `GB-ENG`, `JP-13`
-</ParamField>
-
-## Response
-
-<ResponseField name="id" type="integer">
-  Internal CSC state ID — same value used by `/v1/states/:id` and as a foreign key from `/cities`.
-</ResponseField>
-
-<ResponseField name="name" type="string">
-  Official state/province name in English (e.g. `"California"`).
-</ResponseField>
-
-<ResponseField name="iso2" type="string | null">
-  Legacy subdivision code without the country prefix (e.g. `"CA"`). May be `null` for some entries.
-</ResponseField>
-
-<ResponseField name="iso3166_2" type="string | null">
-  Canonical ISO 3166-2 code (e.g. `"US-CA"`). May be `null` for older entries — the endpoint still resolves them via the `iso2` fallback.
-</ResponseField>
-
-<ResponseField name="country_id" type="integer">
-  Internal CSC country ID — foreign key into `/countries`.
-</ResponseField>
-
-<ResponseField name="country_code" type="string">
-  ISO 3166-1 alpha-2 code of the parent country (e.g. `"US"`).
-</ResponseField>
 
 <RequestExample>
 ```bash cURL

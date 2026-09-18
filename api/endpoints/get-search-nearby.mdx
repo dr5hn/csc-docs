@@ -1,7 +1,6 @@
 ---
 title: "Nearby Search"
-api: "GET https://api.countrystatecity.in/v1/search/nearby"
-authMethod: "key"
+openapi: "GET /search/nearby"
 description: "Find countries, states, and cities near a coordinate, ranked by straight-line distance"
 ---
 
@@ -19,77 +18,9 @@ Find countries, states, or cities near a `lat`/`lng` coordinate. Results are ord
 
 <Note>**Availability:** Professional and Business plans. Other plans receive `403`. [Compare plans](https://countrystatecity.in/pricing?source=playground&campaign=nearby_search), or see **Trying it without a paid plan** below.</Note>
 
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Query Parameters
-
-<ParamField query="lat" type="number" required>
-  Latitude of the search origin. `-90` to `90`.
-</ParamField>
-
-<ParamField query="lng" type="number" required>
-  Longitude of the search origin. `-180` to `180`.
-</ParamField>
-
-<ParamField query="type" type="string" default="city">
-  What to search. One of `city`, `state`, or `country`.
-</ParamField>
-
-<ParamField query="country" type="string">
-  Only return results from this country. Use a two-letter country code such as `IN` or `US`. Do not use this with `type=country`.
-</ParamField>
-
-<ParamField query="state" type="string">
-  Only return cities from this state. This works only with `type=city` and requires `country`.
-</ParamField>
-
-<ParamField query="kind" type="string">
-  Only return this kind of city. This works only with `type=city`. Choose `settlement`, `administrative`, `section`, or `unknown`. See [City Types](/database/city-types).
-</ParamField>
-
-<ParamField query="min_population" type="integer">
-  Only return results with at least this population. Use a whole number of `0` or more.
-</ParamField>
-
-<ParamField query="radius" type="number" default="25">
-  Search radius in kilometers. `1`–`500`.
-</ParamField>
-
-<ParamField query="limit" type="integer" default="20">
-  Maximum number of results to return. `1`–`100`.
-</ParamField>
-
-<ParamField query="locale" type="string">
-  Add `localized_name` and `matched_locale` to each result. Example: `ja` or `pt-BR`. Professional and Business plans only. See [Localized Place Names](/api/localization).
-</ParamField>
-
-<ParamField query="include_translations" type="boolean" default="false">
-  Include the full raw `translations` JSON string. Professional and Business plans only.
-</ParamField>
-
 ## Response
 
 Returns an array, nearest-first. Each item carries the standard fields for the entity at your plan's data-access level, plus:
-
-<ResponseField name="distance_km" type="number">
-  Straight-line distance from your coordinate, in kilometers, rounded to two decimal places.
-</ResponseField>
-
-<ResponseField name="kind" type="string">
-  The city kind. Included only in city results.
-</ResponseField>
-
-<ResponseField name="localized_name" type="string">
-  The display name for `locale`, when requested and available on your plan.
-</ResponseField>
-
-<ResponseField name="matched_locale" type="string">
-  The locale used for `localized_name`, including fallback values such as `native` or `en`.
-</ResponseField>
 
 <Note>
   State and city results always include `country_name` (and, for cities, `state_name`), regardless of your plan's data-access level — useful for display without a second lookup. This differs from [Autocomplete](/api/endpoints/get-search-autocomplete), which instead always includes `country_code`/`state_code` on city results; nearby search doesn't force those two.

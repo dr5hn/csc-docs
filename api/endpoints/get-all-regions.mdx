@@ -1,7 +1,6 @@
 ---
 title: "Get All Regions"
-api: "GET https://api.countrystatecity.in/v1/regions"
-authMethod: "key"
+openapi: "GET /regions"
 description: "Retrieve a list of geographic regions"
 ---
 
@@ -12,36 +11,6 @@ Retrieve all geographic regions (Africa, Americas, Asia, Europe, Oceania, Polar)
 <Tip>
 **Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
 </Tip>
-
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Query Parameters
-
-<ParamField query="q" type="string">
-  Search filter on region name. Case-insensitive, minimum 2 characters. Requires Supporter+ plan.
-</ParamField>
-
-## Response
-
-<ResponseField name="id" type="integer">
-  Unique identifier for the region
-</ResponseField>
-
-<ResponseField name="name" type="string">
-  Region name (e.g., Asia, Europe)
-</ResponseField>
-
-<ResponseField name="translations" type="string">
-  JSON string of translations in 18+ languages. **Full access level only.**
-</ResponseField>
-
-<ResponseField name="wikiDataId" type="string">
-  Wikidata item identifier. **Coordinates tier and above.**
-</ResponseField>
 
 <RequestExample>
 ```bash cURL

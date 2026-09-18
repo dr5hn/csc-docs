@@ -1,7 +1,6 @@
 ---
 title: "Lookup Country by ISO Code"
-api: "GET https://api.countrystatecity.in/v1/iso/country"
-authMethod: "key"
+openapi: "GET /iso/country"
 description: "Find a country by ISO 3166-1 alpha-2, alpha-3, or numeric code"
 ---
 
@@ -13,49 +12,9 @@ This is the canonical lookup when you have an ISO code from an external system (
 
 <Info>Responses are cached server-side for 1 hour. The cache slot is shared with [`/v1/iso/country/convert`](/api/endpoints/convert-iso-code) — warming the cache via one endpoint serves the other for free. Numeric codes `4` and `004` resolve to the same cache slot.</Info>
 
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
 ## Query Parameters
 
 Provide **exactly one** of the three. Sending two or zero returns `400`.
-
-<ParamField query="iso2" type="string">
-  ISO 3166-1 alpha-2 code, e.g. `US`, `IN`, `DE`. Case-insensitive (auto-uppercased).
-</ParamField>
-
-<ParamField query="iso3" type="string">
-  ISO 3166-1 alpha-3 code, e.g. `USA`, `IND`, `DEU`. Case-insensitive.
-</ParamField>
-
-<ParamField query="numeric" type="string">
-  ISO 3166-1 numeric code, 1–3 digits. Accepts padded (`004`) and unpadded (`4`) forms. All-zero values are rejected.
-</ParamField>
-
-## Response
-
-<ResponseField name="id" type="integer">
-  Internal CSC country ID — same value used by `/v1/countries/:id` and other foreign-key references.
-</ResponseField>
-
-<ResponseField name="name" type="string">
-  Official country name in English.
-</ResponseField>
-
-<ResponseField name="iso2" type="string">
-  ISO 3166-1 alpha-2 code (e.g. `"US"`).
-</ResponseField>
-
-<ResponseField name="iso3" type="string">
-  ISO 3166-1 alpha-3 code (e.g. `"USA"`).
-</ResponseField>
-
-<ResponseField name="numeric_code" type="string | null">
-  ISO 3166-1 numeric code, zero-padded to 3 digits (e.g. `"840"`). `null` for entries without an assigned numeric code.
-</ResponseField>
 
 <RequestExample>
 ```bash cURL (alpha-2)

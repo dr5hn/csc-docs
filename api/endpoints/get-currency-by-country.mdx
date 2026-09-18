@@ -1,7 +1,6 @@
 ---
 title: "Get Currency by Country"
-api: "GET https://api.countrystatecity.in/v1/currency/{ciso}"
-authMethod: "key"
+openapi: "GET /currency/{ciso}"
 description: "Retrieve the official currency for a single country by ISO2, ISO3, or numeric ID"
 ---
 
@@ -14,39 +13,6 @@ Retrieve the currency used by a single country. The path parameter accepts **thr
 <Note>**Availability:** Supporter plan and above. Returns `403` on lower tiers.</Note>
 
 <Info>Responses are cached server-side for 24 hours. Equivalent identifier forms (e.g., `1` and `001`) resolve to the same cache slot.</Info>
-
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Path Parameters
-
-<ParamField path="ciso" type="string" required>
-  ISO2 code, ISO3 code, or numeric country ID. Case-insensitive for ISO codes.
-</ParamField>
-
-## Response
-
-<ResponseField name="country" type="string">
-  ISO2 code of the country (e.g., `"US"`)
-</ResponseField>
-
-<ResponseField name="currency" type="object">
-  Currency information
-  <Expandable title="properties">
-    <ResponseField name="code" type="string">
-      ISO 4217 currency code (e.g., `"USD"`). Always present — endpoint returns `404` if the country has no currency on record.
-    </ResponseField>
-    <ResponseField name="name" type="string | null">
-      Full currency name (e.g., `"United States dollar"`). May be `null` for edge-case territories.
-    </ResponseField>
-    <ResponseField name="symbol" type="string | null">
-      Unicode currency symbol (e.g., `"$"`). May be `null` — fall back to `code` when rendering.
-    </ResponseField>
-  </Expandable>
-</ResponseField>
 
 <RequestExample>
 ```bash cURL (ISO2)

@@ -1,7 +1,6 @@
 ---
 title: "Autocomplete"
-api: "GET https://api.countrystatecity.in/v1/search/autocomplete"
-authMethod: "key"
+openapi: "GET /search/autocomplete"
 description: "Type-ahead search for cities, states, and countries with deterministic ranking and ready-to-display labels"
 ---
 
@@ -11,69 +10,9 @@ Search cities, states, and countries for a type-ahead / autocomplete UI. Unlike 
 
 <Info>Matching checks the English name, native name, and stored translations. Translation matching starts at 3 characters. Responses are cached separately by query, filters, plan, locale, and translation output.</Info>
 
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Query Parameters
-
-<ParamField query="q" type="string" required>
-  The search text. 2–100 characters, matched case-insensitively against the English and native names.
-</ParamField>
-
-<ParamField query="type" type="string" default="city">
-  What to search. One of `city`, `state`, or `country`.
-</ParamField>
-
-<ParamField query="country" type="string">
-  Restrict results to a single country by ISO 3166-1 alpha-2 code, e.g. `IN`, `US`. Case-insensitive (auto-uppercased). Not valid with `type=country` — sending it returns `400`.
-</ParamField>
-
-<ParamField query="state" type="string">
-  Restrict city results to one state. This works only with `type=city` and requires `country`. Other combinations return `400` because state codes aren't unique across countries.
-</ParamField>
-
-<ParamField query="limit" type="integer" default="10">
-  Maximum number of results to return. 1–50.
-</ParamField>
-
-<ParamField query="locale" type="string">
-  Add `localized_name` and `matched_locale`, and use the localized name in `label`. Example: `ja` or `pt-BR`. Professional and Business plans only. See [Localized Place Names](/api/localization).
-</ParamField>
-
-<ParamField query="include_translations" type="boolean" default="false">
-  Include the full raw `translations` JSON string. Professional and Business plans only.
-</ParamField>
-
 ## Response
 
 Returns an array. Each item carries the standard fields for the entity (`city`, `state`, or `country`) at your plan's data-access level, plus:
-
-<ResponseField name="type" type="string">
-  Which entity this result is: `country`, `state`, or `city`.
-</ResponseField>
-
-<ResponseField name="label" type="string">
-  A ready-to-display string: just the name for a country, `"State, Country"` for a state, `"City, State, Country"` for a city. Missing parts (e.g. a city with no state on record) are omitted rather than left blank.
-</ResponseField>
-
-<ResponseField name="match_score" type="number">
-  Trigram similarity of the best-matching name (English or native), from `0` to `1`, rounded to 2 decimals.
-</ResponseField>
-
-<ResponseField name="matched_field" type="string">
-  Which name field matched: `name`, `native`, or `translation`.
-</ResponseField>
-
-<ResponseField name="localized_name" type="string">
-  The display name for `locale`, when requested and available on your plan.
-</ResponseField>
-
-<ResponseField name="matched_locale" type="string">
-  The locale used for `localized_name`, including fallback values such as `native` or `en`.
-</ResponseField>
 
 <Note>
   City results always include `country_code` and `state_code`, regardless of your plan's data-access level — even the basic-tier field set includes them here, since you can't build a useful `label` or scope a follow-up request without them. (States already include `country_code` at every tier under the normal field rules, so no such exception is needed there.)

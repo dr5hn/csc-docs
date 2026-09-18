@@ -1,7 +1,6 @@
 ---
 title: "Get Region Details"
-api: "GET https://api.countrystatecity.in/v1/regions/{id}"
-authMethod: "key"
+openapi: "GET /regions/{id}"
 description: "Retrieve a single geographic region by its numeric ID"
 ---
 
@@ -12,36 +11,6 @@ Retrieve detailed information for a single geographic region (e.g., Africa, Amer
 <Tip>
 **Trim response columns:** Add `?fields=name,iso2,...` to receive only the columns you need. Available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax.
 </Tip>
-
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Path Parameters
-
-<ParamField path="id" type="integer" required>
-  Numeric region ID (e.g., `3` for Asia, `4` for Europe)
-</ParamField>
-
-## Response
-
-<ResponseField name="id" type="integer">
-  Unique identifier for the region
-</ResponseField>
-
-<ResponseField name="name" type="string">
-  Region name (e.g., Asia, Europe)
-</ResponseField>
-
-<ResponseField name="wikiDataId" type="string">
-  Wikidata item identifier. **Coordinates tier and above.**
-</ResponseField>
-
-<ResponseField name="translations" type="string">
-  JSON string of region name translations in 18+ languages. **Full access level only.**
-</ResponseField>
 
 <RequestExample>
 ```bash cURL

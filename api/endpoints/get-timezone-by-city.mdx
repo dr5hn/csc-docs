@@ -1,7 +1,6 @@
 ---
 title: "Get Timezone by City"
-api: "GET https://api.countrystatecity.in/v1/timezone/{ciso}/{siso}/{city_id}"
-authMethod: "key"
+openapi: "GET /timezone/{ciso}/{siso}/{city_id}"
 description: "Retrieve the timezone for a specific city"
 ---
 
@@ -13,49 +12,9 @@ This prevents "city-ID spoofing" — a caller can't learn the timezone of an arb
 
 <Info>Responses are cached server-side for 24 hours. The cache key includes country, state, **and** city ID, so the ownership check holds on cache HIT — a city ID looked up under one (ciso, siso) pair won't satisfy a request under a different pair.</Info>
 
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Path Parameters
-
-<ParamField path="ciso" type="string" required>
-  Country code: ISO 3166-1 alpha-2 (`US`), alpha-3 (`USA`), or numeric CSC ID. Case-insensitive.
-</ParamField>
-
-<ParamField path="siso" type="string" required>
-  State/province code (e.g. `CA` for California). Case-insensitive.
-</ParamField>
-
-<ParamField path="city_id" type="integer" required>
-  Numeric CSC city ID. Get this from `/v1/countries/:ciso/states/:siso/cities` or `/v1/cities`.
-</ParamField>
-
 ## Response
 
 Same shape as the country and state timezone endpoints:
-
-<ResponseField name="iana" type="string">
-  Canonical IANA timezone name (e.g. `"America/Los_Angeles"`).
-</ResponseField>
-
-<ResponseField name="abbreviation" type="string">
-  Locale-aware short name at request time.
-</ResponseField>
-
-<ResponseField name="offset_utc" type="string">
-  Standard UTC offset in `±HH:MM` form.
-</ResponseField>
-
-<ResponseField name="dst_offset_utc" type="string">
-  DST UTC offset in `±HH:MM` form.
-</ResponseField>
-
-<ResponseField name="is_dst_now" type="boolean">
-  Whether DST is in effect at request time.
-</ResponseField>
 
 <RequestExample>
 ```bash cURL (San Francisco, CA)

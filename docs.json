@@ -16,117 +16,44 @@
           {
             "group": "Getting Started",
             "pages": [
-              "index"
+              "index",
+              "quickstart",
+              "changelog"
             ]
           }
         ]
       },
       {
-        "tab": "API",
+        "tab": "API Guides",
+        "icon": "book",
         "groups": [
           {
-            "group": "API Documentation",
+            "group": "Get Started",
+            "icon": "book-open",
             "pages": [
               "api/introduction",
-              "api/authentication",
+              "api/authentication"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "icon": "layer-group",
+            "pages": [
               "api/field-filtering-and-sorting",
-              "api/localization",
+              "api/localization"
+            ]
+          },
+          {
+            "group": "Help",
+            "icon": "life-ring",
+            "pages": [
               "api/errors",
               "api/faq"
             ]
           },
           {
-            "group": "Countries Endpoints",
-            "pages": [
-              "api/endpoints/get-all-countries",
-              "api/endpoints/get-country-details"
-            ]
-          },
-          {
-            "group": "States Endpoints",
-            "pages": [
-              "api/endpoints/get-all-states",
-              "api/endpoints/get-states-by-country",
-              "api/endpoints/get-state-details"
-            ]
-          },
-          {
-            "group": "Cities Endpoints",
-            "pages": [
-              "api/endpoints/get-cities-by-country",
-              "api/endpoints/get-cities-by-state"
-            ]
-          },
-          {
-            "group": "Regions Endpoints",
-            "pages": [
-              "api/endpoints/get-all-regions",
-              "api/endpoints/get-region-details",
-              "api/endpoints/get-subregions-by-region",
-              "api/endpoints/get-subregion-details",
-              "api/endpoints/get-countries-by-subregion"
-            ]
-          },
-          {
-            "group": "Currency Endpoints",
-            "pages": [
-              "api/endpoints/list-all-currencies",
-              "api/endpoints/get-currency-by-country"
-            ]
-          },
-          {
-            "group": "ISO Code Endpoints",
-            "pages": [
-              "api/endpoints/lookup-country-by-iso",
-              "api/endpoints/lookup-state-by-iso",
-              "api/endpoints/convert-iso-code"
-            ]
-          },
-          {
-            "group": "Phone Endpoints",
-            "pages": [
-              "api/endpoints/list-dial-codes",
-              "api/endpoints/get-dial-code-by-country",
-              "api/endpoints/parse-phone-number"
-            ]
-          },
-          {
-            "group": "Timezone Endpoints",
-            "pages": [
-              "api/endpoints/get-timezone-by-country",
-              "api/endpoints/get-timezone-by-state",
-              "api/endpoints/get-timezone-by-city"
-            ]
-          },
-          {
-            "group": "Search Endpoints",
-            "pages": [
-              "api/endpoints/fuzzy-search",
-              "api/endpoints/get-search-autocomplete",
-              "api/endpoints/get-search-nearby"
-            ]
-          },
-          {
-            "group": "Data Changes",
-            "pages": [
-              "api/endpoints/get-data-changes"
-            ]
-          },
-          {
-            "group": "Postcode Endpoints",
-            "pages": [
-              "api/endpoints/get-postcode-by-code",
-              "api/endpoints/get-postcodes-by-country"
-            ]
-          },
-          {
-            "group": "Meta Endpoints",
-            "pages": [
-              "api/endpoints/get-data-version"
-            ]
-          },
-          {
             "group": "SDKs & Examples",
+            "icon": "cube",
             "pages": [
               "api/sdks",
               "api/sdks/npm",
@@ -137,9 +64,118 @@
             ]
           },
           {
-            "group": "No-Code Integrations",
+            "group": "Integrations",
+            "icon": "plug",
             "pages": [
               "api/no-code-integrations"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "icon": "code",
+        "groups": [
+          {
+            "group": "Countries",
+            "icon": "earth-americas",
+            "pages": [
+              "api/endpoints/get-all-countries",
+              "api/endpoints/get-country-details"
+            ]
+          },
+          {
+            "group": "States",
+            "icon": "map",
+            "pages": [
+              "api/endpoints/get-all-states",
+              "api/endpoints/get-states-by-country",
+              "api/endpoints/get-state-details"
+            ]
+          },
+          {
+            "group": "Cities",
+            "icon": "city",
+            "pages": [
+              "api/endpoints/get-cities-by-country",
+              "api/endpoints/get-cities-by-state"
+            ]
+          },
+          {
+            "group": "Postcodes",
+            "icon": "envelope",
+            "pages": [
+              "api/endpoints/get-postcode-by-code",
+              "api/endpoints/get-postcodes-by-country"
+            ]
+          },
+          {
+            "group": "Regions",
+            "icon": "globe",
+            "pages": [
+              "api/endpoints/get-all-regions",
+              "api/endpoints/get-region-details",
+              "api/endpoints/get-subregions-by-region",
+              "api/endpoints/get-subregion-details",
+              "api/endpoints/get-countries-by-subregion"
+            ]
+          },
+          {
+            "group": "Timezones",
+            "icon": "clock",
+            "pages": [
+              "api/endpoints/get-timezone-by-country",
+              "api/endpoints/get-timezone-by-state",
+              "api/endpoints/get-timezone-by-city"
+            ]
+          },
+          {
+            "group": "Currencies",
+            "icon": "coins",
+            "pages": [
+              "api/endpoints/list-all-currencies",
+              "api/endpoints/get-currency-by-country"
+            ]
+          },
+          {
+            "group": "Phone",
+            "icon": "phone",
+            "pages": [
+              "api/endpoints/list-dial-codes",
+              "api/endpoints/get-dial-code-by-country",
+              "api/endpoints/parse-phone-number"
+            ]
+          },
+          {
+            "group": "ISO Codes",
+            "icon": "hashtag",
+            "pages": [
+              "api/endpoints/lookup-country-by-iso",
+              "api/endpoints/lookup-state-by-iso",
+              "api/endpoints/convert-iso-code"
+            ]
+          },
+          {
+            "group": "Search",
+            "icon": "magnifying-glass",
+            "pages": [
+              "api/endpoints/fuzzy-search",
+              "api/endpoints/get-search-autocomplete",
+              "api/endpoints/get-search-nearby"
+            ]
+          },
+          {
+            "group": "Data Changes",
+            "icon": "code-compare",
+            "pages": [
+              "api/endpoints/get-data-changes"
+            ]
+          },
+          {
+            "group": "Meta",
+            "icon": "circle-info",
+            "pages": [
+              "api/endpoints/get-data-version"
             ]
           }
         ]
@@ -225,9 +261,19 @@
         "icon": "book"
       },
       {
+        "anchor": "API Playground",
+        "href": "https://playground.countrystatecity.in/",
+        "icon": "flask"
+      },
+      {
         "anchor": "GitHub",
         "href": "https://github.com/dr5hn/countries-states-cities-database",
         "icon": "github"
+      },
+      {
+        "anchor": "Status",
+        "href": "https://status.countrystatecity.in/",
+        "icon": "signal"
       },
       {
         "anchor": "Support",
@@ -258,7 +304,7 @@
     "primary": {
       "type": "button",
       "label": "Get API Key",
-      "href": "https://countrystatecity.in"
+      "href": "https://countrystatecity.in/product/api/"
     }
   },
   "contextual": {
@@ -278,7 +324,76 @@
       "github": "https://github.com/dr5hn/countries-states-cities-database",
       "linkedin": "https://www.linkedin.com/in/dr5hn/",
       "x": "https://x.com/dr5hn"
-    }
+    },
+    "links": [
+      {
+        "header": "Products",
+        "items": [
+          {
+            "label": "REST API",
+            "href": "https://countrystatecity.in/product/api/"
+          },
+          {
+            "label": "Database",
+            "href": "https://countrystatecity.in/product/database/"
+          },
+          {
+            "label": "Export Tool",
+            "href": "https://export.countrystatecity.in/"
+          },
+          {
+            "label": "Update Tool",
+            "href": "https://countrystatecity.in/product/update-tool/"
+          }
+        ]
+      },
+      {
+        "header": "Resources",
+        "items": [
+          {
+            "label": "API Playground",
+            "href": "https://playground.countrystatecity.in/"
+          },
+          {
+            "label": "Live Demo",
+            "href": "https://demo.countrystatecity.in/"
+          },
+          {
+            "label": "CLI",
+            "href": "https://cli.countrystatecity.in/"
+          },
+          {
+            "label": "Changelog",
+            "href": "/changelog"
+          },
+          {
+            "label": "Status",
+            "href": "https://status.countrystatecity.in/"
+          }
+        ]
+      },
+      {
+        "header": "Company",
+        "items": [
+          {
+            "label": "About",
+            "href": "https://countrystatecity.in/about/"
+          },
+          {
+            "label": "Pricing",
+            "href": "https://countrystatecity.in/pricing/"
+          },
+          {
+            "label": "Contact",
+            "href": "https://countrystatecity.in/contact/"
+          },
+          {
+            "label": "Encyclopedia",
+            "href": "https://countrystatecity.org/"
+          }
+        ]
+      }
+    ]
   },
   "api": {
     "mdx": {
@@ -290,21 +405,39 @@
     },
     "playground": {
       "display": "interactive"
-    }
+    },
+    "openapi": "https://raw.githubusercontent.com/dr5hn/csc-swagger-playground/main/config.json"
   },
   "seo": {
-    "indexHiddenPages": true
+    "indexHiddenPages": true,
+    "metatags": {
+      "og:site_name": "Country State City Docs",
+      "og:image": "https://docs.countrystatecity.in/images/hero-light.png",
+      "twitter:card": "summary_large_image",
+      "twitter:site": "@dr5hn",
+      "twitter:image": "https://docs.countrystatecity.in/images/hero-light.png",
+      "keywords": "country state city API, countries API, states API, cities API, ISO 3166, geographical database, location dropdown"
+    }
   },
   "integrations": {
     "ga4": {
-        "measurementId": "G-7LDSKYGZJB"
+      "measurementId": "G-7LDSKYGZJB"
     }
   },
   "search": {
     "prompt": "Search the documentation..."
   },
-  "customCss": ["/custom.css"],
+  "customCss": [
+    "/custom.css"
+  ],
   "banner": {
     "content": "[**MakeMySiteLive** — Publish your website in under 2 minutes](https://makemysitelive.com)"
-  }
+  },
+  "description": "Documentation for the Country State City ecosystem: a REST API, downloadable database and tools covering 250 countries, 5,000+ states and 150,000+ cities with ISO codes, coordinates, timezones and currencies.",
+  "redirects": [
+    {
+      "source": "/support",
+      "destination": "/api/faq"
+    }
+  ]
 }
