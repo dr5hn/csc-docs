@@ -17,7 +17,7 @@ Find countries, states, or cities near a `lat`/`lng` coordinate. Results are ord
   It measures straight-line distance to the stored coordinate for a city, state, or country.
 </Warning>
 
-<Note>**Availability:** Professional and Business plans. Other plans receive `403`. [Compare plans](https://countrystatecity.in/pricing?source=playground&campaign=nearby_search), or see **Trying it without a paid plan** below.</Note>
+<Note>**Availability:** Supporter, Professional, and Business plans. Other plans receive `403`. [Compare plans](https://countrystatecity.in/pricing?source=playground&campaign=nearby_search), or see **Trying it without a paid plan** below.</Note>
 
 ## Authentication
 
@@ -64,11 +64,11 @@ Find countries, states, or cities near a `lat`/`lng` coordinate. Results are ord
 </ParamField>
 
 <ParamField query="locale" type="string">
-  Add `localized_name` and `matched_locale` to each result. Example: `ja` or `pt-BR`. Professional and Business plans only. See [Localized Place Names](/api/localization).
+  Add `localized_name` and `matched_locale` to each result. Example: `ja` or `pt-BR`. Requires full data access (Supporter plan and above). See [Localized Place Names](/api/localization).
 </ParamField>
 
 <ParamField query="include_translations" type="boolean" default="false">
-  Include the full raw `translations` JSON string. Professional and Business plans only.
+  Include the full raw `translations` JSON string. Requires full data access (Supporter plan and above).
 </ParamField>
 
 ## Response
@@ -137,7 +137,7 @@ for result in response.json():
 </RequestExample>
 
 <ResponseExample>
-```json 200 - Cities near Mumbai (Professional / Business)
+```json 200 - Cities near Mumbai (Supporter, Professional, Business)
 [
   {
     "id": 57606,
@@ -196,8 +196,8 @@ for result in response.json():
   "message": "This feature is not available on your current plan.",
   "details": {
     "feature": "nearbySearch",
-    "currentTier": "supporter",
-    "requiredTier": "professional",
+    "currentTier": "starter",
+    "requiredTier": "supporter",
     "upgradeUrl": "https://app.countrystatecity.in/pricing"
   }
 }
@@ -206,7 +206,7 @@ for result in response.json():
 
 ## Trying it without a paid plan
 
-The interactive API documentation uses a shared **Playground** plan. It is only for trying the endpoint in the docs. For your own app, [choose a Professional or Business plan](https://countrystatecity.in/pricing?source=playground&campaign=nearby_search).
+The interactive API documentation uses a shared **Playground** plan. It is only for trying the endpoint in the docs. For your own app, [choose a Supporter plan or higher](https://countrystatecity.in/pricing?source=playground&campaign=nearby_search).
 
 ## Related Endpoints
 

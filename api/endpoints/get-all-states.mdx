@@ -7,10 +7,10 @@ description: "Retrieve a complete list of all states, provinces, and regions wor
 
 Retrieve a complete list of all states, provinces, regions, and territories from around the world with basic geographical information.
 
-<Note>**Availability:** Supporter plan and above. Calling `/states` without filtering by country (`bulkStates`) is gated to Supporter+. Community/Starter users must call `/countries/{iso2}/states` instead. The fields returned also vary by tier — see **Tier-Based Field Availability** below.</Note>
+<Note>**Availability:** Starter plan and above. Calling `/states` without filtering by country (`bulkStates`) is gated to Starter+. Community users must call `/countries/{iso2}/states` instead. The fields returned also vary by tier — see **Tier-Based Field Availability** below.</Note>
 
 <Tip>
-**Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
+**Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Starter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
 </Tip>
 
 ## Authentication
@@ -22,7 +22,7 @@ Retrieve a complete list of all states, provinces, regions, and territories from
 ## Query Parameters
 
 <ParamField query="q" type="string">
-  Search filter on name. Case-insensitive match on `name` and `native` fields. Minimum 2 characters. **Requires Supporter+ plan.** Without this parameter, all results are returned (no plan restriction for search).
+  Search filter on name. Case-insensitive match on `name` and `native` fields. Minimum 2 characters. **Requires Starter+ plan.** Without this parameter, all results are returned (no plan restriction for search).
 </ParamField>
 
 ## Response
@@ -60,7 +60,7 @@ Retrieve a complete list of all states, provinces, regions, and territories from
 </ResponseField>
 
 <ResponseField name="type" type="string">
-  Administrative division type (e.g., `"state"`, `"province"`, `"region"`). **Coordinates tier and above.**
+  Administrative division type (e.g., `"state"`, `"province"`, `"region"`). **Full access level only.**
 </ResponseField>
 
 <Info>Additional fields like `fips_code`, `iso3166_2`, `level`, `parent_id`, `native`, `population`, `translations`, and `wikiDataId` are returned on higher tiers. See **Tier-Based Field Availability** below.</Info>
@@ -211,7 +211,7 @@ puts "Found #{states.length} states"
 ]
 ```
 
-```json 200 - Coordinates tier (Supporter) — basic plus
+```json 200 - Full tier (Supporter, Professional, Business)
 [
   {
     "id": 4008,
@@ -228,7 +228,9 @@ puts "Found #{states.length} states"
     "level": 1,
     "parent_id": null,
     "native": "महाराष्ट्र",
-    "population": 112374333
+    "population": 112374333,
+    "translations": "{\"kr\":\"마하라슈트라\",\"de\":\"Maharashtra\",\"fr\":\"Maharashtra\",\"cn\":\"马哈拉施特拉邦\"}",
+    "wikiDataId": "Q1191"
   }
 ]
 ```
@@ -287,7 +289,6 @@ This endpoint returns a large dataset (5,299+ states). Consider using the filter
 | Tier | Plans | Fields |
 |------|-------|--------|
 | **Basic** | Community, Starter, Legacy | `id`, `name`, `iso2`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone` |
-| **Coordinates** | Supporter | All Basic **+** `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population` |
-| **Full** | Professional, Business | All Coordinates **+** `translations`, `wikiDataId` |
+| **Full** | Supporter, Professional, Business | All Basic **+** `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population`, `translations`, `wikiDataId` |
 
 See [Pricing](https://app.countrystatecity.in/pricing) for plan details.

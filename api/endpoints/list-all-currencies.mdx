@@ -7,7 +7,7 @@ description: "Retrieve the currency used by every country, with optional reverse
 
 Retrieve the currency mapping for every country in the database. Each item links a country (by ISO2) to its currency `code`, `name`, and `symbol`. Use the optional `?code=` query parameter to perform a reverse lookup and find every country that uses a given ISO 4217 currency code (e.g., all Eurozone countries).
 
-<Note>**Availability:** Supporter plan and above. Returns `403` on lower tiers.</Note>
+<Note>**Availability:** Starter plan and above. Returns `403` on lower tiers.</Note>
 
 <Info>The list is alphabetically ordered by country ISO2 and excludes countries without currency data (~0.1% of records). Results are cached server-side for 24 hours.</Info>
 

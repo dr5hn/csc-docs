@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-09-09
+
+### Changed
+
+- **Pricing tier realignment** across every geographic, search, and postcode endpoint page, matching the reshuffle in `pricingTiers.ts`:
+  - Starter now includes what was previously Supporter-only: All States (bulk `/states`), Cities by Country, Inline Search Filtering (`?q=`, including postcode listing/search), Regions & Subregions API, Phone Dial Code Lookup, Currency Lookup by Country, Field Filtering (`?fields=`), and Sorting (`?sort=`). Starter's data-access level remains **basic**.
+  - Supporter's data-access level moved from **coordinates** straight to **full** — Supporter now gets `translations`/`wikiDataId` (previously Professional+), plus Fuzzy/Typo-Tolerant Search, Location Autocomplete, and Nearby/Geospatial Search (previously Professional+).
+  - Professional now includes the Data Change Feed (`GET /v1/changes`), previously Business-only.
+  - Since no purchasable tier maps to the old **coordinates** access level anymore, every 3-row tier table (Basic / Coordinates / Full) collapsed to 2 rows (Basic: Community, Starter, Legacy; Full: Supporter, Professional, Business), and paired "Coordinates tier" vs "Professional/Business (Full)" JSON examples merged into one Full-tier example carrying the complete field set.
+  - Updated every affected `403` example's `currentTier`/`requiredTier`, upgrade-CTA prose, and per-field "Requires X+" callout to match.
+
 ## [1.4.0] - 2026-08-29
 
 ### Added
