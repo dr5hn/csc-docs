@@ -1,20 +1,14 @@
-/* MakeMySiteLive banner — white bg, black text, clickable */
-#banner {
-  background-color: #ffffff !important;
-  background-image: none !important;
-  border-bottom: 1px solid #e5e7eb !important;
-}
-
-#banner a,
-#banner a span,
-#banner span,
-#banner p {
-  color: #111827 !important;
-  text-decoration: none !important;
+/* MakeMySiteLive banner icon — Mintlify forces banner text/link color via a
+   Tailwind utility scoped inside its own CSS cascade layer, so unlayered
+   !important overrides here can never win against it (unlayered !important
+   always loses to layered !important, regardless of specificity). Style the
+   banner via its own theme instead of fighting that; only add the icon here. */
+#banner a {
+  text-decoration: none;
 }
 
 #banner a:hover {
-  opacity: 0.75 !important;
+  opacity: 0.75;
 }
 
 #banner a::before {
