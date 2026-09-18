@@ -1,45 +1,12 @@
 ---
 title: "Get Data Version"
-api: "GET https://api.countrystatecity.in/v1/meta/data-version"
-authMethod: "key"
+openapi: "GET /meta/data-version"
 description: "Check which geographic data release your API responses are currently served from"
 ---
 
 Returns the version of the underlying geographic dataset currently live behind the API — which upstream release it was exported from, when that release was imported, and a record-count snapshot taken at import time.
 
 <Note>**Availability:** All plans (Community and above) — no tier restriction. The request still counts toward your daily/monthly usage quota like any other endpoint.</Note>
-
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Response
-
-<ResponseField name="dataVersion" type="string">
-  The full version string, in `<source-release>-<YYYY.MM.DD>` format (e.g. `v3.2-export.7-2026.07.30`). The date part is the day the release was **imported into the API**, not the day the release was published — so the same data can carry a different date string in the npm package. See [npm package parity](#npm-package-parity) below. This is the same value sent on the `X-CSC-Data-Version` header of every `/v1/*` response — see [Response headers on every request](#response-headers-on-every-request) below.
-</ResponseField>
-
-<ResponseField name="sourceRelease" type="string">
-  The upstream release tag from the [countries-states-cities-database](https://github.com/dr5hn/countries-states-cities-database) this data was exported from. Compare this field — not `dataVersion` — when you want to check whether two copies of the data are on the same release.
-</ResponseField>
-
-<ResponseField name="updatedAt" type="string">
-  ISO 8601 UTC timestamp of when this release was imported, with milliseconds — for example `2026-07-30T09:01:18.000Z`.
-</ResponseField>
-
-<ResponseField name="recordCounts" type="object">
-  A snapshot of row counts taken at import time — not computed live on each request. The counts change with every release, so treat the numbers in the example below as illustrative.
-
-  <Expandable title="properties">
-    <ResponseField name="regions" type="integer">Number of regions</ResponseField>
-    <ResponseField name="subregions" type="integer">Number of subregions</ResponseField>
-    <ResponseField name="countries" type="integer">Number of countries</ResponseField>
-    <ResponseField name="states" type="integer">Number of states/provinces</ResponseField>
-    <ResponseField name="cities" type="integer">Number of cities</ResponseField>
-  </Expandable>
-</ResponseField>
 
 <RequestExample>
 ```bash cURL

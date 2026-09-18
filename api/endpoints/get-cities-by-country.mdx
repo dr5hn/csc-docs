@@ -10,16 +10,6 @@ Retrieve all cities within a specific country using the country's ISO2 code. Thi
 **Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
 </Tip>
 
-## Additional query parameters
-
-<ParamField query="kind" type="string">
-  Filter by derived place classification. Comma-separated list of `settlement`, `administrative`, `section`, `unknown` (e.g. `?kind=settlement` or `?kind=settlement,section`). Free on every plan — no tier restriction. Invalid values return a `400` error listing the accepted values. See [City Types](/database/city-types) for what each value covers and how it's derived from `type`.
-</ParamField>
-
-<ParamField query="type" type="string">
-  Filter by the raw source `type` value. Comma-separated list of one or more values from the [City Types](/database/city-types) reference (e.g. `?type=city,adm2`). **Requires Supporter+ plan** — matches the same tier gate as the `type` response field. On a lower plan the request is rejected with a `400` error rather than being ignored. Unrecognized values simply match zero rows rather than erroring.
-</ParamField>
-
 <Info>City responses on the **Basic** tier return `id`, `name`, and `kind`. Upgrading to **Supporter+** unlocks `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, and `native`. **Professional+** adds `translations` and `wikiDataId`. See **Tier-Based Field Availability** below.</Info>
 
 <Note>**Availability:** `/countries/{iso2}/cities` (all cities in a country) requires **Supporter+**. Community/Starter users must use [Get Cities by State](/api/endpoints/get-cities-by-state) instead.</Note>

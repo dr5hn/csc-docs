@@ -1,7 +1,6 @@
 ---
 title: "List All Currencies"
-api: "GET https://api.countrystatecity.in/v1/currency"
-authMethod: "key"
+openapi: "GET /currency"
 description: "Retrieve the currency used by every country, with optional reverse lookup by ISO 4217 code"
 ---
 
@@ -10,41 +9,6 @@ Retrieve the currency mapping for every country in the database. Each item links
 <Note>**Availability:** Supporter plan and above. Returns `403` on lower tiers.</Note>
 
 <Info>The list is alphabetically ordered by country ISO2 and excludes countries without currency data (~0.1% of records). Results are cached server-side for 24 hours.</Info>
-
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key for authentication
-</ParamField>
-
-## Query Parameters
-
-<ParamField query="code" type="string">
-  Optional ISO 4217 currency code (3 letters, case-insensitive). When set, returns only countries that use that currency. Invalid codes return `400`.
-</ParamField>
-
-## Response
-
-Returns an array of objects with this shape:
-
-<ResponseField name="country" type="string">
-  ISO2 code of the country (e.g., `"US"`, `"IN"`, `"FR"`)
-</ResponseField>
-
-<ResponseField name="currency" type="object">
-  Currency information
-  <Expandable title="properties">
-    <ResponseField name="code" type="string">
-      ISO 4217 currency code (e.g., `"USD"`, `"EUR"`). Always present.
-    </ResponseField>
-    <ResponseField name="name" type="string | null">
-      Full currency name (e.g., `"United States dollar"`). May be `null` for edge-case territories.
-    </ResponseField>
-    <ResponseField name="symbol" type="string | null">
-      Unicode currency symbol (e.g., `"$"`, `"€"`, `"₹"`). May be `null` — clients should fall back to `code` when rendering.
-    </ResponseField>
-  </Expandable>
-</ResponseField>
 
 <RequestExample>
 ```bash cURL (all currencies)

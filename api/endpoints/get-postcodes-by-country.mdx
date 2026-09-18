@@ -1,7 +1,6 @@
 ---
 title: "Get Postcodes by Country"
-api: "GET https://api.countrystatecity.in/v1/countries/{countryCode}/postcodes"
-authMethod: "key"
+openapi: "GET /countries/{ciso}/postcodes"
 description: "Page through or search a country's postcodes with cursor pagination"
 ---
 
@@ -15,117 +14,11 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
   This is informational postcode data, not an address verification or mail-deliverability service. Results confirm codes exist in the dataset — they do not confirm delivery points or standardize addresses.
 </Warning>
 
-## Path parameters
-
-<ParamField path="countryCode" type="string" required>
-  ISO 3166-1 alpha-2 country code, case-insensitive (e.g., `US`, `GB`, `IN`). Numeric country IDs and ISO3 codes are not accepted on this endpoint.
-</ParamField>
-
 <Tip>
   **Trim results:** Add `?fields=` to limit the columns returned. Requires **Supporter+**. There is no `?sort=` on this endpoint — results are always ordered by code, then `id`, so cursor pagination stays stable. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for `?fields=` syntax.
 </Tip>
 
-## Authentication
-
-<ParamField header="X-CSCAPI-KEY" type="string" required>
-  Your API key.
-</ParamField>
-
-## Query parameters
-
-<ParamField query="q" type="string">
-  Case-insensitive search: matches postcodes whose code starts with `q`, or whose locality name contains it. 2-100 characters. Optional — omit it to list the country's postcodes instead of searching. Every request to this endpoint requires Supporter+ regardless of whether `q` is present.
-</ParamField>
-
-<ParamField query="state_code" type="string">
-  Exact, case-insensitive filter on state/province code. 1-255 letters, digits, or hyphens.
-</ParamField>
-
-<ParamField query="city_id" type="string">
-  Exact filter on the city ID. A positive integer, passed as a query string (e.g. `?city_id=129881`).
-</ParamField>
-
-<ParamField query="type" type="string">
-  Exact, case-insensitive filter on the postcode's source classification. See [Postcode types](/database/postcodes#postcode-types) for the values currently in the dataset — this is not a fixed enum, so a well-formed but unrecognized value (letters, digits, `_`, `-`, 1-32 characters) just matches zero rows instead of returning a `400`.
-</ParamField>
-
-<ParamField query="limit" type="integer" default="50">
-  Maximum records per page. Use a value from `1` to `100`.
-</ParamField>
-
-<ParamField query="cursor" type="string">
-  Opaque pagination token from a previous response's `pagination.next_cursor`. Treat it as opaque — do not parse or construct it yourself. A cursor is tied to the filters it was issued with: resend the exact same `state_code`/`city_id`/`type`/`q`, or omit them entirely and paginate with the cursor alone.
-</ParamField>
-
 ## Response
-
-<ResponseField name="data" type="array">
-  Matching postcode records for this page, ordered by code, then `id`.
-</ResponseField>
-
-<ResponseField name="data[].id" type="string">
-  Unique identifier for the postcode record, returned as a numeric string (not a JSON number) for 64-bit safety.
-</ResponseField>
-
-<ResponseField name="data[].code" type="string">
-  The postcode as stored, with original spacing and casing preserved.
-</ResponseField>
-
-<ResponseField name="data[].country_code" type="string">
-  ISO2 country code.
-</ResponseField>
-
-<ResponseField name="data[].state_code" type="string | null">
-  State/province code, when linked to one.
-</ResponseField>
-
-<ResponseField name="data[].locality_name" type="string | null">
-  Human-readable place name associated with the postcode.
-</ResponseField>
-
-<ResponseField name="data[].type" type="string | null">
-  A source-provided classification of the postcode, not a fixed enum. See [Postcode types](/database/postcodes#postcode-types).
-</ResponseField>
-
-<ResponseField name="data[].country_id" type="string">
-  Country ID, as a numeric string.
-</ResponseField>
-
-<ResponseField name="data[].state_id" type="string | null">
-  State ID, as a numeric string.
-</ResponseField>
-
-<ResponseField name="data[].city_id" type="string | null">
-  City ID, as a numeric string, when linked to a specific city.
-</ResponseField>
-
-<ResponseField name="data[].latitude" type="number | null">
-  Latitude of the postcode area.
-</ResponseField>
-
-<ResponseField name="data[].longitude" type="number | null">
-  Longitude of the postcode area.
-</ResponseField>
-
-<ResponseField name="data[].source" type="string | null">
-  Originating data source, for attribution and license tracking. **Requires Professional+.**
-</ResponseField>
-
-<ResponseField name="data[].wikiDataId" type="string | null">
-  Wikidata Q-ID for cross-referencing. **Requires Professional+.**
-</ResponseField>
-
-<ResponseField name="pagination.limit" type="integer">
-  The `limit` used for this page.
-</ResponseField>
-
-<ResponseField name="pagination.next_cursor" type="string | null">
-  Token for the next page, or `null` when this is the last page.
-</ResponseField>
-
-<ResponseField name="pagination.has_more" type="boolean">
-  Whether another page is available.
-</ResponseField>
 
 <Info>
   There is no total-count field. Counting every match up front would mean a second expensive query on top of a 844k-row table, so check `has_more` and keep paging instead of expecting a total.
