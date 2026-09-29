@@ -72,13 +72,15 @@ print(state['name'])  # "Bavaria"
 
 ```json 400 - Missing param
 {
-  "error": "Invalid query parameters: iso: is required (e.g. iso=US-CA)"
+  "status": "error",
+  "message": "Invalid query parameters: iso: is required (e.g. iso=US-CA)"
 }
 ```
 
 ```json 400 - Malformed code
 {
-  "error": "Invalid query parameters: iso: must be an ISO 3166-2 code (e.g. US-CA)"
+  "status": "error",
+  "message": "Invalid query parameters: iso: must be an ISO 3166-2 code (e.g. US-CA)"
 }
 ```
 
@@ -97,7 +99,8 @@ print(state['name'])  # "Bavaria"
 
 ```json 404 - No Match
 {
-  "error": "State not found for the given ISO code"
+  "status": "error",
+  "message": "State not found for the given ISO code"
 }
 ```
 </ResponseExample>

@@ -95,19 +95,22 @@ print(f"{parsed['country']} | {parsed['dial_code']} | national {parsed['national
 
 ```json 400 - Missing param
 {
-  "error": "Missing required query parameter: number"
+  "status": "error",
+  "message": "Missing required query parameter: number"
 }
 ```
 
 ```json 400 - No leading +
 {
-  "error": "Phone number must be in E.164 format starting with + (e.g., +14155552671)."
+  "status": "error",
+  "message": "Phone number must be in E.164 format starting with + (e.g., +14155552671)."
 }
 ```
 
 ```json 400 - Wrong digit count
 {
-  "error": "Invalid phone number. Must contain 5-15 digits after the +."
+  "status": "error",
+  "message": "Invalid phone number. Must contain 5-15 digits after the +."
 }
 ```
 
@@ -126,7 +129,8 @@ print(f"{parsed['country']} | {parsed['dial_code']} | national {parsed['national
 
 ```json 404 - No matching country
 {
-  "error": "Could not identify a country for the given phone number."
+  "status": "error",
+  "message": "Could not identify a country for the given phone number."
 }
 ```
 </ResponseExample>

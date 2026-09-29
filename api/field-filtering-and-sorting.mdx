@@ -131,7 +131,7 @@ curl -X GET 'https://api.countrystatecity.in/v1/countries/IN/cities?fields=name&
 
 | Header | Meaning |
 |---|---|
-| `Cache-Control: public, max-age=86400` | The underlying full payload is cached server-side and at the edge for 24 h |
+| `Cache-Control: public, max-age=3600` | Clients and the edge may reuse the response for 1 h. (Separately, the server keeps the unfiltered payload for 24 h, or 1 h for searches.) |
 | `ETag` | Each `?fields=`/`?sort=` permutation gets its own ETag so conditional requests work per-permutation |
 | `X-Cache: HIT` / `MISS` | Whether the **underlying** entity payload was served from cache. Filtering and sorting always run on the response — they're cheap relative to network round-trip. |
 

@@ -69,13 +69,15 @@ print(f"{country['name']} → numeric {country['numeric_code']}")
 
 ```json 400 - Wrong number of params
 {
-  "error": "Invalid query parameters: Provide exactly one of: iso2, iso3, numeric"
+  "status": "error",
+  "message": "Invalid query parameters: Provide exactly one of: iso2, iso3, numeric"
 }
 ```
 
 ```json 400 - Malformed code
 {
-  "error": "Invalid query parameters: iso2: must be a 2-letter code"
+  "status": "error",
+  "message": "Invalid query parameters: iso2: must be a 2-letter code"
 }
 ```
 
@@ -94,7 +96,8 @@ print(f"{country['name']} → numeric {country['numeric_code']}")
 
 ```json 404 - No Match
 {
-  "error": "Country not found for the given code"
+  "status": "error",
+  "message": "Country not found for the given code"
 }
 ```
 </ResponseExample>

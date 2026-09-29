@@ -122,7 +122,7 @@ Self-hosted downloads currently use a snapshot workflow:
 | Automatic merge into your database | No | No |
 | Fresh data | Download a newer release | Renew or create a new export |
 
-The Business API also provides `GET /v1/changes` for customers who need an incremental change feed. That API feature is separate from self-hosted download and Export Tool files.
+The Professional and Business API plans also provide [`GET /v1/changes`](/api/endpoints/get-data-changes) for customers who need an incremental change feed. That API feature is separate from self-hosted download and Export Tool files.
 
 ### Safe refresh workflow
 
@@ -252,7 +252,7 @@ No. Download a new release or renew your Export Tool configuration, import it in
 </Accordion>
 
 <Accordion title="Are incremental files available for self-hosted downloads?">
-No. GitHub downloads and Export Tool files are snapshots. The Business API change feed is the incremental option.
+No. GitHub downloads and Export Tool files are snapshots. The [data change feed](/api/endpoints/get-data-changes) on the Professional and Business API plans is the incremental option.
 </Accordion>
 
 <Accordion title="Are extended fields exclusive to paid API plans?">

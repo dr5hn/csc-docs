@@ -90,13 +90,15 @@ print(response.json()['dial_code'])  # "+91"
 
 ```json 404 - Country Not Found
 {
-  "error": "Country not found."
+  "status": "error",
+  "message": "Country not found."
 }
 ```
 
 ```json 404 - No Dial Code on Record
 {
-  "error": "No dial code available for this country."
+  "status": "error",
+  "message": "No dial code available for this country."
 }
 ```
 </ResponseExample>

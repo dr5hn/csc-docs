@@ -76,13 +76,15 @@ print(f"{len(nanp_countries)} countries share +1")
 
 ```json 400 - Empty code
 {
-  "error": "Invalid dial code. Provide a non-empty value (e.g., +1, 44)."
+  "status": "error",
+  "message": "Invalid dial code. Provide a non-empty value (e.g., +1, 44)."
 }
 ```
 
 ```json 400 - Non-numeric / wrong length
 {
-  "error": "Invalid dial code format. Expected digits (e.g., 91, 1, 44)."
+  "status": "error",
+  "message": "Invalid dial code format. Expected digits (e.g., 91, 1, 44)."
 }
 ```
 
