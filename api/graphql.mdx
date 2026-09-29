@@ -13,7 +13,7 @@ The GraphQL endpoint covers the same geographic data as the REST API — countri
 
 ## When to use it
 
-Reach for GraphQL when a screen needs a nested shape — for example a country with its states and each state's cities — in one round trip. For a single flat list, the REST endpoints work just as well and are simpler to cache by URL.
+Reach for GraphQL when a screen needs a nested shape — for example a country with its states and each state's cities — in one round trip. For a single flat list, the REST endpoints work just as well: they return the complete list in one response and are simpler to cache by URL.
 
 ## Authentication
 
@@ -72,19 +72,29 @@ data = response.json()['data']
 
 ## Exploring the schema
 
-A `GET` request to the same endpoint from a browser opens GraphiQL, an interactive schema explorer with autocomplete and inline docs for every type and field. Add your `X-CSCAPI-KEY` in GraphiQL's own headers panel to run queries from it.
+A `GET` request to the same endpoint with an `Accept` header that includes `text/html` (what a browser sends) returns GraphiQL, an interactive schema explorer with autocomplete and inline docs for every type and field.
+
+The page is protected like any query: the request that loads it must carry your `X-CSCAPI-KEY` header, and your plan must include GraphQL. Typing the URL into the address bar sends no key, so it returns `401` instead of the explorer. To open it:
+
+1. Install a browser extension that adds custom request headers, and set `X-CSCAPI-KEY: YOUR_API_KEY` for `api.countrystatecity.in`.
+2. Open `https://api.countrystatecity.in/v1/graphql`.
+3. In GraphiQL's **Headers** panel, add `{"X-CSCAPI-KEY": "YOUR_API_KEY"}`. GraphiQL sends its queries with the headers from this panel.
+
+Alternatively, use an API client with GraphQL support, such as Postman or Insomnia, with the header set. It can load the schema by introspection over an ordinary `POST`.
+
+Loading the page and each request GraphiQL sends count toward your daily and monthly usage like any other request. If your key restricts allowed domains or IPs, GraphiQL's requests are checked against those restrictions too.
 
 ## Nested queries
 
-Fields that return a related entity — `Country.states`, `State.cities`, `Region.subregions`, `Subregion.countries` — resolve in the same request, batched so that requesting the same relationship for many parents (all 50 US states' cities, for example) issues one grouped fetch per level instead of one per parent:
+Fields that return related entities — `Country.states`, `State.cities`, `Region.subregions`, `Subregion.countries` — resolve in the same HTTP request, so one round trip replaces a chain of REST calls. Each nested list returns a page (20 rows per parent unless you pass `limit`), and every parent row adds a lookup to the [query budget](#query-budget), so keep the outer lists small:
 
 ```graphql
 {
-  countries(searchQuery: "United") {
+  countries(searchQuery: "United", limit: 2) {
     name
-    states {
+    states(limit: 10) {
       name
-      cities {
+      cities(limit: 10) {
         name
       }
     }
@@ -92,25 +102,48 @@ Fields that return a related entity — `Country.states`, `State.cities`, `Regio
 }
 ```
 
+This returns the first 2 matching countries (sorted by name), up to 10 states for each, and up to 10 cities for each of those states: a page at every level, not every match. It is estimated at 23 lookups (1 for `countries`, 1 per country for `states`, 1 per state for `cities`) and 222 rows, well inside the budget.
+
+Nested lookups are not merged into a single database query. The server still fetches each parent's children separately; it runs those lookups a limited number at a time in parallel and reuses a result when the same parent and page appear twice in one request. So the cities of 20 different states still cost 20 lookups.
+
 ## Fields by plan
 
-Every type's field set matches what your plan already returns over REST — see [Field Filtering and Sorting](/api/field-filtering-and-sorting) for the basic / coordinates / full tiers. Requesting a field above your plan's access level returns `null` for that field rather than an error, so a single query can safely request fields you might not have access to.
+Two plan settings apply, separately:
+
+- **The GraphQL feature** decides whether you can call `/v1/graphql` at all. Professional and Business include it, and a custom plan can too. Supporter, for example, has full field access over REST but no GraphQL.
+- **Your data access level** decides which fields come back, using the same per-field filtering as REST. Professional and Business have **full** access, so every field in the schema is returned. A custom plan can have a lower level.
+
+A field above your access level returns `null` rather than an error, so one query can safely ask for fields you might not have:
+
+| Type | Basic | Coordinates adds | Full adds |
+|---|---|---|---|
+| `Country` | `id`, `name`, `iso2`, `iso3`, `phonecode`, `capital`, `currency`, `native`, `emoji`, `latitude`, `longitude`, `region`, `region_id`, `subregion`, `subregion_id`, `timezones` | `numeric_code`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex`, `emojiU` | `translations`, `wikiDataId` |
+| `State` | `id`, `name`, `iso2`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone` | `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population` | `translations`, `wikiDataId` |
+| `City` | `id`, `name`, `kind` | `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, `native` | `translations`, `wikiDataId` |
+| `Region` | `id`, `name` | `wikiDataId` | `translations` |
+| `Subregion` | `id`, `name`, `region_id` | `wikiDataId` | `translations` |
+
+Only fields defined in the GraphQL schema can be requested. REST's `localized_name` and `matched_locale` are not in it, and there are no `locale` or `include_translations` arguments: asking for `localized_name` is a validation error, not `null`. To show a name in another language, select `translations` (a JSON-encoded string keyed by language code) and pick the language in your app, or use the REST [`locale` parameter](/api/localization).
 
 ## Available queries
 
 | Query | Returns |
 |---|---|
-| `countries(searchQuery, limit, offset)` | All countries, optionally filtered and paginated |
-| `country(ciso)` | One country by numeric ID, ISO2, or ISO3 code |
-| `states(country, searchQuery)` | States in one country |
+| `countries(searchQuery, limit, offset)` | All countries |
+| `country(ciso)` | One country by numeric ID or ISO2 code |
+| `states(country, searchQuery, limit, offset)` | States in one country |
 | `allStates(searchQuery, limit, offset)` | All states globally |
 | `state(country, iso)` | One state by country and state code |
 | `cities(country, state, searchQuery, limit, offset)` | Cities in a country, optionally narrowed to one state |
 | `city(id)` | One city by numeric ID |
-| `regions(searchQuery)` | All regions |
+| `regions(searchQuery, limit, offset)` | All regions |
 | `region(id)` | One region by numeric ID |
-| `subregions(region, searchQuery)` | Subregions in one region |
+| `subregions(region, searchQuery, limit, offset)` | Subregions in one region (numeric region ID) |
 | `subregion(id)` | One subregion by numeric ID |
+
+`country(ciso)` takes a numeric ID passed as a string, or an ISO2 code. An ISO3 code such as `"USA"` passes validation but matches nothing, so the query returns `null`; convert it first with [Lookup Country by ISO Code](/api/endpoints/lookup-country-by-iso). The `country` argument of `states`, `state`, and `cities` takes an ISO2 code, and `state(iso)` and `cities(state)` take the state's code (for example `CA`).
+
+`searchQuery` (2 to 100 characters) keeps rows whose name (or, for countries, states, and cities, native name) contains it, ignoring case. A single-item query that matches nothing returns `null` with no error.
 
 <Info>
   `city(id)` has no REST equivalent — it's the one query only available through GraphQL, since REST only ever exposed cities scoped to a country or state.
@@ -118,32 +151,88 @@ Every type's field set matches what your plan already returns over REST — see 
 
 ## Limits
 
-<ParamField query="limit" type="integer">
-  List queries accept `limit`/`offset` arguments the same way REST does. An unset or over-large `limit` is capped at 1,000 rows.
-</ParamField>
+Each HTTP request to `/v1/graphql` counts as one request against your plan's daily and monthly limits, however many lookups it runs, including a request rejected for exceeding the query budget.
 
-Queries are also limited to 5 levels of nesting. In practice this only matters for a query walking the full chain from `regions` down to `cities`; anything shallower is unaffected.
+### Pagination
 
-## Errors
+Every list field, at the root or nested, takes `limit` and `offset`. They are arguments on the field inside your query, not URL query parameters.
 
-A validation problem (a malformed country code, a query exceeding the depth limit) or a plan-gate rejection returns a top-level `errors` array with an HTTP 200 status — this is standard GraphQL behavior, not a REST-style status code:
+| List field | Default `limit` | Maximum `limit` |
+|---|---|---|
+| Root queries: `countries`, `states`, `allStates`, `cities`, `regions`, `subregions` | 1,000 | 1,000 |
+| Nested fields: `Country.states`, `State.cities`, `Region.subregions`, `Subregion.countries` | 20 per parent | 1,000 |
 
-```json 200 - Plan gate rejection
+`offset` defaults to `0`. Lists are sorted by name, then ID, so stepping `offset` by `limit` pages through the full list. A `limit` above 1,000, or a negative `limit` or `offset`, is rejected rather than capped: it fails that field with a `BAD_REQUEST` error (see [Errors](#errors)). `limit: 0` returns an empty list.
+
+Unlike the REST list endpoints, a GraphQL list never returns more than one page. Watch the nested default in particular: `{ country(ciso: "US") { states { name } } }` returns only the first 20 states. Ask for more with `states(limit: 100)`, or page with `offset`.
+
+### Query budget
+
+Before running a query, the API estimates its cost from the `limit` of every list field (the value you pass, or the default above), not from how many rows actually match:
+
+- **Lookups:** every field that returns an object or a list of objects costs one lookup per parent row it runs under. Scalar fields such as `name` are free.
+- **Rows:** every list field adds its `limit` multiplied by the number of parent rows.
+
+One query may use at most **50 lookups** and **25,000 rows**. A query over either limit is rejected with HTTP `400` before any data is fetched:
+
+```json 400 - Query too expensive
 {
   "errors": [
     {
-      "message": "This feature is not available on your current plan.",
+      "message": "Query is too expensive: its estimated cost exceeds the budget (1001 data lookups, 21000 rows; limits: 50 lookups, 25000 rows). Add or lower `limit:` arguments on list fields, remove a level of nesting, or split the request into several queries.",
       "extensions": {
-        "code": "FORBIDDEN",
-        "statusCode": 403
+        "code": "QUERY_TOO_EXPENSIVE",
+        "statusCode": 400,
+        "estimatedFetches": 1001,
+        "estimatedRows": 21000,
+        "maxFetches": 50,
+        "maxRows": 25000
       }
     }
-  ],
-  "data": null
+  ]
 }
 ```
 
-Below the Professional plan, the whole endpoint is gated at the HTTP layer instead — a request without GraphQL on your plan gets a normal REST-style `403` before any query runs.
+That response is for `{ countries { states { name } } }`: `countries` defaults to 1,000 rows, so `states` would run 1,000 lookups. To stay within the budget, add or lower `limit` on the outer lists, drop a level of nesting, or split the work into several requests. For example, fetch a page of countries first, then request each country's states and cities in a separate query, using `offset` for further pages.
+
+Queries are also limited to 5 levels of nesting. That is exactly the deepest chain the schema allows (`regions` → `subregions` → `countries` → `states` → `cities`), so in practice the budget is the limit you will reach.
+
+## Errors
+
+The HTTP status and body depend on where a request fails:
+
+| Where it fails | HTTP status | Body |
+|---|---|---|
+| Before GraphQL runs: for example a missing or invalid key, a plan without GraphQL, or a usage limit reached | `401`, `403`, `429` | The REST error envelope (`status`, `message`, `details`); see [Errors & Rate Limits](/api/errors) |
+| Query budget (`QUERY_TOO_EXPENSIVE`), or a document too large to analyze (`QUERY_TOO_COMPLEX`) | `400` | `errors` only, no `data` |
+| Syntax error, or a field or argument that isn't in the schema | `200`, or `400` if you send `Accept: application/graphql-response+json` | `errors` only, no `data` |
+| Inside a field: invalid argument, a plan feature the field needs, temporary overload | `200` | `errors` plus whatever `data` could be resolved |
+
+Field errors carry `extensions.code` and `extensions.statusCode`: `BAD_REQUEST` (`400`) for an invalid argument such as a malformed country code or a `limit` over 1,000; `FORBIDDEN` (`403`) when your plan lacks a feature that field needs, with `extensions.details` naming the feature (standard Professional and Business plans include every feature these queries use); and `API_ERROR` for anything else. A `503` with `GraphQL is busy. Please retry shortly.` is temporary, so retry after a short wait.
+
+The failed field becomes `null`. When that field is nullable (the single-item queries such as `country`, and the nested lists such as `Country.states`), the rest of `data` still comes back. This response is for `{ country(ciso: "US") { name states(limit: 5000) { name } } }`:
+
+```json 200 - Partial data
+{
+  "errors": [
+    {
+      "message": "limit must not exceed 1000.",
+      "extensions": {
+        "code": "BAD_REQUEST",
+        "statusCode": 400
+      }
+    }
+  ],
+  "data": {
+    "country": {
+      "name": "United States",
+      "states": null
+    }
+  }
+}
+```
+
+Root list queries (`countries`, `states`, `cities`, and the others) can't be `null`, so an error in one of them makes all of `data` `null`.
 
 ## Start querying
 
@@ -151,7 +240,7 @@ Below the Professional plan, the whole endpoint is gated at the HTTP layer inste
   <Card title="Compare API plans" icon="credit-card" href="https://countrystatecity.in/pricing?source=docs&campaign=graphql">
     Choose Professional or Business to add GraphQL to your API key.
   </Card>
-  <Card title="Field Filtering and Sorting" icon="filter" href="/api/field-filtering-and-sorting">
-    See which fields each plan's tier unlocks.
+  <Card title="Errors & Rate Limits" icon="triangle-exclamation" href="/api/errors">
+    Handle the `401`, `403`, and `429` responses returned before a query runs.
   </Card>
 </CardGroup>

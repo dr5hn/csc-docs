@@ -7,6 +7,16 @@ rss: true
 
 Follow along with what has changed across the CSC API docs. For changes to the geographical data itself, use the [Data Changes endpoint](/api/endpoints/get-data-changes).
 
+<Update label="2026-08-31" description="v1.5.0" tags={["Added", "Changed"]}>
+#### Added
+
+- **[GraphQL API](/api/graphql)** guide: documents the new `POST /v1/graphql` endpoint (Professional+), covering authentication, opening the GraphiQL explorer with an API key, nested queries, per-plan field access, the full query list including the GraphQL-only `city(id)` lookup, `limit`/`offset` pagination (root default 1,000, nested default 20 per parent), the 50-lookup / 25,000-row query budget, and how the HTTP status and error shape depend on where a request fails
+
+#### Changed
+
+- Updated `llms.txt` to surface the GraphQL endpoint for AI assistants
+</Update>
+
 <Update label="2026-08-29" description="v1.4.0" tags={["Added", "Fixed"]}>
 #### Added
 

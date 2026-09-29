@@ -15,7 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **GraphQL API** guide (`api/graphql.mdx`): documents the new `POST /v1/graphql` endpoint (Professional+), covering authentication, the GraphiQL explorer, nested/DataLoader-batched queries, the per-plan field-access behavior, the full query list including the GraphQL-only `city(id)` lookup, the 5-level query depth limit, and the GraphQL vs. REST-style error shapes
+- **GraphQL API** guide (`api/graphql.mdx`): documents the new `POST /v1/graphql` endpoint (Professional+), covering authentication, opening the GraphiQL explorer with an API key, nested queries, per-plan field access, the full query list including the GraphQL-only `city(id)` lookup, `limit`/`offset` pagination (root default 1,000, nested default 20 per parent), the 50-lookup / 25,000-row query budget, and how the HTTP status and error shape depend on where a request fails
+
+### Changed
+
+- Updated `llms.txt` to surface the GraphQL endpoint for AI assistants
 
 ## [1.4.0] - 2026-08-29
 
