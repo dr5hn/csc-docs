@@ -24,6 +24,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Brought the Field Filtering & Sorting guide, Localized Place Names guide, CLI reference, postcode and schema database pages, errors/FAQ examples, and `llms.txt` in line with the same tiers. Bulk endpoints that Community plans cannot call (All States, Cities by Country) list only Starter and Legacy under Basic.
   - Full-tier examples that show `translations` now include the `include_translations=true` request that returns them, Full-tier field tables list the `locale`-dependent `localized_name`/`matched_locale` fields, and every plan-gate `403` example uses the `status`/`message`/`details` envelope.
 
+## [1.5.0] - 2026-08-31
+
+### Added
+
+- **GraphQL API** guide (`api/graphql.mdx`): documents the new `POST /v1/graphql` endpoint (Professional+), covering authentication, opening the GraphiQL explorer with an API key, nested queries, per-plan field access, the full query list including the GraphQL-only `city(id)` lookup, `limit`/`offset` pagination (root default 1,000, nested default 20 per parent), the 50-lookup / 25,000-row query budget, and how the HTTP status and error shape depend on where a request fails
+
+### Changed
+
+- Updated `llms.txt` to surface the GraphQL endpoint for AI assistants
+
 ## [1.4.0] - 2026-08-29
 
 ### Added

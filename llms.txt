@@ -15,6 +15,7 @@ This comprehensive Mintlify documentation site covers the complete Country State
 - Timezone endpoints by country, state, and city with DST awareness
 - Field filtering (?fields=) and custom sort (?sort=) on every geographic endpoint (Starter+)
 - Fuzzy / typo-tolerant search (?q=) for cities, states, and countries via trigram similarity, with match scores (Supporter+)
+- GraphQL API (Professional+): POST https://api.countrystatecity.in/v1/graphql with the same X-CSCAPI-KEY header; countries, states, cities, regions, and subregions with nested relationships in one request; paged lists (root default 1,000, nested default 20 per parent); per-query budget of 50 lookups and 25,000 rows (HTTP 400 QUERY_TOO_EXPENSIVE). Guide: /api/graphql
 
 ### CSC Database
 - Complete geographical database with regular updates

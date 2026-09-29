@@ -172,6 +172,13 @@
             ]
           },
           {
+            "group": "GraphQL API",
+            "icon": "diagram-project",
+            "pages": [
+              "api/graphql"
+            ]
+          },
+          {
             "group": "Meta",
             "icon": "circle-info",
             "pages": [
