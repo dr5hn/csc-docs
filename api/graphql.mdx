@@ -115,13 +115,15 @@ Two plan settings apply, separately:
 
 A field above your access level returns `null` rather than an error, so one query can safely ask for fields you might not have:
 
-| Type | Basic | Coordinates adds | Full adds |
-|---|---|---|---|
-| `Country` | `id`, `name`, `iso2`, `iso3`, `phonecode`, `capital`, `currency`, `native`, `emoji`, `latitude`, `longitude`, `region`, `region_id`, `subregion`, `subregion_id`, `timezones` | `numeric_code`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex`, `emojiU` | `translations`, `wikiDataId` |
-| `State` | `id`, `name`, `iso2`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone` | `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population` | `translations`, `wikiDataId` |
-| `City` | `id`, `name`, `kind` | `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, `native` | `translations`, `wikiDataId` |
-| `Region` | `id`, `name` | `wikiDataId` | `translations` |
-| `Subregion` | `id`, `name`, `region_id` | `wikiDataId` | `translations` |
+| Type | Basic | Full adds |
+|---|---|---|
+| `Country` | `id`, `name`, `iso2`, `iso3`, `phonecode`, `capital`, `currency`, `native`, `emoji`, `latitude`, `longitude`, `region`, `region_id`, `subregion`, `subregion_id`, `timezones` | `numeric_code`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex`, `emojiU`, `translations`, `wikiDataId` |
+| `State` | `id`, `name`, `iso2`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone` | `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population`, `translations`, `wikiDataId` |
+| `City` | `id`, `name`, `kind` | `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, `native`, `translations`, `wikiDataId` |
+| `Region` | `id`, `name` | `wikiDataId`, `translations` |
+| `Subregion` | `id`, `name`, `region_id` | `wikiDataId`, `translations` |
+
+A custom plan can also be set to an intermediate level that returns the Full fields except `translations` (and, for countries, states and cities, `wikiDataId`).
 
 Only fields defined in the GraphQL schema can be requested. REST's `localized_name` and `matched_locale` are not in it, and there are no `locale` or `include_translations` arguments: asking for `localized_name` is a validation error, not `null`. To show a name in another language, select `translations` (a JSON-encoded string keyed by language code) and pick the language in your app, or use the REST [`locale` parameter](/api/localization).
 
