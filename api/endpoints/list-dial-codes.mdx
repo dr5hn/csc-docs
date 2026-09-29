@@ -8,7 +8,7 @@ Return every country's international dial code in one call, or do the reverse â€
 
 Dial codes follow ITU-T E.164 and are returned with a leading `+`. For NANP countries with an area-code prefix in the underlying data (e.g. Barbados as `+1-246`), the area code is returned as a separate `area_code` field.
 
-<Note>**Availability:** Supporter plan and above. Returns `403` on lower tiers.</Note>
+<Note>**Availability:** Starter plan and above. Returns `403` on lower tiers.</Note>
 
 <Info>Responses are cached server-side for 24 hours. Equivalent dial-code inputs (`+91`, `91`, `091`, `0091`) all resolve to the same cache slot.</Info>
 
@@ -76,21 +76,28 @@ print(f"{len(nanp_countries)} countries share +1")
 
 ```json 400 - Empty code
 {
-  "error": "Invalid dial code. Provide a non-empty value (e.g., +1, 44)."
+  "status": "error",
+  "message": "Invalid dial code. Provide a non-empty value (e.g., +1, 44)."
 }
 ```
 
 ```json 400 - Non-numeric / wrong length
 {
-  "error": "Invalid dial code format. Expected digits (e.g., 91, 1, 44)."
+  "status": "error",
+  "message": "Invalid dial code format. Expected digits (e.g., 91, 1, 44)."
 }
 ```
 
 ```json 403 - Feature Restricted
 {
-  "error": "This feature is not available on your current plan.",
-  "feature": "phoneDialCode",
-  "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  "status": "error",
+  "message": "This feature is not available on your current plan.",
+  "details": {
+    "feature": "phoneDialCode",
+    "currentTier": "community",
+    "requiredTier": "starter",
+    "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  }
 }
 ```
 </ResponseExample>

@@ -8,7 +8,7 @@ Given a phone number in E.164 format (`+` followed by country code and national 
 
 The matcher walks 3-digit → 2-digit → 1-digit ITU prefixes, so longer-prefix countries (like `+972` Israel) win over shorter-prefix ones that share the leading digit. For NANP `+1` numbers, the area code is matched against known territory area codes — `+1-246-555-1234` resolves to Barbados (`BB`), not the US.
 
-<Note>**Availability:** Supporter plan and above. Returns `403` on lower tiers.</Note>
+<Note>**Availability:** Starter plan and above. Returns `403` on lower tiers.</Note>
 
 <Warning>
 **The response echoes the phone number** (`e164` and `national_number`), so it's PII. The endpoint returns `Cache-Control: no-store` and emits no `ETag` — Cloudflare, browsers, and intermediate proxies will not retain the response. Do not change this if you're proxying through additional caching layers; the `Cache-Control` is intentional.
@@ -95,33 +95,42 @@ print(f"{parsed['country']} | {parsed['dial_code']} | national {parsed['national
 
 ```json 400 - Missing param
 {
-  "error": "Missing required query parameter: number"
+  "status": "error",
+  "message": "Missing required query parameter: number"
 }
 ```
 
 ```json 400 - No leading +
 {
-  "error": "Phone number must be in E.164 format starting with + (e.g., +14155552671)."
+  "status": "error",
+  "message": "Phone number must be in E.164 format starting with + (e.g., +14155552671)."
 }
 ```
 
 ```json 400 - Wrong digit count
 {
-  "error": "Invalid phone number. Must contain 5-15 digits after the +."
+  "status": "error",
+  "message": "Invalid phone number. Must contain 5-15 digits after the +."
 }
 ```
 
 ```json 403 - Feature Restricted
 {
-  "error": "This feature is not available on your current plan.",
-  "feature": "phoneDialCode",
-  "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  "status": "error",
+  "message": "This feature is not available on your current plan.",
+  "details": {
+    "feature": "phoneDialCode",
+    "currentTier": "community",
+    "requiredTier": "starter",
+    "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  }
 }
 ```
 
 ```json 404 - No matching country
 {
-  "error": "Could not identify a country for the given phone number."
+  "status": "error",
+  "message": "Could not identify a country for the given phone number."
 }
 ```
 </ResponseExample>

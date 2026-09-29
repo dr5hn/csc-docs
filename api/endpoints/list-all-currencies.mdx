@@ -6,7 +6,7 @@ description: "Retrieve the currency used by every country, with optional reverse
 
 Retrieve the currency mapping for every country in the database. Each item links a country (by ISO2) to its currency `code`, `name`, and `symbol`. Use the optional `?code=` query parameter to perform a reverse lookup and find every country that uses a given ISO 4217 currency code (e.g., all Eurozone countries).
 
-<Note>**Availability:** Supporter plan and above. Returns `403` on lower tiers.</Note>
+<Note>**Availability:** Starter plan and above. Returns `403` on lower tiers.</Note>
 
 <Info>The list is alphabetically ordered by country ISO2 and excludes countries without currency data (~0.1% of records). Results are cached server-side for 24 hours.</Info>
 
@@ -74,17 +74,21 @@ print(f"{len(eurozone)} countries use EUR")
 
 ```json 400 - Bad Request
 {
-  "status": 400,
-  "message": "Invalid currency code. Must be a 3-letter ISO 4217 code (e.g., USD, EUR).",
-  "details": null
+  "status": "error",
+  "message": "Invalid currency code. Must be a 3-letter ISO 4217 code (e.g., USD, EUR)."
 }
 ```
 
 ```json 403 - Feature Restricted
 {
-  "error": "This feature is not available on your current plan.",
-  "feature": "currencyApi",
-  "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  "status": "error",
+  "message": "This feature is not available on your current plan.",
+  "details": {
+    "feature": "currencyApi",
+    "currentTier": "community",
+    "requiredTier": "starter",
+    "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  }
 }
 ```
 </ResponseExample>

@@ -6,15 +6,20 @@ description: "Retrieve a single subregion by its numeric ID"
 
 Retrieve detailed information for a single subregion (e.g., Southern Asia, Western Europe, Caribbean) by its numeric ID.
 
-<Note>**Availability:** Supporter plan and above. Returns `403` on lower tiers.</Note>
+<Note>**Availability:** Starter plan and above. Returns `403` on lower tiers.</Note>
 
 <Tip>
-**Trim response columns:** Add `?fields=name,iso2,...` to receive only the columns you need. Available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax.
+**Trim response columns:** Add `?fields=name,region_id` to receive only the columns you need. Available on **Starter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax.
 </Tip>
 
 <RequestExample>
 ```bash cURL
 curl -X GET 'https://api.countrystatecity.in/v1/subregions/14' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (with translations)
+curl -X GET 'https://api.countrystatecity.in/v1/subregions/14?include_translations=true' \
   -H 'X-CSCAPI-KEY: YOUR_API_KEY'
 ```
 
@@ -41,16 +46,15 @@ print(subregion)
 </RequestExample>
 
 <ResponseExample>
-```json 200 - Success (Supporter tier)
+```json 200 - Basic tier (Starter)
 {
   "id": 14,
   "name": "Southern Asia",
-  "region_id": 3,
-  "wikiDataId": "Q771405"
+  "region_id": 3
 }
 ```
 
-```json 200 - Success (Professional / Business tier)
+```json 200 - Full tier, with translations (Supporter, Professional, Business)
 {
   "id": 14,
   "name": "Southern Asia",
@@ -62,9 +66,14 @@ print(subregion)
 
 ```json 403 - Feature Restricted
 {
-  "error": "This feature is not available on your current plan.",
-  "feature": "regionsApi",
-  "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  "status": "error",
+  "message": "This feature is not available on your current plan.",
+  "details": {
+    "feature": "regionsApi",
+    "currentTier": "community",
+    "requiredTier": "starter",
+    "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  }
 }
 ```
 

@@ -11,6 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update Professional usage to 2,100/day and 63,000/month, and Business to 3,300/day and 100,000/month. Custom usage is negotiated rather than universally unlimited.
 
+## [1.6.0] - 2026-09-09
+
+### Changed
+
+- **Pricing tier realignment** across every geographic, search, and postcode endpoint page, matching the reshuffle in `pricingTiers.ts`:
+  - Starter now includes what was previously Supporter-only: All States (bulk `/states`), Cities by Country, Inline Search Filtering (`?q=`, including postcode listing/search), Regions & Subregions API, Phone Dial Code Lookup, Currency Lookup by Country, Field Filtering (`?fields=`), and Sorting (`?sort=`). Starter's data-access level remains **basic**.
+  - Supporter's data-access level moved from **coordinates** straight to **full** — Supporter now gets `translations`/`wikiDataId` (previously Professional+), plus Fuzzy/Typo-Tolerant Search, Location Autocomplete, and Nearby/Geospatial Search (previously Professional+).
+  - Professional now includes the Data Change Feed (`GET /v1/changes`), previously Business-only.
+  - Since no purchasable tier maps to the old **coordinates** access level anymore, every 3-row tier table (Basic / Coordinates / Full) collapsed to 2 rows (Basic: Community, Starter, Legacy; Full: Supporter, Professional, Business), and paired "Coordinates tier" vs "Professional/Business (Full)" JSON examples merged into one Full-tier example carrying the complete field set.
+  - Updated every affected `403` example's `currentTier`/`requiredTier`, upgrade-CTA prose, and per-field "Requires X+" callout to match.
+  - Brought the Field Filtering & Sorting guide, Localized Place Names guide, CLI reference, postcode and schema database pages, errors/FAQ examples, and `llms.txt` in line with the same tiers. Bulk endpoints that Community plans cannot call (All States, Cities by Country) list only Starter and Legacy under Basic.
+  - Full-tier examples that show `translations` now include the `include_translations=true` request that returns them, Full-tier field tables list the `locale`-dependent `localized_name`/`matched_locale` fields, and every plan-gate `403` example uses the `status`/`message`/`details` envelope.
+
 ## [1.5.0] - 2026-08-31
 
 ### Added

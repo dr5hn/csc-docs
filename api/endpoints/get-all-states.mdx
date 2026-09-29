@@ -6,10 +6,10 @@ description: "Retrieve a complete list of all states, provinces, and regions wor
 
 Retrieve a complete list of all states, provinces, regions, and territories from around the world with basic geographical information.
 
-<Note>**Availability:** Supporter plan and above. Calling `/states` without filtering by country (`bulkStates`) is gated to Supporter+. Community/Starter users must call `/countries/{iso2}/states` instead. The fields returned also vary by tier — see **Tier-Based Field Availability** below.</Note>
+<Note>**Availability:** Starter plan and above. Calling `/states` without filtering by country (`bulkStates`) is gated to Starter+. Community users must call `/countries/{iso2}/states` instead. The fields returned also vary by tier — see **Tier-Based Field Availability** below.</Note>
 
 <Tip>
-**Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Supporter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
+**Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Starter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
 </Tip>
 
 <Info>Additional fields like `fips_code`, `iso3166_2`, `level`, `parent_id`, `native`, `population`, `translations`, and `wikiDataId` are returned on higher tiers. See **Tier-Based Field Availability** below.</Info>
@@ -22,6 +22,11 @@ curl -X GET 'https://api.countrystatecity.in/v1/states' \
 
 ```bash cURL (with search)
 curl -X GET 'https://api.countrystatecity.in/v1/states?q=texas' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (with translations)
+curl -X GET 'https://api.countrystatecity.in/v1/states?include_translations=true' \
   -H 'X-CSCAPI-KEY: YOUR_API_KEY'
 ```
 
@@ -145,7 +150,7 @@ puts "Found #{states.length} states"
 </RequestExample>
 
 <ResponseExample>
-```json 200 - Basic tier (Community, Starter, Legacy)
+```json 200 - Basic tier (Starter, Legacy)
 [
   {
     "id": 4008,
@@ -160,7 +165,7 @@ puts "Found #{states.length} states"
 ]
 ```
 
-```json 200 - Coordinates tier (Supporter) — basic plus
+```json 200 - Full tier, with translations (Supporter, Professional, Business)
 [
   {
     "id": 4008,
@@ -177,7 +182,9 @@ puts "Found #{states.length} states"
     "level": 1,
     "parent_id": null,
     "native": "महाराष्ट्र",
-    "population": 112374333
+    "population": 112374333,
+    "translations": "{\"kr\":\"마하라슈트라\",\"de\":\"Maharashtra\",\"fr\":\"Maharashtra\",\"cn\":\"马哈拉施特拉邦\"}",
+    "wikiDataId": "Q1191"
   }
 ]
 ```
@@ -233,10 +240,13 @@ This endpoint returns a large dataset (5,299+ states). Consider using the filter
 
 ## Tier-Based Field Availability
 
+This endpoint requires **Starter+** (Legacy plans also include it), so Community accounts never reach field access at all — they get a `403` first.
+
 | Tier | Plans | Fields |
 |------|-------|--------|
-| **Basic** | Community, Starter, Legacy | `id`, `name`, `iso2`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone` |
-| **Coordinates** | Supporter | All Basic **+** `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population` |
-| **Full** | Professional, Business | All Coordinates **+** `translations`, `wikiDataId` |
+| **Basic** | Starter, Legacy | `id`, `name`, `iso2`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone` |
+| **Full** | Supporter, Professional, Business | All Basic **+** `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population`, `translations`, `wikiDataId`, `localized_name`, `matched_locale` |
+
+`translations` is part of Full access but is not returned by default: add `include_translations=true`, or name it in `?fields=`. `localized_name` and `matched_locale` are computed from the translations rather than stored, and appear only when you pass `locale`. See [Localized Place Names](/api/localization).
 
 See [Pricing](https://app.countrystatecity.in/pricing) for plan details.

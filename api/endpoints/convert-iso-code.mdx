@@ -81,39 +81,49 @@ print(response.json()['result'])  # "392"
 
 ```json 400 - Same from/to
 {
-  "error": "Invalid query parameters: from and to must be different"
+  "status": "error",
+  "message": "Invalid query parameters: from and to must be different"
 }
 ```
 
 ```json 400 - Value doesn't match from
 {
-  "error": "Invalid query parameters: value does not match the format required by from"
+  "status": "error",
+  "message": "Invalid query parameters: value does not match the format required by from"
 }
 ```
 
 ```json 400 - Invalid format name
 {
-  "error": "Invalid query parameters: from: must be one of: iso2, iso3, numeric"
+  "status": "error",
+  "message": "Invalid query parameters: from: must be one of: iso2, iso3, numeric"
 }
 ```
 
 ```json 403 - Feature Restricted
 {
-  "error": "This feature is not available on your current plan.",
-  "feature": "isoLookup",
-  "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  "status": "error",
+  "message": "This feature is not available on your current plan.",
+  "details": {
+    "feature": "isoLookup",
+    "currentTier": "community",
+    "requiredTier": "starter",
+    "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  }
 }
 ```
 
 ```json 404 - Source code unknown
 {
-  "error": "Country not found for the given code"
+  "status": "error",
+  "message": "Country not found for the given code"
 }
 ```
 
 ```json 404 - Target column null
 {
-  "error": "No iso3 code available for this country"
+  "status": "error",
+  "message": "No iso3 code available for this country"
 }
 ```
 </ResponseExample>
