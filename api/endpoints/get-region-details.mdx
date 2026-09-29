@@ -9,12 +9,17 @@ Retrieve detailed information for a single geographic region (e.g., Africa, Amer
 <Note>**Availability:** Starter plan and above. Returns `403` on lower tiers.</Note>
 
 <Tip>
-**Trim response columns:** Add `?fields=name,iso2,...` to receive only the columns you need. Available on **Starter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax.
+**Trim response columns:** Add `?fields=id,name` to receive only the columns you need. Available on **Starter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax.
 </Tip>
 
 <RequestExample>
 ```bash cURL
 curl -X GET 'https://api.countrystatecity.in/v1/regions/3' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+```bash cURL (with translations)
+curl -X GET 'https://api.countrystatecity.in/v1/regions/3?include_translations=true' \
   -H 'X-CSCAPI-KEY: YOUR_API_KEY'
 ```
 
@@ -48,7 +53,7 @@ print(region)
 }
 ```
 
-```json 200 - Full tier (Supporter, Professional, Business)
+```json 200 - Full tier, with translations (Supporter, Professional, Business)
 {
   "id": 3,
   "name": "Asia",
@@ -59,9 +64,14 @@ print(region)
 
 ```json 403 - Feature Restricted
 {
-  "error": "This feature is not available on your current plan.",
-  "feature": "regionsApi",
-  "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  "status": "error",
+  "message": "This feature is not available on your current plan.",
+  "details": {
+    "feature": "regionsApi",
+    "currentTier": "community",
+    "requiredTier": "starter",
+    "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  }
 }
 ```
 

@@ -77,9 +77,14 @@ print(response.json()['dial_code'])  # "+91"
 
 ```json 403 - Feature Restricted
 {
-  "error": "This feature is not available on your current plan.",
-  "feature": "phoneDialCode",
-  "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  "status": "error",
+  "message": "This feature is not available on your current plan.",
+  "details": {
+    "feature": "phoneDialCode",
+    "currentTier": "community",
+    "requiredTier": "starter",
+    "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  }
 }
 ```
 

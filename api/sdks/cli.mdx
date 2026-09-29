@@ -57,13 +57,13 @@ csc search countries
 csc search countries --filter "united"
 csc search states --country IN
 csc search cities --country IN --state MH
-csc search regions   # Requires Supporter+ plan
+csc search regions   # Requires Starter+ plan
 csc search india     # Global search — matches country names
 ```
 
 ### Fuzzy, typo-tolerant search
 
-<Note>**Requires Professional+ plan.**</Note>
+<Note>**Requires Supporter+ plan.**</Note>
 
 Works two ways:
 
@@ -97,7 +97,7 @@ Fuzzy results replace the usual per-entity table with a shared one:
 
 ### `--fields` and `--sort`
 
-<Note>**Requires Supporter+ plan.**</Note>
+<Note>**Requires Starter+ plan.** Selecting or sorting by fields outside the basic set, such as `population`, needs Supporter+.</Note>
 
 Available on `search countries`/`states`/`cities` — passed straight through to the API instead of the CLI always fetching full objects:
 
@@ -163,7 +163,7 @@ csc generate seed -e states -f prisma --country IN
 These commands create live components that call the [Autocomplete API](/api/endpoints/get-search-autocomplete) as the user types. Unlike `dropdown` and `seed`, they do not download data when you generate the files, so the generator works offline.
 
 <Note>
-  The generated component needs a **Professional or Business** API plan when it runs. [Get an API key](https://app.countrystatecity.in?source=cli_docs&campaign=location_components&package=cli) or [compare plans](https://countrystatecity.in/pricing?source=cli_docs&campaign=location_components&package=cli).
+  The generated component needs a **Supporter, Professional, or Business** API plan when it runs. [Get an API key](https://app.countrystatecity.in?source=cli_docs&campaign=location_components&package=cli) or [compare plans](https://countrystatecity.in/pricing?source=cli_docs&campaign=location_components&package=cli).
 </Note>
 
 ```bash

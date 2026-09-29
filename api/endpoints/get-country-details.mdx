@@ -18,6 +18,11 @@ curl -X GET 'https://api.countrystatecity.in/v1/countries/IN' \
   -H 'X-CSCAPI-KEY: YOUR_API_KEY'
 ```
 
+```bash cURL (with translations)
+curl -X GET 'https://api.countrystatecity.in/v1/countries/IN?include_translations=true' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
 ```python Python
 import requests
 
@@ -168,7 +173,7 @@ get_country_details('IN')
 </RequestExample>
 
 <ResponseExample>
-```json 200 - Full tier (Supporter, Professional, Business)
+```json 200 - Full tier, with translations (Supporter, Professional, Business)
 {
   "id": 101,
   "name": "India",
@@ -277,6 +282,8 @@ Use this endpoint when you need detailed country information for user profiles, 
 | Tier | Plans | Fields |
 |------|-------|--------|
 | **Basic** | Community, Starter, Legacy | `id`, `name`, `iso2`, `iso3`, `phonecode`, `capital`, `currency`, `native`, `emoji`, `latitude`, `longitude`, `region`, `region_id`, `subregion`, `subregion_id`, `timezones` |
-| **Full** | Supporter, Professional, Business | All Basic **+** `numeric_code`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex`, `emojiU`, `translations`, `wikiDataId` |
+| **Full** | Supporter, Professional, Business | All Basic **+** `numeric_code`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex`, `emojiU`, `translations`, `wikiDataId`, `localized_name`, `matched_locale` |
+
+`translations` is part of Full access but is not returned by default: add `include_translations=true`, or name it in `?fields=`. `localized_name` and `matched_locale` are computed from the translations rather than stored, and appear only when you pass `locale`. See [Localized Place Names](/api/localization).
 
 See [Pricing](https://app.countrystatecity.in/pricing) for plan details.

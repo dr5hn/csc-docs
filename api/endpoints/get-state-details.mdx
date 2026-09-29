@@ -20,6 +20,11 @@ curl -X GET 'https://api.countrystatecity.in/v1/countries/IN/states/MH' \
   -H 'X-CSCAPI-KEY: YOUR_API_KEY'
 ```
 
+```bash cURL (with translations)
+curl -X GET 'https://api.countrystatecity.in/v1/countries/IN/states/MH?include_translations=true' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
 ```python Python
 import requests
 
@@ -211,7 +216,7 @@ state = get_state_details('IN', 'MH')
 }
 ```
 
-```json 200 - Full tier (Supporter, Professional, Business)
+```json 200 - Full tier, with translations (Supporter, Professional, Business)
 {
   "id": 4008,
   "name": "Maharashtra",
@@ -298,6 +303,8 @@ Use this endpoint when you need precise geographical coordinates or want to vali
 | Tier | Plans | Fields |
 |------|-------|--------|
 | **Basic** | Community, Starter, Legacy | `id`, `name`, `iso2`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone` |
-| **Full** | Supporter, Professional, Business | All Basic **+** `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population`, `translations`, `wikiDataId` |
+| **Full** | Supporter, Professional, Business | All Basic **+** `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population`, `translations`, `wikiDataId`, `localized_name`, `matched_locale` |
+
+`translations` is part of Full access but is not returned by default: add `include_translations=true`, or name it in `?fields=`. `localized_name` and `matched_locale` are computed from the translations rather than stored, and appear only when you pass `locale`. See [Localized Place Names](/api/localization).
 
 See [Pricing](https://app.countrystatecity.in/pricing) for plan details.

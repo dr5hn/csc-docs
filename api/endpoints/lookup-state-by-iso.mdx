@@ -84,9 +84,14 @@ print(state['name'])  # "Bavaria"
 
 ```json 403 - Feature Restricted
 {
-  "error": "This feature is not available on your current plan.",
-  "feature": "isoLookup",
-  "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  "status": "error",
+  "message": "This feature is not available on your current plan.",
+  "details": {
+    "feature": "isoLookup",
+    "currentTier": "community",
+    "requiredTier": "starter",
+    "upgradeUrl": "https://app.countrystatecity.in/pricing"
+  }
 }
 ```
 

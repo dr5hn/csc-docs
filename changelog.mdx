@@ -7,6 +7,17 @@ rss: true
 
 Follow along with what has changed across the CSC API docs. For changes to the geographical data itself, use the [Data Changes endpoint](/api/endpoints/get-data-changes).
 
+<Update label="2026-09-09" description="v1.6.0" tags={["Changed"]}>
+#### Changed
+
+- **Pricing tier realignment**: every endpoint page and guide now matches the current plan features.
+  - **Starter** now includes All States (`/states`), Cities by Country, search filtering with `?q=` (including postcode listing and search), the Regions & Subregions API, phone dial codes, currency lookup, and [field filtering and sorting](/api/field-filtering-and-sorting) (`?fields=`, `?sort=`). Starter still returns the basic field set.
+  - **Supporter** now has full data access, including `translations`, `wikiDataId`, and [localized names](/api/localization), plus Fuzzy Search, Location Autocomplete, and Nearby Search. These previously required Professional.
+  - **Professional** now includes the [Data Change Feed](/api/endpoints/get-data-changes), previously Business-only.
+  - Field tables now have two access levels, **Basic** and **Full**, because no plan uses the old Coordinates level. Endpoints that Community plans cannot call, such as All States and Cities by Country, list only Starter and Legacy under Basic.
+  - Full-tier examples that show `translations` now include the `include_translations=true` request that returns them, and plan-gate `403` examples use the standard `status`/`message`/`details` response body.
+</Update>
+
 <Update label="2026-08-29" description="v1.4.0" tags={["Added", "Fixed"]}>
 #### Added
 

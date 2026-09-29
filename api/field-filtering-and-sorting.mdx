@@ -9,7 +9,7 @@ Every geographic endpoint accepts two query parameters that let you shape the re
 - **`?fields=`** — return only the fields you ask for. Trim large list responses down to what your UI actually renders.
 - **`?sort=`** — order list results by one or more fields, ascending or descending.
 
-<Note>**Availability:** Both parameters require the **Supporter plan or above**. Detail endpoints accept `?fields=`; list endpoints accept both `?fields=` and `?sort=`.</Note>
+<Note>**Availability:** Both parameters require the **Starter plan or above**. Detail endpoints accept `?fields=`; list endpoints accept both `?fields=` and `?sort=`. Which fields you can select or sort by still depends on your plan's data access: Starter returns the basic field set, so examples on this page that use `population` or other full-access fields need **Supporter+**.</Note>
 
 <Info>Filtering and sorting are applied **server-side after cache**, so a typical request still takes under 10 ms even on large responses. The full payload is cached once; each `?fields=`/`?sort=` permutation receives its own ETag.</Info>
 
@@ -39,7 +39,7 @@ curl -X GET 'https://api.countrystatecity.in/v1/countries?fields=name,iso2' \
 |---|---|
 | Field name is **unknown** for that entity | `400 Bad Request` listing valid fields |
 | Field is **valid but outside your tier** | Silently dropped — response stays a 200, that field just doesn't appear |
-| Field list is **empty** (`?fields=`) | Treated as if the parameter wasn't sent (no filtering). Still trips the Supporter+ check. |
+| Field list is **empty** (`?fields=`) | Treated as if the parameter wasn't sent (no filtering). Still trips the Starter+ check. |
 | `id` not in your list | Added automatically — every response item carries `id` |
 | `?fields=` sent multiple times | `400 Bad Request` — repeated params arrive as an array, which is rejected. Send one comma-separated list. |
 
@@ -72,8 +72,8 @@ curl -X GET 'https://api.countrystatecity.in/v1/countries?fields=name,population
 Chain fields with commas — earlier tokens take precedence on ties.
 
 ```bash
-# Region first (A→Z), population second (largest first within each region)
-curl -X GET 'https://api.countrystatecity.in/v1/countries?sort=region:asc,population:desc' \
+# Country first (A→Z), population second (largest first within each country)
+curl -X GET 'https://api.countrystatecity.in/v1/states?sort=country_code:asc,population:desc' \
   -H 'X-CSCAPI-KEY: YOUR_API_KEY'
 ```
 
@@ -97,7 +97,7 @@ Only fields with comparable scalar values are sortable. Translation blobs, JSON 
 | Field is sortable but **outside your tier** (e.g. `population` on Starter) | `400 Bad Request` — sort surfaces a clear error instead of silently dropping, so you don't get nonsense order |
 | Direction is anything other than `asc` or `desc` (case-insensitive) | `400 Bad Request` |
 | Token has more than one `:` (e.g. `name:asc:extra`) | `400 Bad Request` — guards against silently swallowed typos |
-| Empty `?sort=` | Treated as if the parameter wasn't sent. Still trips the Supporter+ check. |
+| Empty `?sort=` | Treated as if the parameter wasn't sent. Still trips the Starter+ check. |
 | `?sort=` sent on a detail endpoint (e.g. `/countries/IN`) | Ignored — sort only applies to list endpoints |
 | Numeric strings (`latitude`, `longitude`) | Compared numerically, not lexicographically. `"9.0"` sorts before `"10.0"`. |
 | `null` values | Sorted first in `asc`, last in `desc` |
@@ -113,7 +113,7 @@ Whitespace inside a sort token is tolerated. Both `sort=name:desc` and `sort=nam
 You can use both together. Sort is applied first, then fields are trimmed.
 
 ```bash
-curl -X GET 'https://api.countrystatecity.in/v1/cities?fields=name,population&sort=population:desc' \
+curl -X GET 'https://api.countrystatecity.in/v1/countries/IN/cities?fields=name,population&sort=population:desc' \
   -H 'X-CSCAPI-KEY: YOUR_API_KEY'
 ```
 
@@ -121,7 +121,7 @@ You can sort by a field you didn't include in `?fields=` — the sort happens on
 
 ```bash
 # Sort by population (not returned), keep only the city name
-curl -X GET 'https://api.countrystatecity.in/v1/cities?fields=name&sort=population:desc' \
+curl -X GET 'https://api.countrystatecity.in/v1/countries/IN/cities?fields=name&sort=population:desc' \
   -H 'X-CSCAPI-KEY: YOUR_API_KEY'
 ```
 
@@ -177,8 +177,8 @@ curl -X GET 'https://api.countrystatecity.in/v1/cities?fields=name&sort=populati
   "message": "This feature is not available on your current plan.",
   "details": {
     "feature": "fieldsFiltering",
-    "currentTier": "starter",
-    "requiredTier": "supporter",
+    "currentTier": "community",
+    "requiredTier": "starter",
     "upgradeUrl": "https://app.countrystatecity.in/pricing"
   }
 }
@@ -193,15 +193,17 @@ curl -X GET 'https://api.countrystatecity.in/v1/cities?fields=name&sort=populati
   Use `?fields=` to keep only the columns the UI renders. A country selector usually needs `id`, `name`, `iso2`, `emoji` — that's roughly 1 KB per request instead of 50+ KB for the full response.
 
   ```bash
-  curl 'https://api.countrystatecity.in/v1/countries?fields=name,iso2,emoji'
+  curl 'https://api.countrystatecity.in/v1/countries?fields=name,iso2,emoji' \
+    -H 'X-CSCAPI-KEY: YOUR_API_KEY'
   ```
 </Accordion>
 
 <Accordion title="Ordering a list for display">
-  Use `?sort=` to push the work server-side. Sorting 153,765 cities by population in your client is slow and ships a lot of data you'll discard.
+  Use `?sort=` to push the work server-side. Sorting thousands of cities by population in your client is slow and ships a lot of data you'll discard.
 
   ```bash
-  curl 'https://api.countrystatecity.in/v1/cities?sort=population:desc&fields=name,state_code,population'
+  curl 'https://api.countrystatecity.in/v1/countries/IN/cities?sort=population:desc&fields=name,state_code,population' \
+    -H 'X-CSCAPI-KEY: YOUR_API_KEY'
   ```
 </Accordion>
 
@@ -209,7 +211,8 @@ curl -X GET 'https://api.countrystatecity.in/v1/cities?fields=name&sort=populati
   Combine `?fields=` and `?sort=` to ship exactly the rendered columns in the rendered order. Pair with client-side slicing for pagination.
 
   ```bash
-  curl 'https://api.countrystatecity.in/v1/states?sort=name:asc&fields=name,iso2,country_code'
+  curl 'https://api.countrystatecity.in/v1/states?sort=name:asc&fields=name,iso2,country_code' \
+    -H 'X-CSCAPI-KEY: YOUR_API_KEY'
   ```
 </Accordion>
 </AccordionGroup>

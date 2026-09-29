@@ -30,6 +30,11 @@ curl -X GET 'https://api.countrystatecity.in/v1/countries/IN/cities?kind=settlem
   -H 'X-CSCAPI-KEY: YOUR_API_KEY'
 ```
 
+```bash cURL (with translations)
+curl -X GET 'https://api.countrystatecity.in/v1/countries/IN/cities?include_translations=true' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
 ```python Python
 import requests
 
@@ -246,7 +251,7 @@ cities = get_cities_by_country('IN')
 </RequestExample>
 
 <ResponseExample>
-```json 200 - Full tier (Supporter, Professional, Business)
+```json 200 - Full tier, with translations (Supporter, Professional, Business)
 [
   {
     "id": 133024,
@@ -344,9 +349,13 @@ For better user experience, consider loading cities by state instead of by count
 
 ## Tier-Based Field Availability
 
+This endpoint requires **Starter+** (Legacy plans also include it), so Community accounts never reach field access at all — they get a `403` first.
+
 | Tier | Plans | Fields |
 |------|-------|--------|
-| **Basic** | Community, Starter, Legacy | `id`, `name`, `kind` |
-| **Full** | Supporter, Professional, Business | All Basic **+** `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, `native`, `translations`, `wikiDataId` |
+| **Basic** | Starter, Legacy | `id`, `name`, `kind` |
+| **Full** | Supporter, Professional, Business | All Basic **+** `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, `native`, `translations`, `wikiDataId`, `localized_name`, `matched_locale` |
+
+`translations` is part of Full access but is not returned by default: add `include_translations=true`, or name it in `?fields=`. `localized_name` and `matched_locale` are computed from the translations rather than stored, and appear only when you pass `locale`. See [Localized Place Names](/api/localization).
 
 See [Pricing](https://app.countrystatecity.in/pricing) for plan details.
