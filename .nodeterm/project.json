@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "rev": 48,
+  "savedAt": "2026-10-09T13:30:20.747Z",
+  "id": "project-ln8icg",
+  "name": "csc-docs",
+  "color": "#bf5af2",
+  "viewport": {
+    "x": 21.793814432989734,
+    "y": -924.1579541793583,
+    "zoom": 1
+  },
+  "nodes": [
+    {
+      "id": "term-mv0z0dcn-b091c0a5",
+      "kind": "terminal",
+      "position": {
+        "x": 58.206185567010266,
+        "y": 1004.1579541793583
+      },
+      "size": {
+        "width": 1165,
+        "height": 794
+      },
+      "title": "Screenshot UI layout match",
+      "titleAuto": true,
+      "color": "#d97757",
+      "group": null,
+      "tags": [],
+      "collapsed": false,
+      "cwd": ".",
+      "agentId": "claude",
+      "agentSessionId": "c753b7e0-eec0-4611-b600-e43a21489609"
+    },
+    {
+      "id": "term-mv0zukkz-86915751",
+      "kind": "terminal",
+      "position": {
+        "x": 276.5379568884722,
+        "y": 1842.870017426195
+      },
+      "size": {
+        "width": 640,
+        "height": 440
+      },
+      "title": "Terminal 2",
+      "titleAuto": true,
+      "color": "#32d74b",
+      "group": null,
+      "tags": [],
+      "collapsed": false,
+      "cwd": "."
+    }
+  ],
+  "bridges": [],
+  "ropes": []
+}

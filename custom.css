@@ -18,11 +18,12 @@
 
 #banner p {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
   gap: 8px 12px;
   margin: 0;
+  min-width: 0;
 }
 
 /* Pills */
@@ -34,12 +35,13 @@
   background: #ffffff;
   border: 1px solid #dbe5f1;
   border-radius: 999px;
-  max-width: 100%;
+  min-width: 0;                /* was: max-width: 0 */
+  flex: 0 1 auto;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   font-size: 13px;
   font-weight: 400;
   text-decoration: none;
-  white-space: normal;
+  white-space: nowrap;         /* was: nowarp */
   transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
@@ -100,16 +102,30 @@
   -webkit-text-fill-color: #92400e;
 }
 
-/* On phones the pills don't fit with descriptions: keep icon, name and arrow.
-   The description is a bare text node, so zero the link's font size and
-   restore it on the name. */
+/* Phones: keep icon, name and arrow only, both pills on one row. */
 @media (max-width: 640px) {
+  #banner p {
+    gap: 6px;
+  }
+
   #banner a {
     font-size: 0;
+    gap: 5px;
+    padding: 3px 8px 3px 3px;
   }
 
   #banner a [data-streamdown="strong"] {
-    font-size: 13px;
+    font-size: 12px;
+  }
+
+  #banner a::before {
+    width: 20px;
+    height: 20px;
+  }
+
+  #banner a::after {
+    width: 10px;
+    height: 10px;
   }
 
   #banner a em {
@@ -124,9 +140,6 @@
 
 #banner button:hover {
   opacity: 1;
-}
-
-#banner button:hover {
   background: rgba(15, 23, 42, 0.08);
 }
 
