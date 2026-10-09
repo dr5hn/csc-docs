@@ -6,6 +6,7 @@
    which paints over `color`. So text colors below are set with that property.
    Background and layout aren't forced, so plain rules work for those. */
 #banner {
+  position: relative;
   background: #eef4fb;
   border-bottom: 1px solid #dbe5f1;
   padding-top: 6px;
@@ -23,7 +24,6 @@
   justify-content: center;
   gap: 8px 12px;
   margin: 0;
-  min-width: 0;
 }
 
 /* Pills */
@@ -35,13 +35,12 @@
   background: #ffffff;
   border: 1px solid #dbe5f1;
   border-radius: 999px;
-  min-width: 0;                /* was: max-width: 0 */
-  flex: 0 1 auto;
+  flex: none;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   font-size: 13px;
   font-weight: 400;
   text-decoration: none;
-  white-space: nowrap;         /* was: nowarp */
+  white-space: nowrap;
   transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
@@ -102,16 +101,84 @@
   -webkit-text-fill-color: #92400e;
 }
 
-/* Phones: keep icon, name and arrow only, both pills on one row. */
-@media (max-width: 640px) {
+/* Dismiss button */
+#banner button {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.6;
+}
+
+#banner button:hover {
+  opacity: 1;
+  background: rgba(15, 23, 42, 0.08);
+}
+
+/* The X paths carry stroke="currentColor", and color is forced white above. */
+#banner button svg path {
+  stroke: #334155;
+}
+
+/* Tablet, wider (901px to 1024px): same look as desktop, slightly tighter */
+@media (min-width: 901px) and (max-width: 1024px) {
+  #banner p {
+    gap: 8px;
+    padding: 0 40px; /* keeps pills clear of the X button */
+  }
+
+  #banner a {
+    gap: 6px;
+    padding: 4px 10px 4px 4px;
+    font-size: 12.5px;
+  }
+}
+
+/* Tablet, narrower (641px to 900px): full descriptions, "New" badge hidden */
+@media (min-width: 641px) and (max-width: 900px) {
   #banner p {
     gap: 6px;
+    padding: 0 32px;
+  }
+
+  #banner a {
+    gap: 6px;
+    padding: 3px 10px 3px 3px;
+    font-size: 12px;
+  }
+
+  #banner a::before {
+    width: 20px;
+    height: 20px;
+  }
+
+  #banner a::after {
+    width: 10px;
+    height: 10px;
+  }
+
+  #banner a em {
+    display: none; /* the badge costs about 60px, which doesn't fit here */
+  }
+}
+
+/* Phones: keep icon, name and arrow only, both pills on one row.
+   The description is a bare text node, so zero the link's font size and
+   restore it on the name. */
+@media (max-width: 700px) {
+  #banner p {
+    gap: 6px;
+    padding: 0 28px; /* keeps pills clear of the X */
   }
 
   #banner a {
     font-size: 0;
     gap: 5px;
     padding: 3px 8px 3px 3px;
+  }
+
+  #banner a *:not([data-streamdown="strong"]) {
+    font-size: 0;
   }
 
   #banner a [data-streamdown="strong"] {
@@ -133,19 +200,15 @@
   }
 }
 
-/* Dismiss button */
-#banner button {
-  opacity: 0.6;
-}
+/* Very small phones */
+@media (max-width: 400px) {
+  #banner a [data-streamdown="strong"] {
+    font-size: 11px;
+  }
 
-#banner button:hover {
-  opacity: 1;
-  background: rgba(15, 23, 42, 0.08);
-}
-
-/* The X paths carry stroke="currentColor", and color is forced white above. */
-#banner button svg path {
-  stroke: #334155;
+  #banner a::after {
+    display: none;
+  }
 }
 
 /* Dark mode */
