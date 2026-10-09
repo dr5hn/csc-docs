@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Country State City ecosystem documentation",
   "private": true,
+  "engines": {
+    "node": ">=20 <25"
+  },
   "scripts": {
     "sync-changelog": "node scripts/sync-changelog.js",
     "update-database-stats": "node scripts/update-database-stats.js",
