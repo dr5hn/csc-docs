@@ -438,7 +438,8 @@
     "/custom.css"
   ],
   "banner": {
-    "content": "[**MakeMySiteLive** — Publish your website in under 2 minutes](https://makemysitelive.com)"
+    "content": "[**MakeMySiteLive** Publish your website in under 2 minutes *New*](https://makemysitelive.com) [**RemoteGigs** Find remote jobs and gigs](https://remotegig.in)",
+    "dismissible": true
   },
   "description": "Documentation for the Country State City ecosystem: a REST API, downloadable database and tools covering 250 countries, 5,000+ states and 150,000+ cities with ISO codes, coordinates, timezones and currencies.",
   "redirects": [
