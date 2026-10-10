@@ -6,7 +6,6 @@
    which paints over `color`. So text colors below are set with that property.
    Background and layout aren't forced, so plain rules work for those. */
 #banner {
-  position: relative;
   background: #eef4fb;
   border-bottom: 1px solid #dbe5f1;
   padding-top: 6px;
@@ -103,10 +102,7 @@
 
 /* Dismiss button */
 #banner button {
-  position: absolute;
   right: 6px;
-  top: 50%;
-  transform: translateY(-50%);
   opacity: 0.6;
 }
 
@@ -134,8 +130,8 @@
   }
 }
 
-/* Tablet, narrower (641px to 900px): full descriptions, "New" badge hidden */
-@media (min-width: 641px) and (max-width: 900px) {
+/* Tablet, narrower (768px to 900px): full descriptions, "New" badge hidden */
+@media (min-width: 768px) and (max-width: 900px) {
   #banner p {
     gap: 6px;
     padding: 0 32px;
@@ -165,7 +161,7 @@
 /* Phones: keep icon, name and arrow only, both pills on one row.
    The description is a bare text node, so zero the link's font size and
    restore it on the name. */
-@media (max-width: 700px) {
+@media (max-width: 767px) {
   #banner p {
     gap: 6px;
     padding: 0 28px; /* keeps pills clear of the X */
@@ -202,6 +198,11 @@
 
 /* Very small phones */
 @media (max-width: 400px) {
+  #banner a {
+    gap: 3px;
+    padding-right: 6px;
+  }
+
   #banner a [data-streamdown="strong"] {
     font-size: 11px;
   }
