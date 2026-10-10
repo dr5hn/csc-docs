@@ -52,7 +52,7 @@ This documentation covers four main areas:
 ## Development Setup
 
 ### Prerequisites
-- Node.js 16+ installed
+- Node.js 20.17+ or 22 (LTS). Mintlify does not run on Node 25. With nvm, run `nvm use` in the repo root; `.nvmrc` pins 22.
 - npm or yarn package manager
 
 ### Local Development
