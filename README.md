@@ -65,6 +65,8 @@ This documentation covers four main areas:
    ```
 
    The Mintlify CLI is installed locally from the lockfile.
+   Its scoped `is-online` override avoids an upstream preview startup crash;
+   recheck that override when upgrading Mintlify.
 
 2. **Start local development server:**
    ```bash
@@ -78,6 +80,7 @@ This documentation covers four main areas:
 
 - `npm run dev` - Start local development server
 - `npm run build` - Validate documentation locally
+- `npm run check:links` - Check internal documentation links
 - `npm run sync-changelog` - Sync changelog from API
 
 ## Contributing
@@ -122,7 +125,12 @@ Documentation is automatically deployed to production when changes are pushed to
 Validate the documentation before merging:
 ```bash
 npm run build
+npm run check:links
 ```
+
+Pull requests run these checks after a clean lockfile install on Node.js 26 and
+Node.js 22 (the previous tooling baseline). This compatibility check does not
+select the Node.js version used by Mintlify's hosted builds.
 
 ## License
 
