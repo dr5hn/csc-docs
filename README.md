@@ -52,8 +52,8 @@ This documentation covers four main areas:
 ## Development Setup
 
 ### Prerequisites
-- Node.js 20.17+ or 22 (LTS). Mintlify does not run on Node 25. With nvm, run `nvm use` in the repo root; `.nvmrc` pins 22.
-- npm or yarn package manager
+- Node.js 26. With nvm, run `nvm use` in the repo root; `.nvmrc` pins 26.
+- npm package manager
 
 ### Local Development
 
@@ -61,28 +61,23 @@ This documentation covers four main areas:
    ```bash
    git clone [repository-url]
    cd docs
-   npm install
+   npm ci
    ```
 
-2. **Install Mintlify CLI globally:**
-   ```bash
-   npm install -g mint
-   ```
+   The Mintlify CLI is installed locally from the lockfile.
 
-3. **Start local development server:**
+2. **Start local development server:**
    ```bash
    npm run dev
-   # or
-   mint dev
    ```
 
-4. **View documentation:**
+3. **View documentation:**
    Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ### Available Scripts
 
 - `npm run dev` - Start local development server
-- `npm run build` - Build documentation for production
+- `npm run build` - Validate documentation locally
 - `npm run sync-changelog` - Sync changelog from API
 
 ## Contributing
@@ -123,8 +118,8 @@ All documentation is built with [Mintlify](https://mintlify.com) and uses MDX fo
 
 Documentation is automatically deployed to production when changes are pushed to the main branch via GitHub integration with Mintlify.
 
-### Manual Deployment
-If needed, you can trigger a manual build:
+### Local Validation
+Validate the documentation before merging:
 ```bash
 npm run build
 ```

@@ -6,10 +6,13 @@
   "scripts": {
     "sync-changelog": "node scripts/sync-changelog.js",
     "update-database-stats": "node scripts/update-database-stats.js",
-    "dev": "npx mintlify dev",
-    "build": "npx mintlify validate"
+    "dev": "mint dev",
+    "build": "mint validate"
   },
   "keywords": ["documentation", "geography", "api", "countries", "states", "cities"],
   "author": "Country State City Team",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "mint": "^4.2.1040"
+  }
 }
