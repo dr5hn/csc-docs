@@ -6,10 +6,19 @@
   "scripts": {
     "sync-changelog": "node scripts/sync-changelog.js",
     "update-database-stats": "node scripts/update-database-stats.js",
-    "dev": "npx mintlify dev",
-    "build": "npx mintlify validate"
+    "dev": "mint dev",
+    "build": "mint validate",
+    "check:links": "mint broken-links"
   },
   "keywords": ["documentation", "geography", "api", "countries", "states", "cities"],
   "author": "Country State City Team",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "mint": "4.2.1040"
+  },
+  "overrides": {
+    "@mintlify/previewing@4.0.1482": {
+      "is-online": "12.0.2"
+    }
+  }
 }
