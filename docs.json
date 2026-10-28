@@ -429,6 +429,9 @@
   "integrations": {
     "ga4": {
       "measurementId": "G-7LDSKYGZJB"
+    },
+    "clarity": {
+      "projectId": "z4ojfuzvou"
     }
   },
   "search": {
