@@ -65,8 +65,7 @@ This documentation covers four main areas:
    ```
 
    The Mintlify CLI is installed locally from the lockfile.
-   Its scoped `is-online` override avoids an upstream preview startup crash;
-   recheck that override when upgrading Mintlify.
+   Overrides patch Mintlify's transitive dependencies; recheck them when upgrading Mintlify.
 
 2. **Start local development server:**
    ```bash
