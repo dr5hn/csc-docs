@@ -14,11 +14,22 @@
   "author": "Country State City Team",
   "license": "MIT",
   "devDependencies": {
-    "mint": "4.2.1040"
+    "mint": "4.2.1166"
   },
   "overrides": {
-    "@mintlify/previewing@4.0.1482": {
-      "is-online": "12.0.2"
-    }
+    "adm-zip@0.6.0": "0.6.1",
+    "axios@1.18.0": "1.21.0",
+    "fflate@0.7.3": "0.7.5",
+    "fflate@0.8.2": "0.8.3",
+    "image-size@2.0.2": "2.0.4",
+    "js-yaml@^4.0.0": "4.3.2",
+    "katex@0.16.47": "0.19.1",
+    "qs": "6.17.1",
+    "re2js@2.8.6": "2.9.1",
+    "sharp@^0.33.0": "0.35.5",
+    "smol-toml@1.6.0": "1.9.1",
+    "zod@^3.0.0": "3.25.76",
+    "zod@^4.0.0": "4.6.7",
+    "zod-to-json-schema@3.20.4": "3.25.2"
   }
 }
