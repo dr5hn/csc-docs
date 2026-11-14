@@ -1,0 +1,2 @@
+# Node maintenance commands and tests must not run as browser scripts.
+/scripts/
