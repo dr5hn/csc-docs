@@ -8,6 +8,7 @@
     "update-database-stats": "node scripts/update-database-stats.js",
     "dev": "mint dev",
     "build": "mint validate",
+    "test": "node --test scripts/*.test.js",
     "check:links": "mint broken-links"
   },
   "keywords": ["documentation", "geography", "api", "countries", "states", "cities"],

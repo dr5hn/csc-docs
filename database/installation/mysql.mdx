@@ -1,399 +1,64 @@
 ---
 title: "MySQL Installation"
-description: "Complete guide to installing the Countries States Cities database in MySQL with step-by-step instructions"
+description: "Download and import a versioned CountryStateCity MySQL export, then verify counts and relationships"
 icon: "database"
 ---
 
-MySQL is one of the most popular open-source relational database management systems. This guide walks you through installing the Countries States Cities database in MySQL.
+Use the MySQL export with a supported MySQL server and the `mysql` client. The dump uses `utf8mb4` for international text.
 
-<Info>
-MySQL installation typically takes 2-5 minutes and requires approximately 200MB of disk space.
-</Info>
+<Note>
+These instructions use [v5.2.0-export.1](https://github.com/dr5hn/countries-states-cities-database/releases/tag/v5.2.0-export.1), published 3 November 2026. Its core tables contain 250 countries, 5,327 states and 156,169 city records. API data and installed package snapshots can differ. Check the [latest release](https://github.com/dr5hn/countries-states-cities-database/releases/latest) before choosing another version.
+</Note>
+## Download the release
 
-## Prerequisites
+Run these POSIX-shell commands in a new directory. Downloads are compressed; extract them before opening or importing.
 
-Before starting, ensure you have:
+```bash
+set -eu
+mkdir csc-mysql
+cd csc-mysql
+curl -fL 'https://github.com/dr5hn/countries-states-cities-database/releases/download/v5.2.0-export.1/sql-world.sql.gz' -o world.sql.gz
+gzip -d world.sql.gz
+```
+## Import into a new database
 
-- MySQL 5.7+ installed (MySQL 8.0+ recommended)
-- Administrative access to your MySQL server
-- At least 500MB free disk space
-- Downloaded the `mysql/world.sql` file from our [GitHub repository](https://github.com/dr5hn/countries-states-cities-database)
+Use a new, empty database. The dump contains table definitions and data; importing into an existing database can replace tables. The first command must succeed before you run the import.
 
-## Method 1: Command Line Import
-
-<Steps>
-<Step title="Create Database">
-  ```bash
-  mysql -u root -p -e "CREATE DATABASE world CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-  ```
-  
-  <Note>
-  We use utf8mb4 charset to properly handle Unicode characters including emojis and special characters.
-  </Note>
-</Step>
-
-<Step title="Import Database">
-  ```bash
-  mysql -u root -p world < mysql/world.sql
-  ```
-  
-  <Check>
-  The import process typically takes 2-5 minutes depending on your system performance.
-  </Check>
-</Step>
-
-<Step title="Verify Installation">
-  ```sql
-  mysql -u root -p world -e "
-  SELECT COUNT(*) as countries FROM countries;
-  SELECT COUNT(*) as states FROM states;  
-  SELECT COUNT(*) as cities FROM cities;
-  "
-  ```
-  
-  Expected output:
-  ```
-  | countries |
-  |    250    |
-
-  | states |
-  |  5299  |
-
-  | cities |
-  | 153765 |
-  ```
-</Step>
-</Steps>
-
-## Method 2: MySQL Workbench
-
-For users who prefer a graphical interface:
-
-<Steps>
-<Step title="Open MySQL Workbench">
-  Connect to your MySQL server instance.
-</Step>
-
-<Step title="Create New Schema">
-  - Right-click in the Navigator panel
-  - Select "Create Schema"
-  - Name it "world"
-  - Set charset to "utf8mb4"
-  - Set collation to "utf8mb4_unicode_ci"
-</Step>
-
-<Step title="Import SQL File">
-  - Go to Server → Data Import
-  - Select "Import from Self-Contained File"
-  - Choose the `mysql/world.sql` file
-  - Select "world" as target schema
-  - Click "Start Import"
-</Step>
-</Steps>
-
-## Advanced Configuration
-
-### Performance Tuning for Large Imports
-
-<CodeGroup>
-```sql Optimize Import Performance
--- Disable checks during import for better performance
-SET foreign_key_checks = 0;
-SET unique_checks = 0;
-SET autocommit = 0;
-
--- Import the database here --
--- mysql -u root -p world < mysql/world.sql
-
--- Re-enable checks after import
-SET foreign_key_checks = 1;
-SET unique_checks = 1;
-COMMIT;
+```bash
+set -eu
+mysql -u root -p -e "CREATE DATABASE csc_world CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p csc_world < world.sql
 ```
 
-```sql Memory Configuration
--- Increase buffer pool size for better performance
-SET GLOBAL innodb_buffer_pool_size = 1073741824; -- 1GB
+For MySQL Workbench, create the empty `csc_world` schema, select **Server → Data Import → Import from Self-Contained File**, and choose the extracted `world.sql`.
 
--- Increase log file size for large imports
-SET GLOBAL innodb_log_file_size = 268435456; -- 256MB
-```
-</CodeGroup>
+## Verify the import
 
-### Create Application User
-
-<Steps>
-<Step title="Create Dedicated User">
-  ```sql
-  CREATE USER 'csc_user'@'localhost' IDENTIFIED BY 'secure_password_here';
-  ```
-  
-  <Warning>
-  Replace 'secure_password_here' with a strong, unique password.
-  </Warning>
-</Step>
-
-<Step title="Grant Permissions">
-  ```sql
-  -- For read-only access
-  GRANT SELECT ON world.* TO 'csc_user'@'localhost';
-  
-  -- For read-write access (if needed)
-  GRANT SELECT, INSERT, UPDATE, DELETE ON world.* TO 'csc_user'@'localhost';
-  
-  FLUSH PRIVILEGES;
-  ```
-</Step>
-</Steps>
-
-## Database Structure Verification
-
-After installation, verify the database structure:
-
-<CodeGroup>
-```sql Table Information
--- Check all tables are created
-SHOW TABLES;
-
--- Check table structures
-DESCRIBE countries;
-DESCRIBE states;
-DESCRIBE cities;
+```bash
+mysql -u root -p csc_world -e "SELECT COUNT(*) AS countries FROM countries; SELECT COUNT(*) AS states FROM states; SELECT COUNT(*) AS cities FROM cities;"
 ```
 
-```sql Sample Data Queries
--- View sample countries
-SELECT id, name, iso2, iso3, region FROM countries LIMIT 10;
+For the pinned release, expect 250, 5,327 and 156,169 respectively. Inspect tables with `SHOW TABLES` and columns with `DESCRIBE cities`.
 
--- View states for a specific country
-SELECT id, name, state_code, country_id 
-FROM states 
-WHERE country_id = (SELECT id FROM countries WHERE iso2 = 'US') 
-LIMIT 10;
+## Query the hierarchy
 
--- View cities with coordinates
-SELECT id, name, latitude, longitude, country_name, state_name 
-FROM cities 
-WHERE country_name = 'United States' 
-LIMIT 10;
-```
-</CodeGroup>
-
-## Performance Optimization
-
-### Create Additional Indexes
+Names of parent places are joined from their tables. `cities` does not store `country_name` or `state_name`; use a left join for nullable state links.
 
 ```sql
--- Performance indexes for common queries
-CREATE INDEX idx_countries_iso2 ON countries(iso2);
-CREATE INDEX idx_countries_iso3 ON countries(iso3);
-CREATE INDEX idx_countries_region ON countries(region);
-
-CREATE INDEX idx_states_country_id ON states(country_id);
-CREATE INDEX idx_states_name ON states(name);
-
-CREATE INDEX idx_cities_country_id ON cities(country_id);
-CREATE INDEX idx_cities_state_id ON cities(state_id);
-CREATE INDEX idx_cities_coordinates ON cities(latitude, longitude);
-CREATE INDEX idx_cities_name ON cities(name);
+SELECT ci.id, ci.name AS city, st.name AS state, co.name AS country
+FROM cities AS ci
+JOIN countries AS co ON co.id = ci.country_id
+LEFT JOIN states AS st ON st.id = ci.state_id
+WHERE co.iso2 = 'IN'
+ORDER BY ci.id
+LIMIT 10;
 ```
-
-### Update Table Statistics
-
-```sql
--- Update statistics for query optimizer
-ANALYZE TABLE countries, states, cities;
-```
-
-## Connection Examples
-
-<Tabs>
-<Tab title="PHP">
-```php
-<?php
-$servername = "localhost";
-$username = "csc_user";
-$password = "your_password";
-$dbname = "world";
-
-try {
-    $pdo = new PDO("mysql:host=$servername;dbname=$dbname;charset=utf8mb4", 
-                   $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-    // Test query
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM countries");
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    echo "Countries in database: " . $result['count'];
-    
-} catch(PDOException $e) {
-    echo "Connection failed: " . $e->getMessage();
-}
-?>
-```
-</Tab>
-
-<Tab title="Python">
-```python
-import mysql.connector
-
-config = {
-    'user': 'csc_user',
-    'password': 'your_password',
-    'host': 'localhost',
-    'database': 'world',
-    'charset': 'utf8mb4'
-}
-
-try:
-    connection = mysql.connector.connect(**config)
-    cursor = connection.cursor()
-    
-    # Test query
-    cursor.execute("SELECT COUNT(*) FROM countries")
-    count = cursor.fetchone()[0]
-    print(f"Countries in database: {count}")
-    
-except mysql.connector.Error as err:
-    print(f"Database error: {err}")
-    
-finally:
-    if connection.is_connected():
-        cursor.close()
-        connection.close()
-```
-</Tab>
-
-<Tab title="Node.js">
-```javascript
-const mysql = require('mysql2/promise');
-
-const config = {
-  host: 'localhost',
-  user: 'csc_user',
-  password: 'your_password',
-  database: 'world',
-  charset: 'utf8mb4'
-};
-
-async function testConnection() {
-  try {
-    const connection = await mysql.createConnection(config);
-    
-    // Test query
-    const [rows] = await connection.execute('SELECT COUNT(*) as count FROM countries');
-    console.log(`Countries in database: ${rows[0].count}`);
-    
-    await connection.end();
-  } catch (error) {
-    console.error('Database error:', error.message);
-  }
-}
-
-testConnection();
-```
-</Tab>
-</Tabs>
 
 ## Troubleshooting
 
-### Common Issues
+- Confirm that you selected the export for your database engine; SQL dialects are not interchangeable.
+- Check the release tag and source files when counts differ. Counts from an API or a package can describe another snapshot.
+- Inspect the actual table definitions before selecting columns. See the [schema reference](/database/schema).
 
-<AccordionGroup>
-<Accordion title="Access Denied Error">
-**Problem**: `ERROR 1045 (28000): Access denied for user`
-
-**Solutions**:
-1. Verify username and password
-2. Check user permissions: `SHOW GRANTS FOR 'csc_user'@'localhost';`
-3. Ensure user can connect from your host
-4. Try connecting as root first to verify server is running
-</Accordion>
-
-<Accordion title="Character Set Issues">
-**Problem**: Special characters display as question marks or boxes
-
-**Solutions**:
-1. Ensure database uses utf8mb4 charset
-2. Set connection charset: `SET NAMES utf8mb4;`
-3. Check client application charset settings
-4. Verify file encoding when importing
-</Accordion>
-
-<Accordion title="Import Timeout">
-**Problem**: `ERROR 2006 (HY000): MySQL server has gone away`
-
-**Solutions**:
-1. Increase max_allowed_packet: `SET GLOBAL max_allowed_packet=1073741824;`
-2. Increase wait_timeout: `SET GLOBAL wait_timeout=3600;`
-3. Import in smaller batches
-4. Use `--single-transaction` flag for mysqldump imports
-</Accordion>
-
-<Accordion title="Slow Performance">
-**Problem**: Queries are running slowly
-
-**Solutions**:
-1. Add appropriate indexes (see Performance Optimization section)
-2. Increase innodb_buffer_pool_size
-3. Update table statistics with ANALYZE TABLE
-4. Use EXPLAIN to identify slow queries
-5. Consider query optimization techniques
-</Accordion>
-</AccordionGroup>
-
-## Backup and Maintenance
-
-### Create Automated Backup
-
-```bash
-#!/bin/bash
-# backup_world_db.sh
-
-DATE=$(date +%Y%m%d_%H%M%S)
-BACKUP_DIR="/path/to/backups"
-DB_NAME="world"
-
-# Create backup
-mysqldump -u root -p --single-transaction --routines --triggers \
-  $DB_NAME > "$BACKUP_DIR/world_backup_$DATE.sql"
-
-# Compress backup
-gzip "$BACKUP_DIR/world_backup_$DATE.sql"
-
-# Keep only last 7 backups
-find $BACKUP_DIR -name "world_backup_*.sql.gz" -type f -mtime +7 -delete
-
-echo "Backup completed: world_backup_$DATE.sql.gz"
-```
-
-### Regular Maintenance
-
-```sql
--- Check table integrity
-CHECK TABLE countries, states, cities;
-
--- Optimize tables
-OPTIMIZE TABLE countries, states, cities;
-
--- Update statistics
-ANALYZE TABLE countries, states, cities;
-```
-
-<Tip>
-Set up automated maintenance scripts to run during off-peak hours for optimal performance.
-</Tip>
-
-## Next Steps
-
-After successful installation:
-
-1. **Set up regular backups** using the script above
-2. **Configure monitoring** for database performance
-3. **Implement connection pooling** for production applications
-4. **Review security settings** and user permissions
-5. **Test your application** connectivity and queries
-
-<Card title="Need Help?" icon="support">
-  Join our [community discussions](https://github.com/dr5hn/countries-states-cities-database/discussions) for MySQL-specific questions and optimization tips.
-</Card>
+Back up your database before replacing data or changing its schema. Keep release and source notices with distributed data; review the [ODbL licence](https://opendatacommons.org/licenses/odbl/1-0/).
+See the [MySQL reference manual](https://dev.mysql.com/doc/refman/8.4/en/) for server setup, account permissions, backup and performance tuning.

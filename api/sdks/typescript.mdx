@@ -7,11 +7,11 @@ icon: "js"
 Official JS/TS client for the live Country State City REST API — countries, states, cities, regions, currencies, phone codes, timezones, fuzzy search, and account usage. Zero runtime dependencies, dual ESM/CJS builds, full TypeScript types.
 
 <Note>
-  This is not the same thing as the [npm Packages](/api/sdks/npm) covered elsewhere on this site. Those embed the geographical data directly — no API key, no network call. `@countrystatecity/sdk` is the opposite: a **live REST API client**. It needs an API key, makes real HTTP requests, and is subject to your plan's usage quotas — in exchange, it's always current and covers endpoints the offline packages don't have (`search`, `usage`, and live currency/timezone/phone lookups). You can use both together — see **Migrating from the local packages** below.
+  This is not the same thing as the [npm Packages](/api/sdks/npm) covered elsewhere on this site. Bundled data packages work locally without an API key; browser and GeoJSON packages load snapshots from a CDN. `@countrystatecity/sdk` is the opposite: a **live REST API client**. It needs an API key, makes real HTTP requests, and is subject to your plan's usage quotas — it accesses the data currently served by the API and covers endpoints the offline packages don't have (`search`, `usage`, and live currency/timezone/phone lookups). You can use both together — see **Migrating from the local packages** below.
 </Note>
 
 <Warning>
-  `@countrystatecity/sdk` is currently **0.1.0**, pre-1.0. The API surface may still shift before a stable 1.0 release.
+  `@countrystatecity/sdk` is pre-1.0. These examples were checked against published **0.2.0** on 14 November 2026. The API surface may still shift before a stable 1.0 release.
 </Warning>
 
 ## Installation
@@ -43,6 +43,10 @@ const { data: matches } = await csc.search.fuzzy({
 
 Every resource method returns `{ data, meta }` — `data` contains the typed result and `meta` carries request, usage, pagination, and cache information alongside it. See **Response Metadata** below.
 
+<Note>
+  Basic hierarchy endpoints follow the Community and Starter plan limits. Fuzzy search, autocomplete and nearby search need Supporter or higher; the change feed needs Professional or higher. Compare [current plans](https://countrystatecity.in/pricing/) before using a method.
+</Note>
+
 ## Configuration
 
 ```typescript
@@ -69,17 +73,18 @@ Every `list`/`get`/etc. method also accepts a trailing `{ signal?, timeout?, hea
 |---|---|
 | `csc.countries` | `list({ limit?, offset?, fields?, sort? })`, `get(iso2)` |
 | `csc.states` | `list({ country?, limit?, offset?, fields?, sort? })`, `get(country, stateCode)` |
-| `csc.cities` | `list({ country?, state?, kind?, limit?, offset?, fields?, sort? })`, `get(country, stateCode, cityId)` |
+| `csc.cities` | `list({ country, state?, kind?, limit?, offset?, fields?, sort? })`, `get(country, stateCode, cityId)` |
 | `csc.regions` | `list()`, `get(id)`, `subregions(id)` |
 | `csc.currencies` | `list()`, `get(code)`, `byCountry(iso2)` |
 | `csc.iso` | `lookup({ iso2? \| iso3? \| numeric? })` |
 | `csc.phone` | `list()`, `get(iso2)`, `byDialCode(dialCode)` |
 | `csc.timezones` | `list()`, `byCountry(iso2)`, `convert({ time, from, to })` |
-| `csc.search` | `fuzzy({ query, type?, country?, limit?, threshold? })` — `type` defaults to `city` |
+| `csc.search` | `fuzzy({ query, type?, country?, limit?, threshold? })`, `autocomplete({ query, type?, country?, state?, limit? })`, `nearby({ lat, lng, type?, kind?, country?, state?, minPopulation?, radius?, limit? })` |
+| `csc.changes` | `list({ startDate?, placeType?, countryCode?, changeType?, limit?, nextPageToken? })` |
 | `csc.usage` | `get()` — returns cached rate-limit usage from the last request when available, otherwise makes one lightweight request |
 
 <Note>
-  `csc.cities.list({ state })` requires `country` to also be set — a `ValidationError` is thrown client-side otherwise, before any network call.
+  `csc.cities.list()` always requires `country`; `state` optionally narrows it — a `ValidationError` is thrown client-side otherwise, before any network call.
 </Note>
 
 ## Error Handling
@@ -189,7 +194,7 @@ const { data } = await csc.countries.list();
 ```
 
 <Warning>
-  **A key embedded in browser JavaScript is public** — visible in your bundle and every outgoing request. Never use an unrestricted/server key here. Instead, create a key in your CSC dashboard that's **restricted to specific allowed origins** (your site's domain(s)); requests from any other origin are rejected server-side. The SDK adds no protection on top of this — origin restriction is an account/dashboard setting, not something the client enforces.
+  **A key embedded in browser JavaScript is public** — visible in your bundle and every outgoing request. Never use an unrestricted/server key here. Origin whitelisting requires Supporter or higher. Create a key in your CSC dashboard that's **restricted to specific allowed origins** (your site's domain(s)); requests from any other origin are rejected server-side. The SDK adds no protection on top of this — origin restriction is an account/dashboard setting, not something the client enforces.
 </Warning>
 
 ## Node.js and Next.js
@@ -202,7 +207,7 @@ Use the SDK directly in any Node.js 18+ script or backend service. In Next.js, k
 
 ## Migrating from the Local Packages
 
-If you're already using [`@countrystatecity/countries`](/api/sdks/npm) and want live, quota-aware data instead of the weekly-updated bundled snapshot:
+If you're already using [`@countrystatecity/countries`](/api/sdks/npm) and want live, quota-aware data instead of a versioned bundled snapshot:
 
 ```typescript
 // Before — @countrystatecity/countries
@@ -226,7 +231,7 @@ const { data: cities } = await csc.cities.list({ country: 'US', state: 'CA' });
 
 ### Why migrate
 
-- You need data more current than the weekly-updated local snapshot.
+- You want the data currently served by the API instead of your installed snapshot.
 - You need `search` or `usage` — neither has a local-package equivalent.
 - You're already calling the live API elsewhere and want one typed client instead of hand-rolled `fetch` calls.
 

@@ -4,6 +4,10 @@ description: "Common questions and solutions for using the Country State City AP
 icon: "circle-question"
 ---
 
+<Note>
+  Fields and endpoints depend on your API plan. Community includes 100 requests per day and 3,000 per month, with basic fields. Compare the [current plans](https://countrystatecity.in/pricing/) before using extended fields or search endpoints.
+</Note>
+
 ## Getting Started
 
 <AccordionGroup>
@@ -85,7 +89,7 @@ icon: "circle-question"
   - Use server-side applications or serverless functions
   - Store API keys in environment variables
   - Implement your own backend API that securely calls our API
-  - Use build-time environment variables for static sites
+  - Keep secrets in a server-side proxy; build-time variables included in client bundles are public
 
   **Why this matters:**
   - API keys in client-side code are visible to anyone
@@ -261,7 +265,7 @@ icon: "circle-question"
   We implement automated validation and quality checks to ensure data accuracy. Major updates are announced through our changelog.
 
   <Info>
-  The dataset includes 250 countries, 5,299+ states/provinces, and 153,765+ cities worldwide.
+  The dataset includes 250 countries, 5,300+ states/provinces, and 150,000+ cities worldwide.
   </Info>
 </Accordion>
 
@@ -280,7 +284,7 @@ icon: "circle-question"
   - More manageable response sizes
 
   <Warning>
-  Requesting all cities globally would result in 153,765+ records, which would be slow and consume significant bandwidth.
+  Requesting all cities globally would result in 150,000+ records, which would be slow and consume significant bandwidth.
   </Warning>
 </Accordion>
 

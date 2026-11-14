@@ -48,9 +48,16 @@ This guide takes you from zero to a working cascading location picker, the most 
 <CodeGroup>
 ```javascript Node.js
 const BASE = 'https://api.countrystatecity.in/v1';
-const headers = { 'X-CSCAPI-KEY': process.env.CSC_API_KEY };
+const apiKey = process.env.CSC_API_KEY;
+if (!apiKey) throw new Error('Set CSC_API_KEY on the server');
+const headers = { 'X-CSCAPI-KEY': apiKey };
 
-const get = (path) => fetch(`${BASE}${path}`, { headers }).then((r) => r.json());
+/** Read a JSON response, failing on HTTP errors. */
+async function get(path) {
+  const response = await fetch(`${BASE}${path}`, { headers });
+  if (!response.ok) throw new Error(`CSC request failed: HTTP ${response.status}`);
+  return response.json();
+}
 
 const countries = await get('/countries');
 const states = await get('/countries/IN/states');
@@ -67,7 +74,10 @@ BASE = "https://api.countrystatecity.in/v1"
 HEADERS = {"X-CSCAPI-KEY": os.environ["CSC_API_KEY"]}
 
 def get(path):
-    return requests.get(f"{BASE}{path}", headers=HEADERS).json()
+    """Read JSON after checking the HTTP response."""
+    response = requests.get(f"{BASE}{path}", headers=HEADERS, timeout=30)
+    response.raise_for_status()
+    return response.json()
 
 countries = get("/countries")
 states = get("/countries/IN/states")
