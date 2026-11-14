@@ -1,12 +1,12 @@
 ---
 title: "Database Overview"
-description: "Complete geographical database with 250+ countries, 5,299+ states, and 153,765+ cities in multiple formats"
+description: "Geographic database snapshot: 250 countries, 5,327 states and 156,169 city records in SQL, JSON, CSV and more"
 icon: "database"
 ---
 
 ## Introduction
 
-The Countries States Cities Database is the world's most comprehensive open-source geographical database, providing structured data for countries, states/provinces, and cities worldwide. With regular updates and multiple export formats, it serves as the foundation for countless applications requiring geographical data.
+The Countries States Cities Database is CountryStateCity’s open geographical dataset of countries, states/provinces, and city records. Choose a versioned download for offline queries, application dropdowns and local joins.
 
 <CardGroup cols={2}>
   <Card title="Live Database Demo" icon="play" href="https://demo.countrystatecity.in/">
@@ -19,7 +19,7 @@ The Countries States Cities Database is the world's most comprehensive open-sour
 
 ## Database Statistics
 
-Our database contains comprehensive geographical data covering the entire world:
+The figures below describe one published database snapshot. City records can include settlements and administrative units; coverage varies by country and release:
 
 <div className="grid grid-cols-2 md:grid-cols-5 gap-4 my-6">
   <div className="text-center p-4 bg-blue-50 rounded-lg">
@@ -35,17 +35,17 @@ Our database contains comprehensive geographical data covering the entire world:
     <div className="text-sm text-purple-600">Countries</div>
   </div>
   <div className="text-center p-4 bg-orange-50 rounded-lg">
-    <div className="text-2xl font-bold text-orange-600">5,299</div>
+    <div className="text-2xl font-bold text-orange-600">5,327</div>
     <div className="text-sm text-orange-600">States</div>
   </div>
   <div className="text-center p-4 bg-red-50 rounded-lg">
-    <div className="text-2xl font-bold text-red-600">153,765</div>
+    <div className="text-2xl font-bold text-red-600">156,169</div>
     <div className="text-sm text-red-600">Cities</div>
   </div>
 </div>
 
 <Info>
-Last Updated: 27th May 2026
+Snapshot: [v5.2.0-export.1](https://github.com/dr5hn/countries-states-cities-database/releases/tag/v5.2.0-export.1), published 3 November 2026. These counts describe that release; API data and package snapshots can differ.
 </Info>
 
 ## Available Formats
@@ -125,7 +125,7 @@ Hierarchical combinations (Country+States, Country+Cities) are primarily availab
 
 ### Developer-Friendly
 - **Multiple export formats** supporting different technology stacks
-- **Consistent schema** across all formats
+- **Documented schema** with format-specific differences
 - **Well-documented** structure with clear relationships
 - **API integration** for real-time access alongside offline database usage
 
@@ -163,7 +163,7 @@ Choose the approach that best fits your project:
   Use our [REST API](/api/introduction) for real-time data access without managing database files.
   
   <Tip>
-  Ideal for applications that need always up-to-date data and don't want to handle updates.
+  Use the dataset currently served by the API, with fields and endpoints determined by your plan.
   </Tip>
 </Step>
 

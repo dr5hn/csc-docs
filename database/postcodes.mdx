@@ -1,10 +1,10 @@
 ---
 title: "Postcodes"
-description: "844,248 postal codes across 125 countries with type classification, source tracking, and query examples"
+description: "728,556 postal codes across 117 countries with type classification, source tracking, and query examples"
 icon: "mailbox"
 ---
 
-The postcodes table contains **844,248 records** covering **125 countries**. Each record includes the postcode / ZIP code string, country, granularity type, source attribution, and locality name.
+The SQLite and CSV postcode exports in [v5.2.0-export.1](https://github.com/dr5hn/countries-states-cities-database/releases/tag/v5.2.0-export.1), published 3 November 2026, contain **728,556 records** covering **117 countries**. API and package snapshots can differ. Each record includes the postcode / ZIP code string, country, granularity type, source attribution, and locality name.
 
 <Warning>
   This is informational postcode data, not an address verification or mail-deliverability service. A record confirms a code exists in the dataset — it does not confirm a delivery point, standardize an address, or guarantee mail will arrive.
@@ -14,9 +14,9 @@ The postcodes table contains **844,248 records** covering **125 countries**. Eac
 
 | Stat | Value |
 |---|---|
-| Total postcodes | 844,248 |
-| Countries covered | 125 |
-| Distinct `type` values in the current dataset | 5 (`full`, `area`, `fsa`, `po_box`, `street`) |
+| Total postcodes | 728,556 |
+| Countries covered | 117 |
+| Distinct `type` values in this snapshot | 3 (`full`, `area`, `fsa`) |
 
 <Note>
   `type` is a source-provided classification, not a fixed enum on either the database column or the API. It reflects whatever granularity each country's source data actually distinguishes, and can gain new values as more sources are imported — don't hardcode a switch over a closed list.
@@ -24,15 +24,13 @@ The postcodes table contains **844,248 records** covering **125 countries**. Eac
 
 ## Postcode Types
 
-The five values present in the current dataset, most to least common:
+The three values present in this pinned snapshot, most to least common:
 
 | Type | Description | Countries | Example |
 |---|---|---|---|
-| `full` | Complete postcode identifying a specific delivery point or small area — the default for most countries | 113, e.g. Portugal, Mexico, Japan, US, Malta | `90210` (US) |
-| `area` | A broader geographic area code, used where the source data doesn't resolve to a specific delivery point | 11, e.g. Netherlands, Iran, UK, Isle of Man, Bermuda | `98714` (French Polynesia) |
+| `full` | Complete postcode identifying a specific delivery point or small area — the default for most countries | 111 countries | `90210` (US) |
+| `area` | A broader geographic area code, used where the source data doesn't resolve to a specific delivery point | 7 countries: Anguilla, Bermuda, China, UK, Iran, Netherlands and French Polynesia | `98714` (French Polynesia) |
 | `fsa` | Forward Sortation Area — the first 3 characters of a Canadian postal code, identifying a wide geographic area | Canada only | `A0A` |
-| `po_box` | Postal delivery via PO Box, distinct from a street-delivery code for the same area | South Africa only | `0001` (Pretoria) |
-| `street` | Street/physical-delivery code, distinct from a PO Box code for the same area | South Africa only | `0002` (Pretoria) |
 
 ## Query Examples
 

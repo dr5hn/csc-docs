@@ -6,45 +6,16 @@ This directory contains utility scripts for maintaining the documentation.
 
 ### update-database-stats.js
 
-Automatically fetches the latest database statistics from the [Countries States Cities Database GitHub repository](https://github.com/dr5hn/countries-states-cities-database) and updates the `database/overview.mdx` file.
+Reads the latest stable published GitHub release and refreshes the counts, description and source link in `database/overview.mdx`.
 
-**Usage:**
 ```bash
-# Direct execution
-node scripts/update-database-stats.js
-
-# Using npm script
 npm run update-database-stats
+npm test
 ```
 
-**What it does:**
-1. Fetches the README.md content from the GitHub repository
-2. Parses the "Insights" section to extract current statistics:
-   - Total Regions
-   - Total Subregions
-   - Total Countries
-   - Total States/Regions/Municipalities
-   - Total Cities/Towns/Districts
-3. Updates the statistics display in `database/overview.mdx`
-4. Updates the "Last Updated" date to the current date
+The command validates all five displayed counts, the release tag and its publication date before writing. Missing, duplicate or invalid statistics fail with a nonzero exit status and leave the page unchanged. The displayed date is the release publication date, not the day the command ran. Repeating the command for the same release leaves the page unchanged.
 
-**Example output:**
-```
-🔍 Fetching database statistics from GitHub...
-✅ Successfully fetched README content
-📊 Parsed statistics:
-   Regions: 6
-   Subregions: 22
-   Countries: 250
-   States: 5,299
-   Cities: 153,765
-
-📝 Updating overview.mdx file...
-✅ Successfully updated overview.mdx with new statistics
-
-🎉 Successfully updated database statistics!
-📅 Updated date: 21st June 2026
-```
+The source is the GitHub releases API for `dr5hn/countries-states-cities-database`. API counts and package snapshots can differ from the downloadable release. This command updates the overview only; other dataset counts need their own dated source.
 
 ### sync-changelog.js
 

@@ -47,6 +47,10 @@ Use `AsyncCountryStateCity` with `async with` for non-blocking applications. Bot
   </Card>
 </CardGroup>
 
+<Note>
+  Examples checked with `countrystatecity-api@0.2.1` and offline packages at `3.1.0` on 14 November 2026. Package snapshots and the hosted API can differ; check the installed package metadata before upgrading.
+</Note>
+
 ## Offline Packages
 
 The offline packages use full type hints, Pydantic models, and lazy loading. Their data is bundled directly, so they do not require an API key or network request.
@@ -102,10 +106,8 @@ states = get_states_of_country("IN")
 print(f"Total states in India: {len(states)}")
 
 for state in states[:3]:
-    print(f"{state.name} ({state.iso2})")
-# Maharashtra (MH)
-# Karnataka (KA)
-# Tamil Nadu (TN)
+    print(f"{state.name} ({state.state_code})")
+# Rows follow the installed snapshot; ordering and coverage can change.
 ```
 
 #### Cities
@@ -118,9 +120,7 @@ print(f"Cities in California: {len(cities)}")
 
 for city in cities[:3]:
     print(f"{city.name} — {city.latitude}, {city.longitude}")
-# Los Angeles — 34.05223, -118.24368
-# San Diego — 32.72541, -117.15726
-# San Jose — 37.33939, -121.89496
+# Rows follow the installed snapshot; city names are not unique identifiers.
 ```
 
 #### Country Details
@@ -155,7 +155,7 @@ print(f"US timezones: {len(timezones)}")
 
 # Lookup by zone name
 tz = get_timezone_by_zone_name("America/New_York")
-print(f"{tz.zone_name} — {tz.gmt_offset_name}")
+print(f"{tz.zoneName} — {tz.gmtOffsetName}")
 
 # Convert time between zones
 from datetime import datetime
@@ -242,11 +242,11 @@ results = search_phonecodes("united")
   <Card title="Lazy loading" icon="bolt">
     Data loads on first access and caches with LRU cache for minimal memory footprint.
   </Card>
-  <Card title="Zero dependencies" icon="box">
-    Only requires Pydantic — no other external packages.
+  <Card title="Declared dependencies" icon="box">
+    Pydantic validates the data models. Check each package’s declared dependencies.
   </Card>
   <Card title="Full coverage" icon="globe">
-    250+ countries, 5,299+ states, 153,765+ cities with coordinates and metadata.
+    250 country and territory records, 5,300+ states and 150,000+ city records; fields vary by snapshot.
   </Card>
 </CardGroup>
 

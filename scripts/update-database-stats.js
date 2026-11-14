@@ -1,289 +1,76 @@
 #!/usr/bin/env node
 
-/**
- * Script to fetch database statistics from GitHub repository and update overview.mdx
- * Usage: node scripts/update-database-stats.js
- */
+/** Refresh the database overview from one published GitHub release. */
+const fs = require('node:fs/promises');
+const path = require('node:path');
 
-const https = require('https');
-const fs = require('fs').promises;
-const path = require('path');
-
-const GITHUB_README_URL = 'https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/README.md';
+const RELEASE_API = 'https://api.github.com/repos/dr5hn/countries-states-cities-database/releases/latest';
+const RELEASES_URL = 'https://github.com/dr5hn/countries-states-cities-database/releases/tag/';
 const OVERVIEW_FILE = path.join(__dirname, '../database/overview.mdx');
-const POSTCODES_FILE = path.join(__dirname, '../database/postcodes.mdx');
+const FIELDS = [
+  ['regions', 'Regions', 'blue'],
+  ['subregions', 'Subregions', 'green'],
+  ['countries', 'Countries', 'purple'],
+  ['states', 'States', 'orange'],
+  ['cities', 'Cities', 'red'],
+];
 
-/**
- * Fetch content from GitHub README
- */
-async function fetchGitHubReadme() {
-  return new Promise((resolve, reject) => {
-    https.get(GITHUB_README_URL, (response) => {
-      let data = '';
-      
-      response.on('data', (chunk) => {
-        data += chunk;
-      });
-      
-      response.on('end', () => {
-        if (response.statusCode === 200) {
-          resolve(data);
-        } else {
-          reject(new Error(`HTTP ${response.statusCode}: Failed to fetch README`));
-        }
-      });
-    }).on('error', (error) => {
-      reject(error);
-    });
-  });
-}
-
-/**
- * Parse statistics from README content
- */
-function parseStatistics(readmeContent) {
-  const stats = {
-    regions: null,
-    subregions: null,
-    countries: null,
-    states: null,
-    cities: null,
-    postcodes: null,
-    postcodeCountries: null
-  };
-
-  // The GitHub README has statistics in the "Insights" section with this format:
-  // Total Regions : 6 <br>
-  // Total Sub Regions : 22 <br>
-  // Total Countries : 250 <br>
-  // Total States/Regions/Municipalities : 5,299 <br>
-  // Total Cities/Towns/Districts : 153,765 <br>
-  // Total Postcodes : 844248 (125 countries) <br>
-
-  const patterns = [
-    /Total\s+Regions?\s*:\s*(\d+(?:,\d+)*)/i,
-    /Total\s+Sub\s+Regions?\s*:\s*(\d+(?:,\d+)*)/i,
-    /Total\s+Countries?\s*:\s*(\d+(?:,\d+)*)/i,
-    /Total\s+States?(?:\/Regions?\/Municipalities?)?\s*:\s*(\d+(?:,\d+)*)/i,
-    /Total\s+Cities?(?:\/Towns?\/Districts?)?\s*:\s*(\d+(?:,\d+)*)/i,
-    /Total\s+Postcodes?\s*:\s*(\d+(?:,\d+)*)\s*\(\s*(\d+(?:,\d+)*)\s*countries?\s*\)/i
-  ];
-
-  // Parse each statistic
-  const regionMatch = readmeContent.match(patterns[0]);
-  const subregionMatch = readmeContent.match(patterns[1]);
-  const countryMatch = readmeContent.match(patterns[2]);
-  const stateMatch = readmeContent.match(patterns[3]);
-  const cityMatch = readmeContent.match(patterns[4]);
-  const postcodeMatch = readmeContent.match(patterns[5]);
-
-  if (regionMatch) stats.regions = parseInt(regionMatch[1].replace(/,/g, ''));
-  if (subregionMatch) stats.subregions = parseInt(subregionMatch[1].replace(/,/g, ''));
-  if (countryMatch) stats.countries = parseInt(countryMatch[1].replace(/,/g, ''));
-  if (stateMatch) stats.states = parseInt(stateMatch[1].replace(/,/g, ''));
-  if (cityMatch) stats.cities = parseInt(cityMatch[1].replace(/,/g, ''));
-  if (postcodeMatch) {
-    stats.postcodes = parseInt(postcodeMatch[1].replace(/,/g, ''));
-    stats.postcodeCountries = parseInt(postcodeMatch[2].replace(/,/g, ''));
+/** Validate a complete published release before using any of its counts. */
+function parseRelease(release) {
+  if (!release || typeof release !== 'object' || release.draft !== false || release.prerelease !== false ||
+      typeof release.tag_name !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(release.tag_name) ||
+      typeof release.body !== 'string' || typeof release.published_at !== 'string' ||
+      !/^\d{4}-\d{2}-\d{2}T/.test(release.published_at) || !Number.isFinite(Date.parse(release.published_at))) {
+    throw new Error('Expected a published stable release with a safe tag, body and publication date');
   }
-
+  const stats = { tag: release.tag_name, publishedAt: release.published_at };
+  for (const [key, label] of FIELDS) {
+    const matches = [...release.body.matchAll(new RegExp(`^- \\*\\*${label}\\*\\*:[ \\t]*(\\d+(?:,\\d{3})*)[ \\t]*\\r?$`, 'gm'))];
+    const value = matches.length === 1 ? Number(matches[0][1].replaceAll(',', '')) : NaN;
+    if (!Number.isSafeInteger(value) || value <= 0) throw new Error(`Missing or invalid release count: ${label}`);
+    stats[key] = value;
+  }
   return stats;
 }
 
-/**
- * Format number with commas
- */
-function formatNumber(num) {
-  return num.toLocaleString();
-}
-
-/**
- * Get current date in the format used in the file
- */
-function getCurrentDate() {
-  const date = new Date();
-  const day = date.getDate();
-  const month = date.toLocaleDateString('en-US', { month: 'long' });
-  const year = date.getFullYear();
-  
-  // Add ordinal suffix
-  const suffix = ['th', 'st', 'nd', 'rd'][day % 10 > 3 || Math.floor(day / 10) === 1 ? 0 : day % 10];
-  
-  return `${day}${suffix} ${month} ${year}`;
-}
-
-/**
- * Update the overview.mdx file with new statistics
- */
-async function updateOverviewFile(stats) {
-  try {
-    let content = await fs.readFile(OVERVIEW_FILE, 'utf8');
-    let updated = false;
-
-    // Update each statistic if we found it
-    if (stats.regions !== null) {
-      content = content.replace(
-        /<div className="text-2xl font-bold text-blue-600">\d+(?:,\d+)*<\/div>/,
-        `<div className="text-2xl font-bold text-blue-600">${formatNumber(stats.regions)}</div>`
-      );
-      updated = true;
-    }
-
-    if (stats.subregions !== null) {
-      content = content.replace(
-        /<div className="text-2xl font-bold text-green-600">\d+(?:,\d+)*<\/div>/,
-        `<div className="text-2xl font-bold text-green-600">${formatNumber(stats.subregions)}</div>`
-      );
-      updated = true;
-    }
-
-    if (stats.countries !== null) {
-      content = content.replace(
-        /<div className="text-2xl font-bold text-purple-600">\d+(?:,\d+)*<\/div>/,
-        `<div className="text-2xl font-bold text-purple-600">${formatNumber(stats.countries)}</div>`
-      );
-      updated = true;
-    }
-
-    if (stats.states !== null) {
-      content = content.replace(
-        /<div className="text-2xl font-bold text-orange-600">\d+(?:,\d+)*<\/div>/,
-        `<div className="text-2xl font-bold text-orange-600">${formatNumber(stats.states)}</div>`
-      );
-      updated = true;
-    }
-
-    if (stats.cities !== null) {
-      content = content.replace(
-        /<div className="text-2xl font-bold text-red-600">\d+(?:,\d+)*<\/div>/,
-        `<div className="text-2xl font-bold text-red-600">${formatNumber(stats.cities)}</div>`
-      );
-      updated = true;
-    }
-
-    // Update the last updated date
-    if (updated) {
-      const currentDate = getCurrentDate();
-      content = content.replace(
-        /Last Updated: [^<]+/,
-        `Last Updated: ${currentDate}`
-      );
-
-      // Also update the description in frontmatter if numbers changed significantly
-      if (stats.countries !== null && stats.states !== null && stats.cities !== null) {
-        const countriesK = Math.floor(stats.countries / 50) * 50; // Round down to nearest 50
-        const statesK = Math.floor(stats.states / 500) * 500; // Round down to nearest 500  
-        const citiesK = Math.floor(stats.cities / 1000) * 1000; // Round down to nearest 1000
-        
-        content = content.replace(
-          /description: "Complete geographical database with \d+\+ countries, \d+\+ states, and \d+\+ cities in multiple formats"/,
-          `description: "Complete geographical database with ${countriesK}+ countries, ${Math.floor(statesK/1000)}k+ states, and ${Math.floor(citiesK/1000)}k+ cities in multiple formats"`
-        );
-      }
-
-      await fs.writeFile(OVERVIEW_FILE, content, 'utf8');
-      console.log('✅ Successfully updated overview.mdx with new statistics');
-    } else {
-      console.log('ℹ️  No statistics found to update');
-    }
-
-    return updated;
-  } catch (error) {
-    throw new Error(`Failed to update overview file: ${error.message}`);
+/** Render all counts and their provenance, rejecting an unexpected template. */
+function renderOverview(content, stats) {
+  const format = (value) => value.toLocaleString('en-US');
+  for (const [key, , color] of FIELDS) {
+    const pattern = new RegExp(`(<div className="text-2xl font-bold text-${color}-600">)[\\d,]+(</div>)`, 'g');
+    if ([...content.matchAll(pattern)].length !== 1) throw new Error(`Expected one ${key} statistic in the overview`);
+    content = content.replace(pattern, (_, before, after) => `${before}${format(stats[key])}${after}`);
   }
+  const description = /^description: ".*"$/gm;
+  const source = /<Info>\r?\n(?:Last Updated:[^\n]*|Snapshot:[\s\S]*?)\r?\n<\/Info>/g;
+  if ([...content.matchAll(description)].length !== 1 || [...content.matchAll(source)].length !== 1) {
+    throw new Error('Expected one overview description and snapshot source block');
+  }
+  const date = new Date(stats.publishedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  content = content.replace(description, `description: "Geographic database snapshot: ${format(stats.countries)} countries, ${format(stats.states)} states and ${format(stats.cities)} city records in SQL, JSON, CSV and more"`);
+  return content.replace(source, `<Info>\nSnapshot: [${stats.tag}](${RELEASES_URL}${encodeURIComponent(stats.tag)}), published ${date}. These counts describe that release; API data and package snapshots can differ.\n</Info>`);
 }
 
-/**
- * Update the postcodes.mdx file with the latest postcode count / country coverage.
- * Keeps the hardcoded "844,248 records across 125 countries" figures from
- * going stale between manual doc edits.
- */
-async function updatePostcodesFile(stats) {
-  if (stats.postcodes === null || stats.postcodeCountries === null) {
-    return false;
-  }
-
-  try {
-    let content = await fs.readFile(POSTCODES_FILE, 'utf8');
-    const postcodes = formatNumber(stats.postcodes);
-    const countries = formatNumber(stats.postcodeCountries);
-
-    content = content
-      .replace(
-        /description: "[\d,]+ postal codes across [\d,]+ countries with type classification, source tracking, and query examples"/,
-        `description: "${postcodes} postal codes across ${countries} countries with type classification, source tracking, and query examples"`
-      )
-      .replace(
-        /The postcodes table contains \*\*[\d,]+ records\*\* covering \*\*[\d,]+ countries\*\*\./,
-        `The postcodes table contains **${postcodes} records** covering **${countries} countries**.`
-      )
-      .replace(
-        /\| Total postcodes \| [\d,]+ \|/,
-        `| Total postcodes | ${postcodes} |`
-      )
-      .replace(
-        /\| Countries covered \| [\d,]+ \|/,
-        `| Countries covered | ${countries} |`
-      );
-
-    await fs.writeFile(POSTCODES_FILE, content, 'utf8');
-    console.log('✅ Successfully updated postcodes.mdx with new statistics');
-    return true;
-  } catch (error) {
-    throw new Error(`Failed to update postcodes file: ${error.message}`);
-  }
-}
-
-/**
- * Main execution function
- */
+/** Fetch and validate the latest release before writing the overview. */
 async function main() {
-  try {
-    console.log('🔍 Fetching database statistics from GitHub...');
-    
-    const readmeContent = await fetchGitHubReadme();
-    console.log('✅ Successfully fetched README content');
-    
-    const stats = parseStatistics(readmeContent);
-    console.log('📊 Parsed statistics:');
-    console.log(`   Regions: ${stats.regions || 'Not found'}`);
-    console.log(`   Subregions: ${stats.subregions || 'Not found'}`);
-    console.log(`   Countries: ${stats.countries || 'Not found'}`);
-    console.log(`   States: ${stats.states || 'Not found'}`);
-    console.log(`   Cities: ${stats.cities || 'Not found'}`);
-    console.log(`   Postcodes: ${stats.postcodes || 'Not found'}${stats.postcodeCountries ? ` (${stats.postcodeCountries} countries)` : ''}`);
-
-    // Check if we found any statistics
-    const foundStats = Object.values(stats).filter(v => v !== null).length;
-    if (foundStats === 0) {
-      console.log('❌ No statistics found in README. The format may have changed.');
-      console.log('📝 README preview:');
-      console.log(readmeContent.substring(0, 500) + '...');
-      return;
-    }
-
-    console.log(`\n📝 Updating overview.mdx file...`);
-    const overviewUpdated = await updateOverviewFile(stats);
-
-    console.log(`\n📝 Updating postcodes.mdx file...`);
-    const postcodesUpdated = await updatePostcodesFile(stats);
-
-    if (overviewUpdated || postcodesUpdated) {
-      console.log(`\n🎉 Successfully updated database statistics!`);
-      console.log(`📅 Updated date: ${getCurrentDate()}`);
-    } else {
-      console.log('\n⚠️  No updates were made to the file');
-    }
-
-  } catch (error) {
-    console.error('❌ Error:', error.message);
-    process.exit(1);
-  }
+  const response = await fetch(RELEASE_API, {
+    headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'csc-docs-stats' },
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!response.ok) throw new Error(`GitHub release request failed: HTTP ${response.status}`);
+  const stats = parseRelease(await response.json());
+  const content = await fs.readFile(OVERVIEW_FILE, 'utf8');
+  const updated = renderOverview(content, stats);
+  if (updated !== content) await fs.writeFile(OVERVIEW_FILE, updated, 'utf8');
+  console.log(`Database overview: ${stats.tag}, published ${stats.publishedAt}`);
+  console.log(`${stats.countries} countries, ${stats.states} states, ${stats.cities} city records`);
 }
 
-// Run the script if called directly
 if (require.main === module) {
-  main();
+  main().catch((error) => {
+    console.error(`Database statistics update failed: ${error.message}`);
+    process.exitCode = 1;
+  });
 }
 
-module.exports = { fetchGitHubReadme, parseStatistics, updateOverviewFile, updatePostcodesFile };
+module.exports = { parseRelease, renderOverview };

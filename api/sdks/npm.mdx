@@ -4,7 +4,7 @@ description: "Official @countrystatecity npm packages for Node.js and browser en
 icon: "npm"
 ---
 
-The `@countrystatecity` monorepo publishes offline data packages, a CLI, and the live API SDK. The data packages work without an API key or network requests; the CLI and SDK call the REST API.
+The `@countrystatecity` monorepo publishes offline data packages, a CLI, and the live API SDK. Bundled data packages work locally without an API key. `countries-browser` and `geojson` fetch snapshots from a CDN and need a network connection when loading; API-backed CLI commands and the SDK require an API key.
 
 <Tip>
   Need data that updates without publishing a new package version, typo-tolerant search, or usage tracking? Pair these packages with the [TypeScript SDK](/api/sdks/typescript) — a live API client for when you need that instead of (or alongside) a bundled snapshot. Its **Migrating from the Local Packages** section has a side-by-side comparison. [Get a free API key](https://app.countrystatecity.in?source=sdk_docs&campaign=sdk_api_migration).
@@ -12,14 +12,14 @@ The `@countrystatecity` monorepo publishes offline data packages, a CLI, and the
 
 ## Packages
 
-| Package | Environment | Description | Bundle |
+| Package | Environment | Description | Loading strategy |
 |---|---|---|---|
-| [`@countrystatecity/countries`](https://www.npmjs.com/package/@countrystatecity/countries) | Node.js / Server | Countries, states, cities with lazy loading | &lt;10KB |
-| [`@countrystatecity/countries-browser`](https://www.npmjs.com/package/@countrystatecity/countries-browser) | Browser / Any | Same API as above, loads data via jsDelivr CDN | &lt;10KB |
-| [`@countrystatecity/timezones`](https://www.npmjs.com/package/@countrystatecity/timezones) | Node.js / Server | 392 IANA timezones with conversion utilities | &lt;20KB |
-| [`@countrystatecity/currencies`](https://www.npmjs.com/package/@countrystatecity/currencies) | Node.js / Browser | 155 ISO 4217 currencies with symbols and formatting | &lt;3KB |
-| [`@countrystatecity/translations`](https://www.npmjs.com/package/@countrystatecity/translations) | Node.js / Browser | Country name translations in 19 languages | &lt;3KB |
-| [`@countrystatecity/phonecodes`](https://www.npmjs.com/package/@countrystatecity/phonecodes) | Node.js / Browser | Country phone codes with lookup and formatting | &lt;3KB |
+| [`@countrystatecity/countries`](https://www.npmjs.com/package/@countrystatecity/countries) | Node.js / Server | Countries, states, cities with lazy loading | Local data files loaded on demand |
+| [`@countrystatecity/countries-browser`](https://www.npmjs.com/package/@countrystatecity/countries-browser) | Browser / Any | Same API as above, loads data via jsDelivr CDN | CDN snapshots loaded on demand |
+| [`@countrystatecity/timezones`](https://www.npmjs.com/package/@countrystatecity/timezones) | Node.js / Server | IANA timezone data with conversion utilities | Local data |
+| [`@countrystatecity/currencies`](https://www.npmjs.com/package/@countrystatecity/currencies) | Node.js / Browser | ISO 4217 currencies with symbols and formatting | Bundled reference data |
+| [`@countrystatecity/translations`](https://www.npmjs.com/package/@countrystatecity/translations) | Node.js / Browser | Country name translations in 19 languages | Bundled reference data |
+| [`@countrystatecity/phonecodes`](https://www.npmjs.com/package/@countrystatecity/phonecodes) | Node.js / Browser | Country phone codes with lookup and formatting | Bundled reference data |
 | [`@countrystatecity/postalcodes`](https://www.npmjs.com/package/@countrystatecity/postalcodes) | Node.js / Server | Postal codes with locality search and validation | Lazy-loaded |
 | [`@countrystatecity/geojson`](https://www.npmjs.com/package/@countrystatecity/geojson) | Browser / Any | Countries, states, and cities as GeoJSON points | Lazy-loaded |
 | [`@countrystatecity/cli`](https://www.npmjs.com/package/@countrystatecity/cli) | Terminal | Search, explore, and generate code from geographic data | – |
@@ -74,26 +74,26 @@ npm install @countrystatecity/sdk
 import { getCountries, getStatesOfCountry, getCitiesOfState } from '@countrystatecity/countries';
 
 const countries = await getCountries();
-// [{ id: 101, name: 'India', iso2: 'IN', emoji: '🇮🇳', ... }, ...]
+// Returns the countries in your installed snapshot.
 
 const states = await getStatesOfCountry('US');
-// [{ id: 1, name: 'California', iso2: 'CA', ... }, ...]
+// Returns states belonging to US; inspect each record’s id and iso2.
 
 const cities = await getCitiesOfState('US', 'CA');
-// [{ id: 110992, name: 'Los Angeles', latitude: '34.05', longitude: '-118.24', ... }, ...]
+// Returns the California city slice; ordering and populated fields vary by snapshot.
 ```
 
 ```typescript Browser (React / Vue / Svelte)
 import { getCountries, getStatesOfCountry, getCitiesOfState } from '@countrystatecity/countries-browser';
 
 const countries = await getCountries();
-// [{ id: 101, name: 'India', iso2: 'IN', emoji: '🇮🇳', ... }, ...]
+// Returns the countries in your installed snapshot.
 
 const states = await getStatesOfCountry('IN');
-// [{ id: 1, name: 'Maharashtra', iso2: 'MH', ... }, ...]
+// Returns states belonging to IN; inspect each record’s id and iso2.
 
 const cities = await getCitiesOfState('IN', 'MH');
-// [{ id: 1, name: 'Mumbai', ... }, ...]
+// Returns city records for IN/MH from the CDN snapshot.
 ```
 </CodeGroup>
 
@@ -184,7 +184,7 @@ See the [CLI](/api/sdks/cli) page for the full command reference, including typo
 
 ## Data Updates
 
-All packages update automatically every week via a CI pipeline that fetches the latest data from the [countries-states-cities-database](https://github.com/dr5hn/countries-states-cities-database), runs tests, and publishes a patch release to npm.
+Data packages contain versioned snapshots of the [countries-states-cities-database](https://github.com/dr5hn/countries-states-cities-database). Updating your application requires installing a newer published package version; release timing and package versions vary. The API SDK and CLI have their own releases.
 
 To get the latest data in your project, update the package:
 

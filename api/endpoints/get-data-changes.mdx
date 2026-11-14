@@ -32,6 +32,8 @@ When several fields change in one release, the record has one main `change_type`
 
 ## Response
 
+The response below illustrates the schema; it is not a historical changelog.
+
 The API returns changes from oldest to newest.
 
 ```json 200 - Renamed city
@@ -64,7 +66,7 @@ For page two and later, send the token by itself. Do not change the original fil
 
 ```javascript JavaScript
 let url = new URL('https://api.countrystatecity.in/v1/changes');
-url.searchParams.set('start_date', '2026-08-01T00:00:00Z');
+url.searchParams.set('start_date', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
 url.searchParams.set('country_code', 'IN');
 url.searchParams.set('limit', '100');
 
@@ -89,16 +91,18 @@ while (url) {
 
 <RequestExample>
 ```bash cURL
-curl 'https://api.countrystatecity.in/v1/changes?start_date=2026-08-01T00:00:00Z&country_code=IN&limit=100' \
+curl 'https://api.countrystatecity.in/v1/changes?country_code=IN&limit=100' \
   -H 'X-CSCAPI-KEY: YOUR_API_KEY'
 ```
 
 ```python Python
 import requests
+from datetime import datetime, timedelta, timezone
 
+start_date = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
 response = requests.get(
     'https://api.countrystatecity.in/v1/changes',
-    params={'start_date': '2026-08-01T00:00:00Z', 'country_code': 'IN'},
+    params={'start_date': start_date, 'country_code': 'IN'},
     headers={'X-CSCAPI-KEY': 'YOUR_API_KEY'},
 )
 response.raise_for_status()
