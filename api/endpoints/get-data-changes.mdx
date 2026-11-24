@@ -14,6 +14,8 @@ If your app stores Country State City data in its own database, a full download 
 
 Use the feed to keep a local search index, checkout form, analytics database, or cached copy up to date. Every change has a stable `change_id`, the affected `place_id`, and the `data_version` that produced it.
 
+If your local database enforces foreign keys, stage each release across its pages, then apply it in a transaction with deferred constraints or insert parents before children and remove children before parents. Sequence order is chronological, not a foreign-key dependency order.
+
 Changes are available for **90 days**. Run your sync regularly and save the `change_id` values you have applied so retrying a page cannot create duplicates.
 
 ## Change types
