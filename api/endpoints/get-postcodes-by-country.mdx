@@ -19,7 +19,7 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
 </Tip>
 
 <Info>
-  There is no total-count field. Counting every match up front would mean a second expensive query on top of a 844k-row table, so check `has_more` and keep paging instead of expecting a total.
+  There is no total-count field. Counting every match up front would mean a second expensive query on top of a large postcode table, so check `has_more` and keep paging instead of expecting a total.
 </Info>
 
 ```json 200 - Search with q, Basic tier (Starter)
@@ -57,7 +57,7 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
       "city_id": null,
       "latitude": null,
       "longitude": null,
-      "source": "geonames",
+      "source": "india-post",
       "wikiDataId": null
     }
   ],
@@ -67,6 +67,26 @@ Page through a country's postcodes / ZIP codes, or narrow the list with a code/l
     "has_more": false
   }
 }
+```
+
+## Coverage and source relationships
+
+The hosted `v6.2.0-export.1` dataset checked on 24 November 2026 contains
+**728,556 postcode records across 117 countries**. Its current source types are
+`full`, `area` and `fsa`; types and country coverage vary by release. A valid
+country with no matching list rows returns an empty page; exact lookup uses
+separate `postcode_not_found` and `postcode_coverage_unavailable` reasons.
+
+`city_id`, `state_id`, locality and coordinates may be `null`. Retain missing
+links instead of inferring a city from its postcode or name. Of the current
+records, 186,871 have a city link and 717,974 have a state link. Postcodes do not
+have a direct source `county_id`; where a city is linked, use that city's recorded
+county relationship. See [city fields](/api/endpoints/get-cities-by-country).
+
+```bash
+# Source-linked city filter (city IDs are strings; some records have no city link)
+curl 'https://api.countrystatecity.in/v1/countries/AT/postcodes?city_id=3681&limit=20' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
 ```
 
 ## Tier-based field availability
