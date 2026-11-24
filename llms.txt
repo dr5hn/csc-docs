@@ -35,11 +35,10 @@ This comprehensive Mintlify documentation site covers the complete Country State
 - FAQ and troubleshooting documentation
 
 ### Export Tool  
-- Multiple export formats (SQL, JSON, CSV, XML)
+- Datasets: countries, states, counties, cities, postcodes; 13 formats (JSON, CSV, Excel, SQL dialects, GeoJSON and more)
 - Custom data filtering and selection capabilities
-- Bulk export functionality with format-specific optimizations
+- Credit pricing with a free preview; paid exports download for 30 days and keep their data snapshot
 - Use case documentation for different scenarios
-- Integration APIs for automated exports
 
 ### AI Tools Integration
 - Claude Code integration examples
@@ -81,7 +80,7 @@ Cities:
 - Direct API consumption with official TypeScript/JavaScript and Python SDKs
 - Self-hosted database integration with multiple platform support
 - Community-driven data updates via Update Tool workflow
-- Flexible data exports in multiple formats (JSON, CSV, SQL, XML)
+- Five datasets in 13 export formats, with a free preview and native downloads
 - AI-powered development workflows with Claude, Cursor, and Windsurf integration
 - Real-world code examples and implementation patterns
 

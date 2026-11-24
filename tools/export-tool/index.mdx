@@ -1,207 +1,73 @@
 ---
 title: "Export Tool Overview"
 sidebarTitle: "Overview"
-description: "Create custom geographical data exports without downloading massive databases. Get exactly the data you need, in the format you want, with just a few clicks."
+description: "Export countries, states, counties, cities and postcodes as files in the format you need. Pay with credits, preview the exact cost for free."
 icon: "pen-to-square"
 ---
 
+The Export Tool at [export.countrystatecity.in](https://export.countrystatecity.in/) turns the Country State City geographical data into a file you download once and keep. You pick the datasets, the columns, the filters and a format. The preview shows the exact credit cost before you pay.
+
 <CardGroup cols={2}>
-<Card title="Quick Start" icon="rocket" href="/tools/export-tool/getting-started">
-  Sign up and get free trial credits to test the system
-</Card>
-<Card title="Use Cases" icon="lightbulb" href="/tools/export-tool/use-cases">
-  Real-world examples for e-commerce, apps, and analytics
+<Card title="Getting Started" icon="rocket" href="/tools/export-tool/getting-started">
+  Create an account and run your first export
 </Card>
 <Card title="Export Formats" icon="file-code" href="/tools/export-tool/formats">
-  JSON, CSV, XML, YAML, SQL, GeoJSON, and more formats available
+  What is inside each downloaded file
 </Card>
-<Card title="FAQs" icon="question" href="/tools/export-tool/faq">
-  Have Questions?
+<Card title="Use Cases" icon="lightbulb" href="/tools/export-tool/use-cases">
+  Which datasets and format fit your job
+</Card>
+<Card title="FAQ" icon="question" href="/tools/export-tool/faq">
+  Credits, downloads, renewals and troubleshooting
 </Card>
 </CardGroup>
 
-## Why Choose CSC Export Tool?
+## What you can export
 
-### The Problem with Traditional Approaches
+| Dataset | Base credits | What it holds |
+|:--------|:------------:|:--------------|
+| Countries | 1 | ISO codes, currency, phone code, region, timezones and more |
+| States | 3 | States, provinces and regions, linked to a country |
+| Counties | 3 | Counties and districts, linked to a country and to one or more states |
+| Cities | 4 | Cities, linked to a country and optionally a state or county |
+| Postcodes | 5 | Postal codes, linked to a country and optionally a state and a city |
 
-<Warning>
-**The Old Way**: Download entire geographical databases (hundreds of MBs), write code to filter data, deal with inconsistent formats, and waste hours on data preparation.
-</Warning>
+Your total is the dataset credits, plus one format cost, plus any extras you choose. Extras are extra column tiers, sorting, geographic filters, translations and the flag bundle. The preview is free and its total is the price you pay.
 
-### The CSC Export Tool Solution
+<Info>
+The live row counts and the current data snapshot are not copied into these docs because they change. Check [`/api/status`](https://eapi.countrystatecity.in/api/status) for the active snapshot and the number of records in each dataset. Check [`/api/datasets`](https://eapi.countrystatecity.in/api/datasets) for the exact columns and credit cost of every dataset.
+</Info>
 
-<Check>
-**The Smart Way**: Select only the fields you need, choose from 10+ ready-to-use formats, get clean optimized datasets, and save hours of development time.
-</Check>
-
-## Key Benefits
-
-<Tabs>
-<Tab title="Selective Data">
-**Choose Exactly What You Need**
-
-- Pick specific datasets (Countries, States, Cities)
-- Select only the fields you require
-- Filter by country or region
-- No unnecessary data bloat
-
-```json Example: E-commerce Checkout
-{
-  "countries": [
-    {
-      "name": "United States",
-      "iso2": "US", 
-      "currency": "USD",
-      "currency_symbol": "$"
-    }
-  ]
-}
-```
-</Tab>
-
-<Tab title="Multiple Formats">
-**Ready for Any System**
-
-- **JSON**: Web apps, APIs, JavaScript
-- **CSV**: Spreadsheets, data analysis
-- **XML**: Enterprise systems
-- **YAML**: Configuration files
-- **SQL**: Database imports
-
-```csv CSV for Analytics
-name,iso2,population,gdp,area
-United States,US,331449281,21427700,9372610
-China,CN,1439323776,14342300,9596960
-```
-</Tab>
-
-<Tab title="Cost Effective">
-**Pay Only for What You Use**
-
-- Credits-based system
-- No monthly subscriptions
-- Free trial credits included
-- Credits never expire
-
-<Card
-  title="View Pricing"
-  icon="credit-card"
-  href="https://countrystatecity.in/pricing"
->
-  See credit packages and pricing details
-</Card>
-</Tab>
-</Tabs>
-
-## How It Works
+## How an export works
 
 <Steps>
-<Step title="Sign Up & Get Free Credits">
-Choose GitHub or email sign-up and receive free trial credits to test the system.
+<Step title="Select and preview">
+Choose datasets, columns, filters and a format. The preview is free and shows the exact cost.
 </Step>
-
-<Step title="Select Your Data">
-Pick datasets (Countries, States, Cities) and choose exactly which fields you need.
+<Step title="Confirm">
+Confirming records the export in your history and takes the credits. No file exists yet.
 </Step>
-
-<Step title="Choose Format">
-Select from JSON, CSV, XML, YAML, or SQL based on your use case.
-</Step>
-
-<Step title="Preview & Export">
-Review your selections, confirm credit cost, and generate your custom dataset.
-</Step>
-
-<Step title="Download & Use">
-Get your data as a convenient ZIP file and integrate it into your project.
+<Step title="Download">
+The file is generated as it downloads. Downloading again never takes more credits.
 </Step>
 </Steps>
 
-## Popular Use Cases
+## Credits and downloads
 
-<CardGroup cols={3}>
-<Card title="E-commerce" icon="shopping-cart">
-**Country dropdowns with currency info**
-- Dataset: Countries
-- Format: JSON
-- Fields: name, iso2, currency
-</Card>
+- Credits never expire. See current packages on the [Credits page](https://export.countrystatecity.in/dashboard/credits).
+- A paid export can be downloaded for 30 days.
+- An export is pinned to the data snapshot that was active when you confirmed it. Downloads always return that snapshot, even after newer data is published.
+- To get newer data, use **Renew**. It creates a new paid export for the original credit cost, uses the snapshot that is published at that moment, and starts a new 30 days.
 
-<Card title="Mobile Apps" icon="mobile">
-**Location services with coordinates**
-- Dataset: Cities
-- Format: JSON
-- Fields: cities with lat/lng
-</Card>
+## What the tool does not do
 
-<Card title="Analytics" icon="chart-bar">
-**Population and economic data**
-- Dataset: Countries
-- Format: CSV
-- Fields: countries with stats
-</Card>
-</CardGroup>
-
-## Credit System Overview
-
-Understanding how credits work helps you plan your exports efficiently:
-
-**Dataset Costs:**
-- Countries: **1 credit**
-- States: **3 credits**
-- Cities: **4 credits**
-
-**Format Costs:**
-- JSON / NDJSON / XML / YAML: **+2 credits**
-- CSV / Markdown: **+3 credits**
-- SQL: **+4 credits**
-- Excel (.xlsx) / GeoJSON: **+4 credits**
-- PostgreSQL / SQL Server / SQLite3: **+5 credits**
-- MongoDB Extended JSON: **+3 credits**
-
-Filters and add-ons may add more (region/multi-country, translations, sort, flag bundle). The preview always shows the exact cost before you confirm.
-
-<Info>
-**Example Calculation**: Countries + States data in CSV format = 1 + 3 + 3 = **7 credits total**
-</Info>
-
-## Pricing & Credit Packages
-
-<Card
-  title="View Pricing & Credit Packages"
-  icon="credit-card"
-  href="https://countrystatecity.in/pricing"
->
-  Compare credit packages and find the best option for your needs
-</Card>
-
-## Data Quality & Freshness
-
-<Tip>
-**Always Current**: Our geographical database is updated daily with the latest information from reliable sources, ensuring you get the most current data available.
-</Tip>
-
-- **Daily Updates**: Fresh data synchronized every 24 hours
-- **Reliable Sources**: Data from authoritative geographical databases
-- **Version Tracking**: Consistent data across all exports
-- **Quality Assurance**: Validated and cleaned data ready for production use
-- **Bulk Exports**: Handle large datasets efficiently
-- **Custom Filtering**: Filter by specific countries or regions
-- **Export History**: Track and manage all your previous exports  
-- **30-Day Access**: Re-download exports for a full month
-
-
-## Ready to Start?
-
-Get started today with free trial credits and see how the CSC Export Tool can streamline your development workflow.
-<CardGroup>
-<Card title="Get Started Now" icon="arrow-right" href="/tools/export-tool/getting-started">
-Sign up for free and create your first custom export in minutes
-</Card>
-</CardGroup>
-
----
+- It does not promise a daily refresh. New data is published only after it has been checked.
+- It does not email you when an export is ready, and there is no background queue. You download from your export history.
+- It does not offer team-shared credits, PDF output or an automation API.
+- It does not guarantee postal coverage for every country. How well each source covers a country varies.
 
 <Note>
-**Need Help?** Our documentation covers everything from basic usage to advanced features. For additional support, contact us at export@countrystatecity.in
+The hosted API, SDKs and database packages have their own releases. This page only describes the Export Tool. Do not assume that counties and postcodes are available in the hosted API because they are in the Export Tool.
 </Note>
+
+Questions? Email export@countrystatecity.in.

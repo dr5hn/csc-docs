@@ -34,7 +34,7 @@ This documentation covers four main areas:
 
 ### 🛠️ Tools Documentation
 - **Update Tool**: Submit data corrections and additions
-- **Export Tool**: Download data in various formats (JSON, CSV, SQL, XML)
+- **Export Tool**: Export countries, states, counties, cities and postcodes in 13 formats
 - Integration workflows
 
 ### 🤖 AI Tools Integration
