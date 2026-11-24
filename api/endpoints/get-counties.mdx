@@ -102,7 +102,7 @@ The existing [GraphQL resource budget](/api/graphql#query-budget) applies.
 ```
 
 <Note>
-  The [change feed](/api/endpoints/get-data-changes) still tracks countries,
-  states and cities. City `county_id` participates in city snapshots on subsequent
-  publication; county entity changes are not included in that feed.
+  The [change feed](/api/endpoints/get-data-changes) includes county changes and
+  state-membership moves after its baseline is established. City `county_id` edits
+  are reported as city parent changes. Existing records are not replayed as additions.
 </Note>
