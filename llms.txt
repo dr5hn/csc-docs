@@ -80,7 +80,7 @@ Cities:
 - Direct API consumption with official TypeScript/JavaScript and Python SDKs
 - Self-hosted database integration with multiple platform support
 - Community-driven data updates via Update Tool workflow
-- Flexible data exports in multiple formats (JSON, CSV, SQL, XML)
+- Five datasets in 13 export formats, with a free preview and native downloads
 - AI-powered development workflows with Claude, Cursor, and Windsurf integration
 - Real-world code examples and implementation patterns
 

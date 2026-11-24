@@ -28,7 +28,7 @@ The preview shows the exact total, including extras that depend on your selectio
 
 ## What's in the download
 
-Exports of the current data snapshot always arrive as a ZIP file. The file is generated while you download it, so the first bytes arrive quickly and large exports do not need much memory on our side.
+Exports of the current data snapshot always arrive as a ZIP file. The file is generated while you download it, so allow time for preparation and check your browser’s Downloads for progress. You do not need to buy the export again if a download fails.
 
 | Format | Files inside the ZIP |
 |:-------|:---------------------|
@@ -84,10 +84,10 @@ Choose the dialect that matches your database. The generic SQL format writes pla
 
 ## Data shape to expect
 
-- **Counties.** Counties link to states through the `states` column. Most have a primary `state_id` too. Seven New Zealand counties have no primary state, so their `state_id` and `state_code` are `null`, and the links are only in `states`.
+- **Counties.** Most counties have a primary `state_id`. Multi-state counties preserve their state links in the `states` column. Seven New Zealand counties have no primary state, so their `state_id` and `state_code` are `null`, and the links are only in `states`.
 - **Cities.** Three Western Sahara (EH) cities have no state, so their `state_id` and `state_code` are `null`. Cities can link to a county with `county_id`.
 - **Postcodes.** `code` is a string, because leading zeros matter. A postcode always links to a country. The links to a state and to a city are optional. Postcodes do not link to counties. The same code can appear more than once.
-- **Null values.** A missing value stays `null`. Check each column on [`/api/datasets`](https://eapi.countrystatecity.in/api/datasets), which lists the columns and the nullable ones.
+- **Null values.** Missing relationships and source values can be `null` or absent; formats without a null type use an empty cell. Check each column on [`/api/datasets`](https://eapi.countrystatecity.in/api/datasets), which lists the columns and the nullable ones.
 
 <Warning>
 Source coverage varies by country and by dataset, and postcodes have a `source` column you can select. There is no guarantee of complete postal coverage worldwide. Read the notices in your ZIP for the source terms.
