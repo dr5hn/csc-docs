@@ -67,6 +67,17 @@ curl -X GET 'https://api.countrystatecity.in/v1/countries?fields=name,population
 ]
 ```
 
+### City population years
+
+Select `population` and `population_year` together when showing dated figures.
+Both need coordinates/full data access (Supporter+ on the standard plans).
+Unknown years remain `null`; they sort first ascending and last descending.
+
+```bash
+curl 'https://api.countrystatecity.in/v1/countries/AT/cities?fields=name,population,population_year&sort=population_year:desc' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
 ### Multi-field sort
 
 Chain fields with commas — earlier tokens take precedence on ties.
@@ -85,7 +96,7 @@ Only fields with comparable scalar values are sortable. Translation blobs, JSON 
 |---|---|
 | countries | `id`, `name`, `iso2`, `iso3`, `population`, `gdp`, `area_sq_km`, `latitude`, `longitude` |
 | states | `id`, `name`, `iso2`, `country_code`, `population`, `latitude`, `longitude` |
-| cities | `id`, `name`, `state_code`, `country_code`, `population`, `latitude`, `longitude` |
+| cities | `id`, `name`, `state_code`, `country_code`, `population`, `population_year`, `latitude`, `longitude` |
 | regions | `id`, `name` |
 | subregions | `id`, `name`, `region_id` |
 

@@ -10,7 +10,7 @@ Retrieve all cities within a specific country using the country's ISO2 code. Thi
 **Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Starter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
 </Tip>
 
-<Info>City responses on the **Basic** tier return `id`, `name`, and `kind`. Upgrading to **Supporter+** unlocks the full field set: `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, `native`, `translations`, and `wikiDataId`. See **Tier-Based Field Availability** below.</Info>
+<Info>City responses on the **Basic** tier return `id`, `name`, and `kind`. Upgrading to **Supporter+** unlocks the full field set: `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `population_year`, `type`, `level`, `parent_id`, `native`, `translations`, and `wikiDataId`. See **Tier-Based Field Availability** below.</Info>
 
 <Note>**Availability:** `/countries/{iso2}/cities` (all cities in a country) requires **Starter+**. Community users must use [Get Cities by State](/api/endpoints/get-cities-by-state) instead.</Note>
 
@@ -264,8 +264,9 @@ cities = get_cities_by_country('IN')
     "latitude": "19.07283000",
     "longitude": "72.88261000",
     "timezone": "Asia/Kolkata",
-    "population": 12442373,
-    "type": "adm1",
+    "population": "15414288",
+    "population_year": null,
+    "type": "city",
     "level": null,
     "parent_id": null,
     "native": "मुंबई",
@@ -347,6 +348,28 @@ cities = get_cities_by_country('IN')
 For better user experience, consider loading cities by state instead of by country for countries with many administrative divisions.
 </Tip>
 
+<Note>
+  Some cities have no state assignment: `state_id` and `state_code` can be `null`.
+  Country-wide lists include them; state-specific lists cannot. Preserve these
+  nulls instead of assigning a state from the city's name.
+</Note>
+
+## Population reference year
+
+On Supporter+ (or a custom plan with coordinates/full field access), city records
+include `population_year`, a nullable integer describing the source's reference
+year for `population`. A missing year is `null`; it is not the import year or a
+claim that the figure is current. Basic responses omit both population fields.
+
+For example, the 24 November 2026 API dataset records Mumbai's population as
+`"15414288"` and its year as `null`. Keep that uncertainty when displaying it.
+Population is serialized as a string because source counts use 64-bit integers;
+the year is a JSON number when known.
+
+The same meaning applies to city results from [nearby search](/api/endpoints/get-search-nearby),
+[fuzzy search](/api/endpoints/fuzzy-search) and [GraphQL](/api/graphql).
+You can [select and sort by the year](/api/field-filtering-and-sorting) on eligible plans.
+
 ## Tier-Based Field Availability
 
 This endpoint requires **Starter+** (Legacy plans also include it), so Community accounts never reach field access at all — they get a `403` first.
@@ -354,7 +377,7 @@ This endpoint requires **Starter+** (Legacy plans also include it), so Community
 | Tier | Plans | Fields |
 |------|-------|--------|
 | **Basic** | Starter, Legacy | `id`, `name`, `kind` |
-| **Full** | Supporter, Professional, Business | All Basic **+** `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, `native`, `translations`, `wikiDataId`, `localized_name`, `matched_locale` |
+| **Full** | Supporter, Professional, Business | All Basic **+** `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `population_year`, `type`, `level`, `parent_id`, `native`, `translations`, `wikiDataId`, `localized_name`, `matched_locale` |
 
 `translations` is part of Full access but is not returned by default: add `include_translations=true`, or name it in `?fields=`. `localized_name` and `matched_locale` are computed from the translations rather than stored, and appear only when you pass `locale`. See [Localized Place Names](/api/localization).
 

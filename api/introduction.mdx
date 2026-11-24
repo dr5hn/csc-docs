@@ -1,12 +1,12 @@
 ---
 title: "Country State City API"
-description: "Access comprehensive geographical data with our RESTful API featuring 250 countries, 5,300+ states, and 150,000+ cities"
+description: "Access comprehensive geographical data with our RESTful API featuring 250 countries, 5,300+ states, and 170,000+ cities"
 icon: "globe"
 ---
 
 ## Overview
 
-The Country State City API provides developers with comprehensive access to geographical data covering 250 countries, 5,300+ states/provinces, and over 150,000 cities worldwide. Coverage and field access depend on the record and your plan. Check the [API statistics](https://api.countrystatecity.in/stats) for current counts; downloadable releases and package snapshots can differ.
+The Country State City API provides developers with comprehensive access to geographical data covering 250 countries, 5,300+ states/provinces, and over 170,000 cities worldwide. Coverage and field access depend on the record and your plan. Check the [API statistics](https://api.countrystatecity.in/stats) for current counts; downloadable releases and package snapshots can differ.
 
 <Card
   title="Get your API key"
@@ -33,6 +33,14 @@ The Country State City API provides developers with comprehensive access to geog
     Regular updates ensure data accuracy with automated validation and quality checks.
   </Card>
 </CardGroup>
+
+<Info>
+  City population fields include a nullable `population_year` on eligible plans.
+  Read the [reference-year guide](/api/endpoints/get-cities-by-country#population-reference-year)
+  before treating a population as a current-year figure. Source updates are
+  published with [data-version metadata](/api/endpoints/get-data-version) and a
+  [change feed](/api/endpoints/get-data-changes).
+</Info>
 
 ## Quick Start
 

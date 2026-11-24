@@ -119,13 +119,30 @@ A field above your access level returns `null` rather than an error, so one quer
 |---|---|---|
 | `Country` | `id`, `name`, `iso2`, `iso3`, `phonecode`, `capital`, `currency`, `native`, `emoji`, `latitude`, `longitude`, `region`, `region_id`, `subregion`, `subregion_id`, `timezones` | `numeric_code`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex`, `emojiU`, `translations`, `wikiDataId` |
 | `State` | `id`, `name`, `iso2`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone` | `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population`, `translations`, `wikiDataId` |
-| `City` | `id`, `name`, `kind` | `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `type`, `level`, `parent_id`, `native`, `translations`, `wikiDataId` |
+| `City` | `id`, `name`, `kind` | `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `population_year`, `type`, `level`, `parent_id`, `native`, `translations`, `wikiDataId` |
 | `Region` | `id`, `name` | `wikiDataId`, `translations` |
 | `Subregion` | `id`, `name`, `region_id` | `wikiDataId`, `translations` |
 
 A custom plan can also be set to an intermediate level that returns the Full fields except `translations` (and, for countries, states and cities, `wikiDataId`).
 
 Only fields defined in the GraphQL schema can be requested. REST's `localized_name` and `matched_locale` are not in it, and there are no `locale` or `include_translations` arguments: asking for `localized_name` is a validation error, not `null`. To show a name in another language, select `translations` (a JSON-encoded string keyed by language code) and pick the language in your app, or use the REST [`locale` parameter](/api/localization).
+
+## City population years
+
+`City.population_year` is a nullable `Int` paired with `population`. It is the
+source's reference year, not the API import date. An unknown year returns `null`.
+Custom plans without population field access also receive `null` for both fields.
+
+```graphql
+{
+  knownYear: city(id: "1600") { id name population population_year }
+  unknownYear: city(id: "133024") { id name population population_year }
+}
+```
+
+In the API dataset installed on 24 November 2026, Abfaltersbach (`1600`) has year
+`2026`; Mumbai (`133024`) has no recorded year. These are dated examples, not a
+promise that future source releases keep the same figures.
 
 ## Available queries
 
