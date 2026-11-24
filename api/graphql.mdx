@@ -119,7 +119,7 @@ A field above your access level returns `null` rather than an error, so one quer
 |---|---|---|
 | `Country` | `id`, `name`, `iso2`, `iso3`, `phonecode`, `capital`, `currency`, `native`, `emoji`, `latitude`, `longitude`, `region`, `region_id`, `subregion`, `subregion_id`, `timezones` | `numeric_code`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex`, `emojiU`, `translations`, `wikiDataId` |
 | `State` | `id`, `name`, `iso2`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone` | `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population`, `translations`, `wikiDataId` |
-| `City` | `id`, `name`, `kind` | `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `population_year`, `type`, `level`, `parent_id`, `native`, `translations`, `wikiDataId` |
+| `City` | `id`, `name`, `kind` | `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `population_year`, `county_id`, `type`, `level`, `parent_id`, `native`, `translations`, `wikiDataId` |
 | `Region` | `id`, `name` | `wikiDataId`, `translations` |
 | `Subregion` | `id`, `name`, `region_id` | `wikiDataId`, `translations` |
 
@@ -155,6 +155,9 @@ promise that future source releases keep the same figures.
 | `state(country, iso)` | One state by country and state code |
 | `cities(country, state, searchQuery, limit, offset)` | Cities in a country, optionally narrowed to one state |
 | `city(id)` | One city by numeric ID |
+| `counties(country, state, searchQuery, limit, offset)` | Counties, optionally filtered by state |
+| `county(country, id)` | One county within a country |
+| `countyCities(country, county, searchQuery, limit, offset)` | Source-linked cities of one county |
 | `regions(searchQuery, limit, offset)` | All regions |
 | `region(id)` | One region by numeric ID |
 | `subregions(region, searchQuery, limit, offset)` | Subregions in one region (numeric region ID) |
@@ -263,3 +266,5 @@ Root list queries (`countries`, `states`, `cities`, and the others) can't be `nu
     Handle the `401`, `403`, and `429` responses returned before a query runs.
   </Card>
 </CardGroup>
+
+See [county lookups](/api/endpoints/get-counties) for nullable city `county_id` links and counties spanning multiple states.

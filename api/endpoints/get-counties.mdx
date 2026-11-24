@@ -1,0 +1,107 @@
+---
+title: "County Lookups"
+description: "List counties by country or state, inspect a county and find its source-linked cities"
+icon: "map"
+---
+
+County endpoints use the usual API key and count toward your request quota. Basic
+lookups are available on every standard REST plan. Supporter+ adds coordinates,
+source classification, population, translations and Wikidata fields.
+
+| Method | Path | Result |
+|---|---|---|
+| GET | `/v1/countries/{country}/counties` | All counties in the country |
+| GET | `/v1/countries/{country}/states/{state}/counties` | Counties linked to that state |
+| GET | `/v1/countries/{country}/counties/{id}` | One county, scoped to its country |
+| GET | `/v1/countries/{country}/counties/{id}/cities` | Cities with that explicit source county link |
+
+Use an ISO2 country code (for example `NZ`) or numeric country ID. State paths use
+the state's code. County IDs must be positive safe integers. Unknown country,
+state or county details return `404`; a valid country/state with no counties
+returns an empty array. REST lists return complete arrays, ordered by name then ID
+unless you request another supported sort.
+
+```bash
+curl 'https://api.countrystatecity.in/v1/countries/NZ/counties/14024' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+## Counties spanning several states
+
+A county may have no single primary state. Preserve `state_id: null` and
+`state_code: null` and use its `states` array, which contains every known source
+membership as `{id, name, code}`. An empty array means no state link is recorded.
+Filtering by one state still returns the complete membership array.
+
+For example, the source release installed on 24 November 2026 links **Taupō
+District** (`14024`, New Zealand) to four states. It appears in all four state
+lists; it is not duplicated within any one list. Do not assign it a primary state
+based on the first array item. Source state/region terminology varies by country.
+
+## Fields and access
+
+| Access level | Fields |
+|---|---|
+| Basic (all standard plans) | `id`, `name`, `country_id`, `country_code`, `state_id`, `state_code`, `states` |
+| Coordinates (custom plans) | Basic + `type`, `type_local`, `level`, `parent_id`, `latitude`, `longitude`, `native`, `population`, `timezone` |
+| Full (Supporter+) | Coordinates + `translations`, `wikiDataId`; `localized_name` and `matched_locale` when localization is requested |
+
+IDs and population counts are serialized as strings; coordinates are nullable
+strings. Translations use the existing JSON-encoded string format. Use
+[`?locale=` and `?include_translations=true`](/api/localization) for localized output.
+
+[`?fields=` and `?sort=`](/api/field-filtering-and-sorting) require Starter+.
+County sortable fields are `id`, `name`, `country_code`, `state_code`, `type`,
+`population`, `latitude` and `longitude`, subject to your field access.
+Substring search `?q=` also requires Starter+ (2–100 characters) and matches
+county names. Search, field selection and sort do not change the source membership array.
+
+```bash
+curl 'https://api.countrystatecity.in/v1/countries/US/counties?fields=name,state_code&sort=name' \
+  -H 'X-CSCAPI-KEY: YOUR_API_KEY'
+```
+
+## City relationships
+
+City responses at coordinates/full access include nullable `county_id`, including
+city lists, nearby/fuzzy results and GraphQL. Basic city responses keep `id`,
+`name` and `kind`. A missing county link stays `null`; the API does not infer it
+from a city name, postcode or location.
+
+County city lists return the existing city shape with its tier rules and support
+`?kind=`, eligible `?type=`, `?q=`, `?fields=`, `?sort=` and localization. A county
+with no linked cities returns `[]`. County coverage is country-dependent and not
+an exhaustive worldwide administrative boundary service.
+
+Responses include `ETag`, `X-Cache` and `Cache-Control`; conditional requests with
+`If-None-Match` can return `304`. Data-only source updates refresh these caches
+through the same geographic import process.
+
+## GraphQL
+
+On Professional+ (or a custom plan with GraphQL enabled), use `counties`, `county`
+and `countyCities`. Root lists default to 1,000 rows and support `limit`/`offset`;
+`County.states` defaults to 20 items and accepts the same paging arguments.
+The existing [GraphQL resource budget](/api/graphql#query-budget) applies.
+
+```graphql
+{
+  county(country: "NZ", id: "14024") {
+    id
+    name
+    state_id
+    states { id name code }
+  }
+  countyCities(country: "NZ", county: "14024", limit: 10) {
+    id
+    name
+    county_id
+  }
+}
+```
+
+<Note>
+  The [change feed](/api/endpoints/get-data-changes) still tracks countries,
+  states and cities. City `county_id` participates in city snapshots on subsequent
+  publication; county entity changes are not included in that feed.
+</Note>

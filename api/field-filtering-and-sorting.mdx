@@ -96,7 +96,8 @@ Only fields with comparable scalar values are sortable. Translation blobs, JSON 
 |---|---|
 | countries | `id`, `name`, `iso2`, `iso3`, `population`, `gdp`, `area_sq_km`, `latitude`, `longitude` |
 | states | `id`, `name`, `iso2`, `country_code`, `population`, `latitude`, `longitude` |
-| cities | `id`, `name`, `state_code`, `country_code`, `population`, `population_year`, `latitude`, `longitude` |
+| cities | `id`, `name`, `state_code`, `country_code`, `population`, `population_year`, `county_id`, `latitude`, `longitude` |
+| counties | `id`, `name`, `country_code`, `state_code`, `type`, `population`, `latitude`, `longitude` |
 | regions | `id`, `name` |
 | subregions | `id`, `name`, `region_id` |
 
