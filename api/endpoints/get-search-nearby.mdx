@@ -18,6 +18,10 @@ Find countries, states, or cities near a `lat`/`lng` coordinate. Results are ord
 
 <Note>**Availability:** Supporter, Professional, and Business plans. Other plans receive `403`. [Compare plans](https://countrystatecity.in/pricing?source=playground&campaign=nearby_search), or see **Trying it without a paid plan** below.</Note>
 
+City results include the derived `kind` and, at coordinates/full field access,
+`population` with nullable integer `population_year`. The year comes from the source;
+unknown years stay `null`. See [city population years](/api/endpoints/get-cities-by-country#population-reference-year).
+
 ## Response
 
 Returns an array, nearest-first. Each item carries the standard fields for the entity at your plan's data-access level, plus:
@@ -71,38 +75,40 @@ for result in response.json():
 ```json 200 - Cities near Mumbai (Supporter, Professional, Business)
 [
   {
-    "id": 57606,
+    "id": 133024,
     "name": "Mumbai",
     "kind": "settlement",
     "state_id": 4008,
     "state_code": "MH",
     "country_id": 101,
     "country_code": "IN",
-    "latitude": "19.07600000",
-    "longitude": "72.87770000",
-    "population": 12442373,
+    "latitude": "19.07283000",
+    "longitude": "72.88261000",
+    "population": "15414288",
+    "population_year": null,
     "timezone": "Asia/Kolkata",
     "wikiDataId": "Q1156",
     "country_name": "India",
     "state_name": "Maharashtra",
-    "distance_km": 0
+    "distance_km": 0.63
   },
   {
-    "id": 57612,
+    "id": 134138,
     "name": "Thane",
     "kind": "settlement",
     "state_id": 4008,
     "state_code": "MH",
     "country_id": 101,
     "country_code": "IN",
-    "latitude": "19.21830000",
-    "longitude": "72.97810000",
-    "population": 1841488,
+    "latitude": "19.33333000",
+    "longitude": "73.25000000",
+    "population": "1886941",
+    "population_year": null,
     "timezone": "Asia/Kolkata",
-    "wikiDataId": "Q210421",
+    "wikiDataId": "Q207749",
     "country_name": "India",
     "state_name": "Maharashtra",
-    "distance_km": 17.36
+    "distance_km": 48.50
   }
 ]
 ```

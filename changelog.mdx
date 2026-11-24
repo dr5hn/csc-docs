@@ -7,6 +7,12 @@ rss: true
 
 Follow along with what has changed across the CSC API docs. For changes to the geographical data itself, use the [Data Changes endpoint](/api/endpoints/get-data-changes).
 
+<Update label="2026-11-24" description="City population reference years" tags={["Added", "Changed"]}>
+- City REST lists, nearby/fuzzy results and GraphQL now expose nullable `population_year` alongside `population` at the same field access level. Unknown years remain `null`; Basic city responses omit both fields.
+- Added year selection/sorting examples and clarified nullable state links and the current country-specific city classification rules.
+- The hosted API now serves source release `v6.2.0-export.1`. Use the data-version endpoint for the installed version; downloadable snapshots and packages have separate release schedules.
+</Update>
+
 <Update label="2026-09-09" description="v1.6.0" tags={["Changed"]}>
 #### Changed
 

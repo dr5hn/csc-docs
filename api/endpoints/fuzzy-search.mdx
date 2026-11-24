@@ -12,6 +12,10 @@ Matching uses PostgreSQL trigram similarity over both the English `name` and the
 
 <Info>Each result is scored against the English and native names. Queries with at least 3 characters also check stored translations. Responses are cached separately by query, filters, plan, locale, and translation output.</Info>
 
+City results include the derived `kind` and, at coordinates/full field access,
+`population` with nullable integer `population_year`. The year comes from the source;
+unknown years stay `null`. See [city population years](/api/endpoints/get-cities-by-country#population-reference-year).
+
 ## Response
 
 Returns an array sorted by `match_score` descending. Each item carries the standard fields for the entity (`city`, `state`, or `country`) at your plan's data-access level — every plan with fuzzy search access (Supporter, Professional, Business) resolves to the **full** field set — plus two fuzzy-specific fields:
@@ -65,7 +69,7 @@ for match in response.json():
 ```json 200 - City match (Supporter, Professional, Business)
 [
   {
-    "id": 132649,
+    "id": 133024,
     "name": "Mumbai",
     "state_id": 4008,
     "state_code": "MH",
@@ -84,7 +88,7 @@ for match in response.json():
 ```json 200 - Native-script match
 [
   {
-    "id": 132649,
+    "id": 133024,
     "name": "Mumbai",
     "native": "मुंबई",
     "match_score": 1,

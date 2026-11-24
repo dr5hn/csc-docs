@@ -5,7 +5,7 @@ This comprehensive Mintlify documentation site covers the complete Country State
 ## Core Products & Services
 
 ### Country State City API
-- REST API with 250 countries, 5,300+ states/provinces, 150,000+ cities
+- REST API with 250 countries, 5,300+ states/provinces, 170,000+ cities
 - Coverage varies by record, release and API plan. Current API counts: https://api.countrystatecity.in/stats. Dated downloadable snapshot: https://docs.countrystatecity.in/database/overview#database-statistics
 - Real-time data access with authentication via X-CSCAPI-KEY headers
 - High-performance JSON responses with sub-100ms response times globally
@@ -14,6 +14,7 @@ This comprehensive Mintlify documentation site covers the complete Country State
 - ISO 3166-1 / 3166-2 lookup endpoints (alpha-2, alpha-3, numeric codes + state subdivisions)
 - Phone dial-code endpoints including reverse lookup and E.164 number parsing
 - Timezone endpoints by country, state, and city with DST awareness
+- City population_year: nullable integer source reference year, paired with population on coordinates/full access; unknown years remain null. REST city lists, nearby/fuzzy city results, GraphQL City and change snapshots share this meaning.
 - Field filtering (?fields=) and custom sort (?sort=) on every geographic endpoint (Starter+)
 - Fuzzy / typo-tolerant search (?q=) for cities, states, and countries via trigram similarity, with match scores (Supporter+)
 - GraphQL API (Professional+): POST https://api.countrystatecity.in/v1/graphql with the same X-CSCAPI-KEY header; countries, states, cities, regions, and subregions with nested relationships in one request; paged lists (root default 1,000, nested default 20 per parent); per-query budget of 50 lookups and 25,000 rows (HTTP 400 QUERY_TOO_EXPENSIVE). Guide: /api/graphql
