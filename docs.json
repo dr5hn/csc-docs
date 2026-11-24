@@ -419,7 +419,7 @@
     "playground": {
       "display": "interactive"
     },
-    "openapi": "https://raw.githubusercontent.com/dr5hn/csc-swagger-playground/dd657ccb7a781e1fa9a0bd89eeb81d7dc30d2836/config.json"
+    "openapi": "https://raw.githubusercontent.com/dr5hn/csc-swagger-playground/af8549d9f2dba4ed62699f8fa7af56575ea3b9da/config.json"
   },
   "seo": {
     "indexHiddenPages": true,
