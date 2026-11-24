@@ -4,14 +4,14 @@ description: "Official @countrystatecity/sdk — a live REST API client for Node
 icon: "js"
 ---
 
-Official JS/TS client for the live Country State City REST API — countries, states, cities, regions, currencies, phone codes, timezones, fuzzy search, and account usage. Zero runtime dependencies, dual ESM/CJS builds, full TypeScript types.
+Official JS/TS client for the live Country State City REST API — countries, states, cities, counties, postcodes, regions, currencies, phone codes, timezones, fuzzy search, and account usage. Zero runtime dependencies, dual ESM/CJS builds, full TypeScript types.
 
 <Note>
   This is not the same thing as the [npm Packages](/api/sdks/npm) covered elsewhere on this site. Bundled data packages work locally without an API key; browser and GeoJSON packages load snapshots from a CDN. `@countrystatecity/sdk` is the opposite: a **live REST API client**. It needs an API key, makes real HTTP requests, and is subject to your plan's usage quotas — it accesses the data currently served by the API and covers endpoints the offline packages don't have (`search`, `usage`, and live currency/timezone/phone lookups). You can use both together — see **Migrating from the local packages** below.
 </Note>
 
 <Warning>
-  `@countrystatecity/sdk` is pre-1.0. These examples were checked against published **0.2.0** on 14 November 2026. The API surface may still shift before a stable 1.0 release.
+  `@countrystatecity/sdk` is pre-1.0. These examples were checked against published **0.4.0** on 24 November 2026. The API surface may still shift before a stable 1.0 release.
 </Warning>
 
 ## Installation
@@ -73,7 +73,9 @@ Every `list`/`get`/etc. method also accepts a trailing `{ signal?, timeout?, hea
 |---|---|
 | `csc.countries` | `list({ limit?, offset?, fields?, sort? })`, `get(iso2)` |
 | `csc.states` | `list({ country?, limit?, offset?, fields?, sort? })`, `get(country, stateCode)` |
-| `csc.cities` | `list({ country, state?, kind?, limit?, offset?, fields?, sort? })`, `get(country, stateCode, cityId)` |
+| `csc.cities` | `list({ country, state?, kind?, limit?, offset?, fields?, sort? })`, `get()` is deprecated and always throws; there is no single-city endpoint |
+| `csc.counties` | `list({ country, state?, q?, fields?, sort?, locale?, includeTranslations? })`, `get(country, countyId, params?)`, `cities(country, countyId, params?)` |
+| `csc.postcodes` | `get(country, code, { fields? })`, `list({ country, q?, stateCode?, cityId?, type?, limit?, cursor?, fields? })` |
 | `csc.regions` | `list()`, `get(id)`, `subregions(id)` |
 | `csc.currencies` | `list()`, `get(code)`, `byCountry(iso2)` |
 | `csc.iso` | `lookup({ iso2? \| iso3? \| numeric? })` |
@@ -86,6 +88,34 @@ Every `list`/`get`/etc. method also accepts a trailing `{ signal?, timeout?, hea
 <Note>
   `csc.cities.list()` always requires `country`; `state` optionally narrows it — a `ValidationError` is thrown client-side otherwise, before any network call.
 </Note>
+
+## Counties, postcodes and change events
+
+```typescript
+const { data: county } = await csc.counties.get('NZ', '14024');
+console.log(county.states); // Every state membership, including multi-state counties
+const { data: cities } = await csc.counties.cities('NZ', '14024');
+const { data: matches } = await csc.postcodes.get('LK', '11104');
+console.log(matches.data, matches.meta.match_count); // All duplicate-code localities
+const { data: page } = await csc.postcodes.list({ country: 'IN', q: '11', limit: 20 });
+if (page.pagination.next_cursor) {
+  await csc.postcodes.list({ country: 'IN', cursor: page.pagination.next_cursor });
+}
+const { data: changes } = await csc.changes.list({ placeType: 'county', countryCode: 'NZ' });
+```
+
+County lists are complete arrays. Postcode lists fetch one cursor page per call;
+exact lookups and pages preserve their API envelopes inside the SDK's `data`.
+IDs remain strings on the wire; state/city/county links and population years can
+be null. Postcode `cityId` takes a string to preserve 64-bit IDs. Additional fields
+depend on the plan and field selection. See [counties](/api/endpoints/get-counties),
+[postcodes](/api/endpoints/get-postcodes-by-country) and the
+[change feed](/api/endpoints/get-data-changes) for access and pagination rules.
+
+SDK 0.4.0 adds `ICountyChangeEvent` and `IPostcodeChangeEvent`. Unfiltered change
+pages can contain all five place types, so update exhaustive discriminator switches.
+New county/postcode history begins after baseline establishment, without replaying
+existing records as additions.
 
 ## Error Handling
 

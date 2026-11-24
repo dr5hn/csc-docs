@@ -54,15 +54,17 @@ getDataVersion();
 <ResponseExample>
 ```json 200 - Success
 {
-  "dataVersion": "v3.2-export.7-2026.07.30",
-  "sourceRelease": "v3.2-export.7",
-  "updatedAt": "2026-07-30T09:01:18.000Z",
+  "dataVersion": "v6.2.0-export.1-2026.11.24",
+  "sourceRelease": "v6.2.0-export.1",
+  "updatedAt": "2026-11-24T09:09:46.944Z",
   "recordCounts": {
     "regions": 6,
     "subregions": 22,
     "countries": 250,
-    "states": 5308,
-    "cities": 152970
+    "states": 5327,
+    "cities": 171345,
+    "counties": 14058,
+    "postcodes": 728556
   }
 }
 ```
@@ -74,6 +76,8 @@ getDataVersion();
 }
 ```
 </ResponseExample>
+
+County/postcode counts are present in extended manifests; older manifests can omit them. Counts describe the approved release, not request-time live totals.
 
 ## Response headers on every request
 
@@ -101,7 +105,7 @@ The [`@countrystatecity/countries`](https://www.npmjs.com/package/@countrystatec
   For example, the same `v3.2-export.7` release can read as `v3.2-export.7-2026.07.29` in the package and `v3.2-export.7-2026.07.30` from the API.
 </Warning>
 
-The package's `recordCounts` is also narrower than the API's: `countries`/`states`/`cities` only, no `regions`/`subregions`.
+The package's `recordCounts` is also narrower than the API's: `countries`/`states`/`cities` only, no `regions`/`subregions` or county/postcode counts.
 
 ## Related
 

@@ -110,6 +110,26 @@ csc search countries --fields name,iso2 --sort name:asc
   When `--fields` narrows the response, output falls back to a generic table showing whatever columns actually came back — the CLI's usual hardcoded columns (ISO2, Capital, Phone, and so on) may not all be present anymore.
 </Note>
 
+## Counties and postcodes
+
+Available in CLI **0.3.0 or later**:
+
+```bash
+csc search counties --country NZ --state WKO --json
+csc get county 14024 --country NZ --json
+csc search cities --country NZ --county 14024 --json
+csc get postcode 11104 --country LK --json
+csc search postcodes --country IN --query 11 --limit 20 --json
+csc search postcodes --country IN --cursor "<next_cursor>" --json
+```
+
+County results retain every state membership. `--county` requires `--country`
+and cannot combine with `--state` or `--fuzzy`. Exact-postcode JSON retains every
+locality match and `meta.match_count`; search JSON retains `pagination` and its
+opaque `next_cursor`. Each search fetches one page; table mode prints a next cursor
+to stderr. Usage and diagnostics remain on stderr. Postcode list/search requires
+Starter+; Basic county and exact-code lookups are available on all plans.
+
 ## Get Details
 
 ```bash

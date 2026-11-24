@@ -4,7 +4,7 @@ openapi: "GET /changes"
 description: "Keep your copy of Country State City data current without downloading the full dataset again"
 ---
 
-If your app stores Country State City data in its own database, a full download is wasteful when only a few places changed. The change feed returns the countries, states, and cities that were added, removed, or updated so you can apply only those changes.
+If your app stores Country State City data in its own database, a full download is wasteful when only a few places changed. The change feed returns the countries, states, cities, counties, and postcodes that were added, removed, or updated so you can apply only those changes.
 
 <Note>
   **Available on Professional and Business plans.** Returns `403` on Community, Starter, Supporter, and Legacy plans. [Compare plans](https://countrystatecity.in/pricing?source=docs&campaign=data_change_feed) to add the change feed to your API key.
@@ -14,6 +14,8 @@ If your app stores Country State City data in its own database, a full download 
 
 Use the feed to keep a local search index, checkout form, analytics database, or cached copy up to date. Every change has a stable `change_id`, the affected `place_id`, and the `data_version` that produced it.
 
+If your local database enforces foreign keys, stage each release across its pages, then apply it in a transaction with deferred constraints or insert parents before children and remove children before parents. Sequence order is chronological, not a foreign-key dependency order.
+
 Changes are available for **90 days**. Run your sync regularly and save the `change_id` values you have applied so retrying a page cannot create duplicates.
 
 ## Change types
@@ -22,13 +24,35 @@ Changes are available for **90 days**. Run your sync regularly and save the `cha
 |---|---|
 | `added` | A new place was added. |
 | `removed` | A place was removed. |
-| `renamed` | Its name changed. |
+| `renamed` | Its name, postcode code, or postcode locality name changed. |
 | `place_group_changed` | Its region, administrative type, or city kind changed. |
-| `parent_changed` | A state moved to another country, or a city moved to another state/country. |
+| `parent_changed` | Its country, state, county, parent place, or county state membership changed. |
 | `coordinates_changed` | Its latitude or longitude changed. |
 | `other_fields_changed` | Another public field changed. |
 
 When several fields change in one release, the record has one main `change_type`, but `old_values` and `new_values` include every changed field.
+
+## Counties and postcodes
+
+`place_type` can be `country`, `state`, `city`, `county` or `postcode`. Omit the
+filter for all five types, or request `/v1/changes?place_type=county` or
+`/v1/changes?place_type=postcode`. `country_code` scopes all five entities.
+
+County `states` retains every source-linked state membership, including multi-state
+counties with null primary state links. Postcodes use stable string IDs: two records
+with the same code can represent different localities. Apply events by `place_type`
+and `place_id`, not by postcode code. Unknown parent links remain null.
+
+County/postcode history starts after their change-feed baseline is established;
+existing records are not emitted as new additions. With SDK **0.4.0 or later**:
+
+```typescript
+const { data: page } = await csc.changes.list({ placeType: 'postcode', countryCode: 'LK' });
+// page.results keeps old_values/new_values and every distinct postcode ID.
+```
+
+Consumers with an exhaustive switch over `place_type` must handle both new types.
+The same feature access, retention, field filtering and pagination rules apply.
 
 ## Response
 
