@@ -2,14 +2,16 @@
 title: "GraphQL API"
 api: "POST https://api.countrystatecity.in/v1/graphql"
 authMethod: "key"
-description: "Query countries, states, cities, regions, and subregions with GraphQL instead of REST"
+description: "Query countries, states, counties, cities, regions, and subregions with GraphQL instead of REST"
 ---
 
-The GraphQL endpoint covers the same geographic data as the REST API — countries, states, cities, regions, and subregions — through a single endpoint. Ask for exactly the fields you need, and resolve nested relationships (a country's states, a state's cities) in one request instead of chaining several REST calls yourself.
+The GraphQL endpoint covers the same geographic data as the REST API — countries, states, counties, cities, regions, and subregions — through a single endpoint. Ask for exactly the fields you need, and resolve nested relationships (a country's states, a state's cities) in one request instead of chaining several REST calls yourself.
 
 <Note>
   **Available on the Professional and Business plans.** [Compare plans](https://countrystatecity.in/pricing?source=docs&campaign=graphql) to add GraphQL to your API key.
 </Note>
+
+Postcode lookup and search use the [postcode REST endpoints](/api/endpoints/get-postcode-by-code).
 
 ## When to use it
 
@@ -120,6 +122,7 @@ A field above your access level returns `null` rather than an error, so one quer
 | `Country` | `id`, `name`, `iso2`, `iso3`, `phonecode`, `capital`, `currency`, `native`, `emoji`, `latitude`, `longitude`, `region`, `region_id`, `subregion`, `subregion_id`, `timezones` | `numeric_code`, `currency_name`, `currency_symbol`, `tld`, `nationality`, `population`, `gdp`, `area_sq_km`, `postal_code_format`, `postal_code_regex`, `emojiU`, `translations`, `wikiDataId` |
 | `State` | `id`, `name`, `iso2`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone` | `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population`, `translations`, `wikiDataId` |
 | `City` | `id`, `name`, `kind` | `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `population_year`, `county_id`, `type`, `level`, `parent_id`, `native`, `translations`, `wikiDataId` |
+| `County` | `id`, `name`, `country_id`, `country_code`, `state_id`, `state_code`, `states` | `type`, `type_local`, `level`, `parent_id`, `latitude`, `longitude`, `native`, `population`, `timezone`, `translations`, `wikiDataId` |
 | `Region` | `id`, `name` | `wikiDataId`, `translations` |
 | `Subregion` | `id`, `name`, `region_id` | `wikiDataId`, `translations` |
 

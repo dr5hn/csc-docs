@@ -14,6 +14,12 @@ Look up a postcode / ZIP code within a country and get back every matching recor
   This is informational postcode data, not an address verification or mail-deliverability service. A match confirms the code exists in the dataset — it does not confirm a delivery point, standardize an address, or guarantee mail will arrive.
 </Warning>
 
+<Info>
+  Examples were checked against the hosted source release `v6.2.0-export.1` on
+  24 November 2026. Postcode `11104` in Sri Lanka currently has two locality
+  matches. Records and coverage can change between releases.
+</Info>
+
 ## Why the response is an array
 
 A postcode is not always unique to one place. The same code can legitimately cover more than one locality, so this endpoint returns **every** matching record instead of picking one — an empty result is a `404`, never an empty success.
@@ -26,14 +32,6 @@ A postcode is not always unique to one place. The same code can legitimately cov
 {
   "data": [
     {
-      "id": "670115",
-      "code": "11104",
-      "country_code": "LK",
-      "state_code": "12",
-      "locality_name": "Mabola",
-      "type": "full"
-    },
-    {
       "id": "670116",
       "code": "11104",
       "country_code": "LK",
@@ -53,7 +51,7 @@ A postcode is not always unique to one place. The same code can legitimately cov
   "meta": {
     "country_code": "LK",
     "query": "11104",
-    "match_count": 3
+    "match_count": 2
   }
 }
 ```
@@ -62,21 +60,6 @@ A postcode is not always unique to one place. The same code can legitimately cov
 {
   "data": [
     {
-      "id": "670115",
-      "code": "11104",
-      "country_code": "LK",
-      "state_code": "12",
-      "locality_name": "Mabola",
-      "type": "full",
-      "country_id": "208",
-      "state_id": "2804",
-      "city_id": null,
-      "latitude": 7.0062833,
-      "longitude": 79.8924828,
-      "source": "geonames",
-      "wikiDataId": null
-    },
-    {
       "id": "670116",
       "code": "11104",
       "country_code": "LK",
@@ -86,9 +69,9 @@ A postcode is not always unique to one place. The same code can legitimately cov
       "country_id": "208",
       "state_id": "2804",
       "city_id": null,
-      "latitude": 7.1853118,
-      "longitude": 80.0003875,
-      "source": "geonames",
+      "latitude": 7.1891,
+      "longitude": 80.0004,
+      "source": "geonames-postal",
       "wikiDataId": null
     },
     {
@@ -101,16 +84,16 @@ A postcode is not always unique to one place. The same code can legitimately cov
       "country_id": "208",
       "state_id": "2804",
       "city_id": null,
-      "latitude": 6.9906677,
-      "longitude": 79.8931709,
-      "source": "geonames",
+      "latitude": 6.9779,
+      "longitude": 79.8898,
+      "source": "geonames-postal",
       "wikiDataId": null
     }
   ],
   "meta": {
     "country_code": "LK",
     "query": "11104",
-    "match_count": 3
+    "match_count": 2
   }
 }
 ```
