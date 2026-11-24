@@ -77,6 +77,12 @@
         "icon": "code",
         "groups": [
           {
+            "group": "County Endpoints",
+            "pages": [
+              "api/endpoints/get-counties"
+            ]
+          },
+          {
             "group": "Countries",
             "icon": "earth-americas",
             "pages": [

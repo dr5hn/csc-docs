@@ -12,7 +12,7 @@ Retrieve all cities within a specific state or province using both the country's
 **Trim and order results:** Add `?fields=` to limit columns returned, or `?sort=` to order the list. Both are available on **Starter+** plans. See the [Field Filtering & Sorting](/api/field-filtering-and-sorting) guide for syntax and per-entity sortable fields.
 </Tip>
 
-<Info>City responses on the **Basic** tier return `id`, `name`, and `kind`. Upgrading to **Supporter+** unlocks the full field set: `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `population_year`, `type`, `level`, `parent_id`, `native`, `translations`, and `wikiDataId`. See **Tier-Based Field Availability** below.</Info>
+<Info>City responses on the **Basic** tier return `id`, `name`, and `kind`. Upgrading to **Supporter+** unlocks the full field set: `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `population_year`, `county_id`, `type`, `level`, `parent_id`, `native`, `translations`, and `wikiDataId`. See **Tier-Based Field Availability** below.</Info>
 
 <RequestExample>
 ```bash cURL
@@ -409,8 +409,10 @@ You can [select and sort by the year](/api/field-filtering-and-sorting) on eligi
 | Tier | Plans | Fields |
 |------|-------|--------|
 | **Basic** | Community, Starter, Legacy | `id`, `name`, `kind` |
-| **Full** | Supporter, Professional, Business | All Basic **+** `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `population_year`, `type`, `level`, `parent_id`, `native`, `translations`, `wikiDataId`, `localized_name`, `matched_locale` |
+| **Full** | Supporter, Professional, Business | All Basic **+** `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `population_year`, `county_id`, `type`, `level`, `parent_id`, `native`, `translations`, `wikiDataId`, `localized_name`, `matched_locale` |
 
 `translations` is part of Full access but is not returned by default: add `include_translations=true`, or name it in `?fields=`. `localized_name` and `matched_locale` are computed from the translations rather than stored, and appear only when you pass `locale`. See [Localized Place Names](/api/localization).
 
 See [Pricing](https://app.countrystatecity.in/pricing) for plan details.
+
+See [county lookups](/api/endpoints/get-counties) for nullable city `county_id` links and counties spanning multiple states.
