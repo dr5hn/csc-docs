@@ -123,10 +123,12 @@ A field above your access level returns `null` rather than an error, so one quer
 | `State` | `id`, `name`, `iso2`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone` | `fips_code`, `iso3166_2`, `type`, `level`, `parent_id`, `native`, `population`, `translations`, `wikiDataId` |
 | `City` | `id`, `name`, `kind` | `state_id`, `state_code`, `country_id`, `country_code`, `latitude`, `longitude`, `timezone`, `population`, `population_year`, `county_id`, `type`, `level`, `parent_id`, `native`, `translations`, `wikiDataId` |
 | `County` | `id`, `name`, `country_id`, `country_code`, `state_id`, `state_code`, `states` | `type`, `type_local`, `level`, `parent_id`, `latitude`, `longitude`, `native`, `population`, `timezone`, `translations`, `wikiDataId` |
+| `County` | `id`, `name`, `country_id`, `country_code`, `state_id`, `state_code`, `states` | `type`, `type_local`, `level`, `parent_id`, `latitude`, `longitude`, `native`, `population`, `timezone`, `translations`, `wikiDataId` |
+| `Postcode` | `id`, `code`, `country_code`, `state_code`, `locality_name`, `type` | `country_id`, `state_id`, `city_id`, `latitude`, `longitude`, `source`, `wikiDataId` |
 | `Region` | `id`, `name` | `wikiDataId`, `translations` |
 | `Subregion` | `id`, `name`, `region_id` | `wikiDataId`, `translations` |
 
-A custom plan can also be set to an intermediate level that returns the Full fields except `translations` (and, for countries, states and cities, `wikiDataId`).
+A custom plan can also have an intermediate data access level. For postcodes, that level adds IDs and coordinates; `source` and `wikiDataId` need full access. See each REST endpoint for the corresponding field access rules.
 
 Only fields defined in the GraphQL schema can be requested. REST's `localized_name` and `matched_locale` are not in it, and there are no `locale` or `include_translations` arguments: asking for `localized_name` is a validation error, not `null`. To show a name in another language, select `translations` (a JSON-encoded string keyed by language code) and pick the language in your app, or use the REST [`locale` parameter](/api/localization).
 
@@ -161,6 +163,11 @@ promise that future source releases keep the same figures.
 | `counties(country, state, searchQuery, limit, offset)` | Counties, optionally filtered by state |
 | `county(country, id)` | One county within a country |
 | `countyCities(country, county, searchQuery, limit, offset)` | Source-linked cities of one county |
+| `counties(country, state, searchQuery, limit, offset)` | Counties, optionally scoped to a state |
+| `county(country, id)` | One country-scoped county, including all linked states |
+| `countyCities(country, county, searchQuery, limit, offset)` | Cities linked to a county |
+| `postcodesByCode(country, code, limit, offset)` | Distinct locality matches for an exact postcode |
+| `postcodes(country, searchQuery, stateCode, cityId, type, limit, cursor)` | One country-scoped postcode page, with `data` and `pagination` |
 | `regions(searchQuery, limit, offset)` | All regions |
 | `region(id)` | One region by numeric ID |
 | `subregions(region, searchQuery, limit, offset)` | Subregions in one region (numeric region ID) |
@@ -174,20 +181,75 @@ promise that future source releases keep the same figures.
   `city(id)` has no REST equivalent — it's the one query only available through GraphQL, since REST only ever exposed cities scoped to a country or state.
 </Info>
 
+## Counties and postcodes
+
+County `states` preserves every source-linked state, including counties whose primary
+`state_id` is null. Page the membership list with its own `limit` and `offset` when needed.
+
+```graphql
+{
+  counties(country: "US", state: "CA", limit: 5) {
+    id
+    name
+    states(limit: 20) { id name code }
+  }
+  postcodesByCode(country: "GB", code: "SW1A 1AA", limit: 20, offset: 0) {
+    id
+    code
+    locality_name
+    city_id
+    latitude
+    longitude
+  }
+  postcodes(country: "IN", searchQuery: "1100", limit: 20) {
+    data { id code locality_name state_code city_id }
+    pagination { limit next_cursor has_more }
+  }
+}
+```
+
+Exact postcode lookup preserves separate locality records that share a code. Apply
+records by string `id`, not by code. Postcode coordinates are JSON numbers, and
+unknown state/city links stay null. Other geographic coordinate fields keep their
+existing string format.
+
+`postcodesByCode` orders matches by ID and uses SQL `limit`/`offset` pagination,
+with a default and maximum of 1,000. An empty later page returns `[]`. Missing
+country, missing postcode coverage and missing exact code produce separate
+`extensions.details.reason` values: `country_not_found`,
+`postcode_coverage_unavailable` and `postcode_not_found`.
+
+The `postcodes` listing also needs your plan's search feature. Its limit is 1–100
+(default 50), and it uses a signed cursor instead of an offset. To continue,
+pass the same country and the returned cursor:
+
+```graphql
+query ContinuePostcodes($cursor: String!) {
+  postcodes(country: "IN", limit: 20, cursor: $cursor) {
+    data { id code locality_name }
+    pagination { next_cursor has_more }
+  }
+}
+```
+
+Omit the original filters to inherit them from the cursor. If you repeat filters,
+they must match. Cursors expire after 24 hours and cannot be reused with another
+country. Pass `cityId` as a string to preserve 64-bit IDs.
+
 ## Limits
 
 Each HTTP request to `/v1/graphql` counts as one request against your plan's daily and monthly limits, however many lookups it runs, including a request rejected for exceeding the query budget.
 
 ### Pagination
 
-Every list field, at the root or nested, takes `limit` and `offset`. They are arguments on the field inside your query, not URL query parameters.
+Geographic array fields take `limit` and `offset`. The `postcodes` page uses `limit` and `cursor`; its `data` field has no separate pagination arguments. They are arguments on the field inside your query, not URL query parameters.
 
 | List field | Default `limit` | Maximum `limit` |
 |---|---|---|
-| Root queries: `countries`, `states`, `allStates`, `cities`, `regions`, `subregions` | 1,000 | 1,000 |
-| Nested fields: `Country.states`, `State.cities`, `Region.subregions`, `Subregion.countries` | 20 per parent | 1,000 |
+| Root queries: `countries`, `states`, `allStates`, `cities`, `counties`, `countyCities`, `postcodesByCode`, `regions`, `subregions` | 1,000 | 1,000 |
+| Nested fields: `Country.states`, `State.cities`, `Region.subregions`, `Subregion.countries`, `County.states` | 20 per parent | 1,000 |
 
-`offset` defaults to `0`. Lists are sorted by name, then ID, so stepping `offset` by `limit` pages through the full list. A `limit` above 1,000, or a negative `limit` or `offset`, is rejected rather than capped: it fails that field with a `BAD_REQUEST` error (see [Errors](#errors)). `limit: 0` returns an empty list.
+`offset` defaults to `0`. Most arrays are sorted by name, then ID (`postcodesByCode` uses ID order), so stepping `offset` by `limit` pages through the full list. A `limit` above 1,000, or a negative `limit` or `offset`, is rejected rather than capped: it fails that field with a `BAD_REQUEST` error (see [Errors](#errors)). `limit: 0` returns an empty list.
 
 Unlike the REST list endpoints, a GraphQL list never returns more than one page. Watch the nested default in particular: `{ country(ciso: "US") { states { name } } }` returns only the first 20 states. Ask for more with `states(limit: 100)`, or page with `offset`.
 
@@ -197,6 +259,8 @@ Before running a query, the API estimates its cost from the `limit` of every lis
 
 - **Lookups:** every field that returns an object or a list of objects costs one lookup per parent row it runs under. Scalar fields such as `name` are free.
 - **Rows:** every list field adds its `limit` multiplied by the number of parent rows.
+
+The postcode page envelope is priced conservatively at the existing 1,000-row list ceiling, even though its SQL page is at most 100 rows. Wide alias queries may reach the budget sooner.
 
 One query may use at most **50 lookups** and **25,000 rows**. A query over either limit is rejected with HTTP `400` before any data is fetched:
 
@@ -235,7 +299,7 @@ The HTTP status and body depend on where a request fails:
 
 Field errors carry `extensions.code` and `extensions.statusCode`: `BAD_REQUEST` (`400`) for an invalid argument such as a malformed country code or a `limit` over 1,000; `FORBIDDEN` (`403`) when your plan lacks a feature that field needs, with `extensions.details` naming the feature (standard Professional and Business plans include every feature these queries use); and `API_ERROR` for anything else. A `503` with `GraphQL is busy. Please retry shortly.` is temporary, so retry after a short wait.
 
-The failed field becomes `null`. When that field is nullable (the single-item queries such as `country`, and the nested lists such as `Country.states`), the rest of `data` still comes back. This response is for `{ country(ciso: "US") { name states(limit: 5000) { name } } }`:
+The failed field becomes `null`. The nullable `postcodes` page can fail while sibling queries still return data. When that field is nullable (the single-item queries such as `country`, and the nested lists such as `Country.states`), the rest of `data` still comes back. This response is for `{ country(ciso: "US") { name states(limit: 5000) { name } } }`:
 
 ```json 200 - Partial data
 {
